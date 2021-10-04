@@ -11,7 +11,7 @@ setup() {
 @test "should print usage" {
   run util
   assert_line --partial "failed: util missing"
-  assert_line --partial "Usage: util [-v|--var VAR] [-n|--newline] UTIL [ARGS...]"
+  assert_line --partial "Usage: util [-v VAR] [-n|--newline] UTIL [ARGS...]"
 }
 
 @test "should print by default" {
@@ -21,12 +21,7 @@ setup() {
 
 @test "should assign to variable if specified" {
   local var
-
   util -v var center "X"
-  assert [ -z "${output:-}" ]
-  assert_equal "${var:-}" " X "
-
-  util --var var center "Y"
-  assert [ -z "${output:-}" ]
-  assert_equal "${var:-}" " Y "
+  assert [ ! "${output-}" ]
+  assert_equal "${var-}" " X "
 }

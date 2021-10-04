@@ -11,7 +11,7 @@ setup() {
 @test "should print usage" {
   run util print_margin
   assert_line --partial "failed: text missing"
-  assert_line --partial "Usage: util [-v|--var VAR] [-n|--newline] print_margin TEXT"
+  assert_line --partial "Usage: util [-v VAR] [-n|--newline] print_margin TEXT"
 }
 
 @test "should print margin" {

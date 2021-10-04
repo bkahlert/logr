@@ -42,20 +42,20 @@ failr() {
   done
 
   local code=$? failr_usage="[-n|--name NAME] [-u|--usage USAGE] [--] [ARGS...]" name=${FUNCNAME[1]:-?} message=() usage print_call=false
-  while (("$#")); do
+  while (($#)); do
     case $1 in
       -n | --name)
-        [[ -n ${2:-} ]] || failr "value of name missing" --usage "$failr_usage" -- "$@"
+        [ "${2-}" ] || failr "value of name missing" --usage "$failr_usage" -- "$@"
         name=$2
         shift 2
         ;;
       -u | --usage)
-        [[ -n ${2:-} ]] || failr "value of usage missing" --usage "$failr_usage" -- "$@"
+        [ "${2-}" ] || failr "value of usage missing" --usage "$failr_usage" -- "$@"
         usage=$2
         shift 2
         ;;
       -c | --code)
-        [[ -n ${2:-} ]] || failr "value of code missing" --usage "$failr_usage" -- "$@"
+        [ "${2-}" ] || failr "value of code missing" --usage "$failr_usage" -- "$@"
         code=$2
         shift 2
         ;;
@@ -84,8 +84,8 @@ failr() {
   printf -v msg '\n%s ✘ %s failed%s%s\n' "$tty_red" "$invocation" \
     "${message+: "$tty_bold${message[*]}$tty_stout_end"}" "$tty_reset"
 
-  [ "${#stacktrace[@]}" -eq 0 ] || msg+="$(printf '     at %s\n' "${stacktrace[@]}")"$'\n'
-  [ -z "${usage:-}" ] || msg+="   Usage: $name ${usage//$'\n'/$'\n'   }"$'\n'
+  [ "${#stacktrace[@]}" -eq 0 ] || msg+="$(printf '     at %s\n' "${stacktrace[@]}")$LF"
+  [ ! "${usage-}" ] || msg+="   Usage: $name ${usage//$LF/$LF   }$LF"
 
   printf '%s\n' "$msg" >&2
 
@@ -102,11 +102,11 @@ failr() {
 #   n - if set, appends a newline
 #   * - args passed to the utility function.
 util() {
-  local args=() util_var newline usage="[-v|--var VAR] [-n|--newline] UTIL [ARGS...]"
-  while (("$#")); do
+  local args=() util_var newline usage="[-v VAR] [-n|--newline] UTIL [ARGS...]"
+  while (($#)); do
     case $1 in
-      -v | --var)
-        [[ -n ${2:-} ]] || failr "value of var missing" --usage "$usage" -- "$@"
+      -v)
+        [ "${2-}" ] || failr "value of var missing" --usage "$usage" -- "$@"
         util_var=$2
         shift 2
         ;;
@@ -121,7 +121,7 @@ util() {
     esac
   done
   set -- "${args[@]}"
-  [[ "$#" == "0" ]] && failr "util missing" --usage "$usage" -- "$@"
+  [[ $# == "0" ]] && failr "util missing" --usage "$usage" -- "$@"
 
   # utilities
   local util_text
@@ -130,13 +130,13 @@ util() {
     usage="${usage%UTIL*}$1 TEXT"
     shift
 
-    [[ "$#" -ge 1 ]] || failr "text missing" --usage "$usage" -- "$@"
+    [[ $# -ge 1 ]] || failr "text missing" --usage "$usage" -- "$@"
 
     local text="$*"
-    text=${text#$'\n'}
-    text=${text%$'\n'}
-    text=${text//$'\n'*$'\n'/; ...; }
-    text=${text//$'\n'/; }
+    text=${text#$LF}
+    text=${text%$LF}
+    text=${text//$LF*$LF/; ...; }
+    text=${text//$LF/; }
 
     printf -v util_text "%s" "$text"
     ;;
@@ -145,10 +145,10 @@ util() {
     args=() usage="${usage%UTIL*}$1 [-w|--width WIDTH] TEXT"
     shift
     local util_center_width
-    while (("$#")); do
+    while (($#)); do
       case $1 in
         -w | --width)
-          [[ -n ${2:-} ]] || failr "value of width missing" --usage "$usage" -- "$@"
+          [ "${2-}" ] || failr "value of width missing" --usage "$usage" -- "$@"
           util_center_width=$2
           shift 2
           ;;
@@ -160,7 +160,7 @@ util() {
     done
 
     set -- "${args[@]}"
-    [[ "$#" -eq 1 ]] || failr "text missing" --usage "$usage" -- "$@"
+    [[ $# -eq 1 ]] || failr "text missing" --usage "$usage" -- "$@"
 
     local -i available_width=${#MARGIN} text_width="${util_center_width:-${#1}}"
     local -i lpad=$(( (available_width - text_width) / 2 ))
@@ -174,7 +174,7 @@ util() {
   cursor)
     usage="${usage%UTIL*}$1 show | hide"
     shift
-    [[ "$#" -eq 1 ]] || failr "command missing" --usage "$usage" -- "$@"
+    [[ $# -eq 1 ]] || failr "command missing" --usage "$usage" -- "$@"
     case $1 in
       show)
         shift
@@ -194,7 +194,7 @@ util() {
     args=() usage="${usage%UTIL*}$1 [-c|--center] ICON"
     shift
     local center
-    while (("$#")); do
+    while (($#)); do
       case $1 in
         -c | --center)
           center=true
@@ -219,7 +219,7 @@ util() {
   print_margin)
     usage="${usage%UTIL*}$1 TEXT"
     shift
-    [[ "$#" -eq 1 ]] || failr "text missing" --usage "$usage" -- "$@"
+    [[ $# -eq 1 ]] || failr "text missing" --usage "$usage" -- "$@"
     printf -v util_text '%s%s%s%s' "$tty_save" "$tty_hpa0" "${1?text missing}" "$tty_load"
     ;;
 
@@ -228,11 +228,11 @@ util() {
     args=() usage="${usage%UTIL*}$1 [-i|--icon ICON] [TEXT...]"
     shift
     local print_line_icon="$MARGIN"
-    while (("$#")); do
+    while (($#)); do
       case $1 in
         -i | --icon)
-          [[ -n ${2:-} ]] || usage
-          util icon -v print_line_icon -c "$2"
+          [ "${2-}" ] || usage
+          util icon -v print_line_icon --center "$2"
           shift 2
           ;;
         *)
@@ -242,7 +242,7 @@ util() {
       esac
     done
     set -- "${args[@]}"
-    local inlined && util --var inlined inline "$*"
+    local inlined && util -v inlined inline "$*"
     printf -v util_text '%s%s%s' "$tty_hpa0" "$print_line_icon" "$inlined"
     ;;
 
@@ -251,11 +251,11 @@ util() {
     args=() usage="${usage%UTIL*}$1 [-i|--icon ICON] [TEXT...]"
     shift
     local print_line_end_icon="$MARGIN"
-    while (("$#")); do
+    while (($#)); do
       case $1 in
         -i | --icon)
-          [[ -n ${2:-} ]] || usage
-          util icon -v print_line_end_icon -c "$2"
+          [ "${2-}" ] || usage
+          util icon -v print_line_end_icon --center "$2"
           shift 2
           ;;
         *)
@@ -274,8 +274,8 @@ util() {
   esac
 
   # output
-  [[ -z "${newline:-}" ]] || printf -v "util_text" '%s\n' "$util_text"
-  if [[ -n "${util_var:-}" ]]; then
+  [ ! "${newline-}" ] || printf -v "util_text" '%s\n' "$util_text"
+  if [ "${util_var-}" ]; then
     printf -v "$util_var" '%s' "$util_text"
   else
     printf '%s' "$util_text"
@@ -287,29 +287,29 @@ util() {
 #   * - args passed to the spinner function.
 spinner() {
   local usage="start | is_active | stop"
-  [ "$#" -gt 0 ] || failr "command missing" --usage "$usage" -- "$@"
+  [ $# -gt 0 ] || failr "command missing" --usage "$usage" -- "$@"
   case $1 in
   start)
     shift
-    [[ "$#" == 0 ]] || failr "unexpected argument" --usage "$usage" -- "$@"
+    [[ $# == 0 ]] || failr "unexpected argument" --usage "$usage" -- "$@"
     spinner stop
     spinner _spin &
     ;;
   is_active)
     shift
-    [[ "$#" == 0 ]] || failr "unexpected argument" --usage "$usage" -- "$@"
+    [[ $# == 0 ]] || failr "unexpected argument" --usage "$usage" -- "$@"
     jobs -p 'spinner _spin' >/dev/null 2>/dev/null
     ;;
   stop)
     shift
-    [[ "$#" == 0 ]] || failr "unexpected argument" --usage "$usage" -- "$@"
+    [[ $# == 0 ]] || failr "unexpected argument" --usage "$usage" -- "$@"
     if spinner is_active; then
       jobs -p 'spinner _spin' | xargs -r kill
     fi
     ;;
   _spin)
     shift
-    [[ "$#" == 0 ]] || failr "unexpected argument" --usage "$usage" -- "$@"
+    [[ $# == 0 ]] || failr "unexpected argument" --usage "$usage" -- "$@"
     local -a frames=()
     read -ra frames <<< "⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏"
     for i in "${!frames[@]}"; do
@@ -385,7 +385,7 @@ logr() {
     ;;
 
   new | item | success | info | warn | error | fail)
-    util -n print_line --icon "$1" "${@:2}"
+    util --newline print_line --icon "$1" "${@:2}"
     [[ $1 != "fail" ]] || return 1
     ;;
   list)
@@ -395,25 +395,25 @@ logr() {
   link)
     usage="${usage%COMMAND*}$1 URL [TEXT]"
     shift
-    [[ "$#" -ge "1" ]] || failr "url missing" --usage "$usage" -- "$@"
+    [[ $# -ge "1" ]] || failr "url missing" --usage "$usage" -- "$@"
     local link url="$1" text=${2:-$1}
     # shellcheck disable=SC1003
     printf -v link '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "$text"
-    util -n print_line --icon link "$link"
+    util --newline print_line --icon link "$link"
     ;;
   file)
     usage="${usage%COMMAND*}$1 [-l|--line LINE [-c|--column COLUMN]] PATH [TEXT]"
     shift
     local args=() line column
-    while (("$#")); do
+    while (($#)); do
       case $1 in
         -l | --line)
-          [[ -n ${2:-} ]] || failr "value of line missing" --usage "$usage" -- "$@"
+          [ "${2-}" ] || failr "value of line missing" --usage "$usage" -- "$@"
           line=$2
           shift 2
           ;;
         -c | --column)
-          [[ -n ${2:-} ]] || failr "value of column missing" --usage "$usage" -- "$@"
+          [ "${2-}" ] || failr "value of column missing" --usage "$usage" -- "$@"
           column=$2
           shift 2
           ;;
@@ -424,25 +424,25 @@ logr() {
       esac
     done
     set -- "${args[@]}"
-    [[ "$#" -ge "1" ]] || failr "path missing" --usage "$usage" -- "$@"
+    [ $# -ge 1 ] || failr "path missing" --usage "$usage" -- "$@"
     local path=$1
     [[ $path =~ ^/ ]] || path="$PWD/$path"
-    if [[ -n ${line:-} ]]; then
+    if [ "${line-}" ]; then
       path+=":$line"
-      if [[ -n ${column:-} ]]; then
+      if [ "${column-}" ]; then
         path+=":$column"
       fi
     fi
     local link url="file://$path" text=${2:-file://$path}
     # shellcheck disable=SC1003
     printf -v link '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "$text"
-    util -n print_line --icon file "$link"
+    util --newline print_line --icon file "$link"
     ;;
   task)
     usage="${usage%COMMAND*}$1 [MESSAGE] [-w|--warn-only] [-- COMMAND [ARGS...]]"
     shift
     local message=() warn_only
-    while (("$#")); do
+    while (($#)); do
       case $1 in
         -w | --warn-only)
           warn_only=true
@@ -487,7 +487,7 @@ logr() {
       return 0
     fi
 
-    if [[ -n "${warn_only:-}" ]]; then
+    if [ "${warn_only-}" ]; then
       util --newline print_line_end --icon warn
       sed -e 's/^/'"$MARGIN$tty_yellow"'/' \
           -e 's/$/'"$tty_reset"'/' \
@@ -512,9 +512,7 @@ main() {
   TMPDIR=${TMPDIR:-/tmp} TMPDIR=${TMPDIR%/}
 
   # bashsupport disable=BP5006
-  declare -g -r \
-    LOGR_VERSION=0.1.0 \
-    MARGIN='   '
+  declare -g -r LOGR_VERSION=0.1.0 MARGIN='   ' LF=$'\n'
 
   # bashsupport disable=BP2001
   # shellcheck disable=SC2034
@@ -613,16 +611,7 @@ main() {
   require_shopt checkjobs # check for running jobs before exiting
   stty -echoctl 2>/dev/null || true # don't echo control characters in hat notation (e.g. `^C`)
 
-  unset BATS_VERSION
-  BATS_VERSION='x xx'
-  if [ "${BATS_VERSION-}" ]; then
-    echo "YES"
-  else
-    echo "NO"
-  fi
-  exit 0
-
-  [ ${BATS_VERSION-} ] || logr _init
+  [ "${BATS_VERSION-}" ] || logr _init
 }
 
 main "$@"

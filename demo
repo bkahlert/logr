@@ -19,18 +19,18 @@ SECTION failr ------------------------------------------------------------------
 (
   # bashsupport disable=BP5008
   foo() {
-    [[ $1 == "baz" ]] || failr "baz expected" -u "baz" -- "$*"
+    [[ $1 == "baz" ]] || failr "baz expected" --usage "baz" -- "$*"
   }
   foo bar
 ) || true
 
 SECTION "util: inline" ---------------------------------------------------------
-util -n inline 'foo'
-util -n inline '
+util --newline inline 'foo'
+util --newline inline '
 foo
 bar
 '
-util -n inline '
+util --newline inline '
 foo
 bar
 baz
@@ -49,7 +49,7 @@ SECTION "util: icon" -----------------------------------------------------------
 printf ' ' && util icon success
 printf ' ' && util icon warn
 printf ' ' && util icon -v var error && echo "$var"
-printf '%s' '->' && util icon -c new && printf '%s\n' '<-'
+printf '%s' '->' && util icon --center new && printf '%s\n' '<-'
 
 SECTION "util: print_margin" ---------------------------------------------------
 for i in 0 1 2 3 4 5; do
@@ -61,14 +61,14 @@ done
 echo
 
 SECTION "util: print_line" -----------------------------------------------------
-util -n print_line -i success 'existing icon + text'
-util -n print_line 'text only'
-util -n print_line --icon not-exists 'not existing icon + text'
+util --newline print_line --icon success 'existing icon + text'
+util --newline print_line 'text only'
+util --newline print_line --icon not-exists 'not existing icon + text'
 
 SECTION "util: print_line_end" -------------------------------------------------
-util print_line -i success 'existing-icon + text' && sleep 0.3 && util print_line_end -n -i success " -> icon + text updated"
-util print_line 'text-only' && sleep 0.3 && util print_line_end -n -i success
-util print_line -i not-exists 'not-existing icon + text' && sleep 0.3 && util print_line_end -n " -> text updated"
+util print_line --icon success 'existing-icon + text' && sleep 0.3 && util print_line_end --new-line --icon success " -> icon + text updated"
+util print_line 'text-only' && sleep 0.3 && util print_line_end --new-line --icon success
+util print_line --icon not-exists 'not-existing icon + text' && sleep 0.3 && util print_line_end --new-line " -> text updated"
 
 SECTION "main" -----------------------------------------------------------------
 printf "%sBRIGHT%s %sBLACK%s\n" "$tty_bright_black" "$tty_reset" "$tty_black" "$tty_reset"

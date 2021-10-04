@@ -9,7 +9,7 @@ setup() {
 }
 
 @test "should print icon and text" {
-  run util print_line -i new 'text'
+  run util print_line --icon new 'text'
   assert_output " ✱ text"
 }
 
@@ -19,11 +19,11 @@ setup() {
 }
 
 @test "should print icon only" {
-  run util print_line -i new
+  run util print_line --icon new
   assert_output " ✱ "
 }
 
 @test "should print question mark on unknown icon " {
-  run util print_line -i unknown-icon "text"
+  run util print_line --icon unknown-icon "text"
   assert_output " ? text"
 }

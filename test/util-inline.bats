@@ -11,7 +11,7 @@ setup() {
 @test "should print usage" {
   run util inline
   assert_line --partial "failed: text missing"
-  assert_line --partial "Usage: util [-v|--var VAR] [-n|--newline] inline TEXT"
+  assert_line --partial "Usage: util [-v VAR] [-n|--newline] inline TEXT"
 }
 
 @test "should inline 1 line" {

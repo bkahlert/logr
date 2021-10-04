@@ -18,8 +18,8 @@ set -euo pipefail
 #   * - echo arguments
 # Outputs:
 #   FD3 - echo message
-trace() {
-  if ((${#@} == 0)) && [ -n "${output:-}" ]; then
+function trace() {
+  if ((${#@} == 0)) && [ "${output-}" ]; then
     set -- "${output:-}"
   fi
   if { true >&3; } 2<>/dev/null; then
@@ -41,27 +41,27 @@ trace() {
 # Outputs:
 #   STDOUT - directory containing the downloaded and extracted Bats library
 #   STDERR - details, on failure
-download_lib() {
+function download_lib() {
   local -r short_name="${1?}"
 
   local -r url="https://github.com/bats-core/bats-${short_name}/tarball/master"
   local -r target="${BATS_SUITE_TMPDIR:?}/_libs/${short_name}"
 
-  if [ ! -d "${target}" ] || [ ! -f "${target}/load.bash" ]; then
+  if [ ! -d "$target" ] || [ ! -f "$target/load.bash" ]; then
     rm -rf "${target:?}"
-    mkdir -p "${target}"
+    mkdir -p "$target"
     (
-      cd "${target}" || exit
-      curl --location --insecure --silent --show-error "${url}" \
+      cd "$target" || exit
+      curl --location --insecure --silent --show-error "$url" \
         | tar --extract --gunzip --strip-components=1
     )
   fi
 
-  if [ ! -d "${target}" ] || [ ! -f "${target}/load.bash" ]; then
-    echo "Failed to download ${short_name} from ${url}" >&2
+  if [ ! -d "$target" ] || [ ! -f "$target/load.bash" ]; then
+    echo "Failed to download $short_name from $url" >&2
     return 1
   fi
-  echo "${target}"
+  echo "$target"
   return 0
 }
 
@@ -71,7 +71,7 @@ download_lib() {
 #   none
 # Arguments:
 #   1 - Short name of the library, e.g. assert
-load_lib() {
+function load_lib() {
   local -r short_name=${1:?}
 
   local file="/opt/bats-${short_name}/load.bash"
@@ -95,17 +95,17 @@ load_lib() {
 # Applies patches to libs.
 # Arguments:
 #   1 - Short name of the library, e.g. assert
-patch_lib() {
+function patch_lib() {
   local -r short_name=${1:?}
 
   case $short_name in
     assert)
       local bats_assert_line
       bats_assert_line=$(declare -f assert_line) || true
-      if [ -n "$bats_assert_line" ]; then
+      if [ "${bats_assert_line-}" ]; then
         eval "bats_${bats_assert_line}"
         # bashsupport disable=BP5008
-        assert_line() {
+        function assert_line() {
           local shell_option=nullglob
           if shopt -q "$shell_option"; then
             printf '%s\n' "❗ Bats' assert_line seems broken if shell option $shell_option is enabled." >&2
@@ -131,7 +131,7 @@ patch_lib() {
 #   1 - otherwise
 # Outputs:
 #   STDERR - details, on failure
-assert_container_status() {
+function assert_container_status() {
   local -r actual_status=$(docker container inspect --format "{{.State.Status}}" "$1")
   local -r expected_status=$2
   assert_equal "${actual_status}" "${expected_status}"
@@ -151,7 +151,7 @@ assert_container_status() {
 #   1 - otherwise
 # Outputs:
 #   STDERR - details, on failure
-assert_file_owner_group() {
+function assert_file_owner_group() {
   local -r file="$1"
   local -r user="$2"
   local -r group="$3"
@@ -179,9 +179,9 @@ assert_file_owner_group() {
 # Outputs:
 #   STDOUT - absolute path of the given fixture
 #   STDERR - details on failure
-fixture() {
+function fixture() {
   local -r dir="${2:-${BATS_TEST_DIRNAME:?}}"
-  if [ -z "${dir#${BATS_CWD:?}}" ]; then
+  if [ ! "${dir#${BATS_CWD:?}}" ]; then
     echo "Cannot find fixture $1" >&2
     exit 1
   fi
@@ -202,6 +202,84 @@ fixture() {
 #   2 - target
 # Outputs:
 #   STDERR - details on failure
-cp_fixture() {
+function cp_fixture() {
   cp "$(fixture "${1:?}")" "${2:?}"
 }
+
+# Checks if this test run was invoked via BashSupport Pro.
+# Globals:
+#   BASH_SOURCE
+#   BATS_SHELL
+# Returns:
+#   0 - successful
+#   1 - not successful
+function check_bashsupport_pro() {
+  local i
+  for i in "${!BASH_SOURCE[@]}"; do
+    [[ ${BASH_SOURCE[i]} =~ IntelliJ|intellij && ${BASH_SOURCE[i]} =~ "bashsupport-pro" ]] || continue
+    return 0
+  done
+  return 1
+}
+
+# Checks if the currently running Bats has the required minimal version.
+# Returns:
+#   0 - successful
+#   1 - not successful
+function check_bats_version() {
+  local version
+  version=$(bats --version) 2>/dev/null
+  echo "$version"
+  version=${version#Bats }
+  echo "$version"
+  [[ ${version} == 1.4* ]]
+}
+
+# Sanity checks
+function main() {
+
+  if check_bats_version; then
+    exit 0
+    return 0
+  fi
+
+  if check_bashsupport_pro; then
+    # shellcheck disable=SC2016
+    printf '%s' '
+❗ You are running these tests with a version of BashSupport Pro that uses an outdated Bats.
+
+You can workaround this problem by using the Bats wrapper `batsw` instead:
+1. Open the outdated bats binary in a text editor.
+   It should be printed at the very top of the test output.
+2. Paste the following lines right after the first line.
+
+current_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+formatter="${current_dir%/bats-core/*}/bats-core/libexec/bats-core/bats-format-bashpro"
+if [ ! -f "$formatter" ]; then echo "Could not find BashSupport Pro formatter at $formatter" >&2; exit 1; fi
+
+project_dir=$PWD
+while true; do
+  if [ ! "${project_dir}" ]; then echo "Could not find BashSupport Pro formatter at $formatter" >&2; exit 1; fi
+  if [ ! -f "${project_dir}/batsw" ]; then project_dir="${project_dir%/*}"; continue; fi
+  break
+done
+[ -x "${project_dir}/batsw" ] || chmod +x "${project_dir}/batsw"
+cd "${project_dir}" && ./batsw --quiet --inject "libexec/bats-core/bats-format-junit=$(cat "$formatter")" "${@//bashpro/junit}"
+exit
+
+3. Run the tests again
+' >&2
+  else
+    # shellcheck disable=SC2016
+    printf '%s' '
+❗ You are running these tests with an outdated version of Bats.
+
+Please update or use the Bats wrapper `batsw`.
+' >&2
+  fi
+
+  exit
+
+}
+
+#main "$@"

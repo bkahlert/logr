@@ -15,7 +15,7 @@ setup() {
 
 @test "should empty" {
   run logr list
-  [[ -z "${output}" ]]
+  [ ! "${output-}" ]
 }
 
 @test "should print array" {

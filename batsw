@@ -9,14 +9,20 @@
 
 set -Eeuo pipefail
 
+#TODO [[ xxx ]]
+#TODO ==
+echo() {
+  [ "${BATSW_QUIET-}" ] || printf '%s\n' "$*" >&2
+}
+
 # Prints the specified message and exits with exit code 1.
 #
 # Globals:
 #   none
 # Arguments:
-#   @ - echo arguments
-function die() {
-  echo " $(tput setaf 1)✘$(tput sgr0)" "$@" >&2
+#   * - echo arguments
+die() {
+  printf ' %s %s\n' "$(tput setaf 1)✘$(tput sgr0)" "$*" >&2
   exit 1
 }
 
@@ -25,10 +31,10 @@ function die() {
 #
 # Arguments:
 #   1 - name of the variable
-function split_to_array() {
+split_to_array() {
   # Called like a program in conjunction with eval.
   # Assigns the arguments array to the variable with the name of the first element.
-  function program() {
+  program() {
     local var="$1"
     shift
     eval "$var"='("${@}")'
@@ -39,12 +45,12 @@ function split_to_array() {
 # Bakes a new Docker image
 #
 # Arguments:
-#   @ - `docker buildx bake` arguments
+#   * - `docker buildx bake` arguments
 # Outputs:
 #   STDOUT - image ID
 #   STDERR - build progress
-function bake_local() {
-  echo "🐳 building Docker image:" "$@" >&2
+bake_local() {
+  echo "🐳 building Docker image:" "$@"
   if ! docker buildx bake "$@"; then
     die "Failed to bake Docker image"
   fi
@@ -61,10 +67,18 @@ function bake_local() {
 #   none
 # Arguments:
 #  None
-function entrypoint_script() {
+entrypoint_script() {
   cat <<'ENTRYPOINT'
 #!/usr/bin/env bash
 set -euo pipefail
+if [ "${BATSW_INJECT-}" ]; then
+  inject_path=${BATSW_INJECT%%=*}
+  [ "${inject_path:0:1}" = "/" ] || inject_path="/opt/bats/${inject_path}"
+  inject_content=${BATSW_INJECT#*=}
+  inject_dir=${inject_path%/*}
+  mkdir -p "$inject_dir"
+  printf '%s\n' "$inject_content" > "$inject_path"
+fi
 declare -r \
 puid= # set during docker build
 declare -r \
@@ -83,8 +97,8 @@ ENTRYPOINT
 # Globals:
 #   none
 # Arguments:
-#   @ - docker build arguments
-function docker_build() {
+#   * - docker build arguments
+docker_build() {
   DOCKER_BUILDKIT=1 \
   DOCKER_SCAN_SUGGEST=false \
     docker build \
@@ -176,22 +190,21 @@ DOCKERFILE
 #   BATS_IMAGE_LOCAL_TAG - Tag of the locally built Bats Docker image (default: bats:local)
 #   BATS_TMPDIR - base temporary directory used by Bats
 # Arguments:
-#   @ - docker run arguments
+#   * - docker run arguments
 # bashsupport disable=BP2001,BP5006
-function bats() {
+bats() {
   local -a DOCKER_ARGS=()
   [ ! -t 1 ] || DOCKER_ARGS+=("--tty")
 
   local -a BATS_ARGS=()
-  while (("$#")); do
+  while (($#)); do
     case "$1" in
       -e|--env)
-        if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+        if [ "${2-}" ] && [ "${2:0:1}" != "-" ]; then
           DOCKER_ARGS+=("$1" "$2")
           shift 2
         else
-          echo " $(tput setaf 1)✘$(tput sgr0) missing argument for $1" >&2
-          exit 1
+          die "value of $1 missing"
         fi
         ;;
       *)
@@ -202,7 +215,7 @@ function bats() {
   done
 
   local tag="${BATS_IMAGE_LOCAL_TAG:-bats:local}"
-  if [ -n "${BATS_IMAGE_ID:-}" ]; then
+  if [ "${BATS_IMAGE_ID-}" ]; then
     echo "🐳 re-using existing Bats Docker image: ${BATS_IMAGE_ID}"
   else
     if BATS_IMAGE_ID=$(
@@ -213,7 +226,7 @@ function bats() {
     ); then
       export BATS_IMAGE_ID
       echo "🐳 using built Bats Docker image: ${BATS_IMAGE_ID}"
-    elif [[ -n "$(docker image ls --quiet "$tag")" ]]; then
+    elif [ "$(docker image ls --quiet "$tag")" ]; then
       BATS_IMAGE_ID="$tag"
       export BATS_IMAGE_ID
       echo " $(tput setaf 11)⚠$(tput sgr0) failed to build Bats Docker image; re-using previous build: ${BATS_IMAGE_ID}"
@@ -223,16 +236,15 @@ function bats() {
   fi
 
   local -r -a BATS_ARGS=(
-    --jobs "$(grep 2>/dev/null -c ^processor /proc/cpuinfo || echo 4)"
+    --jobs "$(grep 2>/dev/null -c ^processor /proc/cpuinfo || printf %s 4)"
     --no-parallelize-within-files
     --recursive
-    --report-formatter junit
     --timing
     "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
   )
-
+# TODO add --rm
   echo "$(tput setaf 7) ℹ$(tput sgr0) bats command line: bats" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
-  docker run --rm --name "bats-$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom | head -c 3 || true)" \
+  docker run --name "bats-$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom | head -c 3 || true)" \
     -e TERM="${TERM:-xterm-256color}" \
     -e TMPDIR="${PWD:?}/${BATS_TMPDIR%${PWD}}" \
     -v /var/run/docker.sock:/var/run/docker.sock \
@@ -249,26 +261,37 @@ function bats() {
 # Globals:
 #   TERM - used to determine the terminal capabilities (default: xterm-256color)
 #   BATS_TMPDIR - base temporary directory used by Bats (default: build/bats-tmp)
+#   BATSW_QUIET - if set, suppresses any output related to the wrapper
 #   DOCKER_BAKE - if set, its value is passed to `docker buildx bake` (example: DOCKER_BAKE=--set=*.tags=test)
 # Arguments:
-#   @ - bats arguments
+#   inject - format: foo=bar; creates a file at location foo with the contents of bar inside the Docker image
+#   quiet  - see BATSW_QUIET
+#   *      - bats arguments
 # bashsupport disable=BP2001,BP5006
-function main() {
+main() {
   export TERM="${TERM:-xterm-256color}"
 
   local -r BATS_CMD=bats
 
   local -a BATS_ARGS=()
-  while (("$#")); do
+  while (($#)); do
     case "$1" in
+      --inject)
+        [ "${2-}" ] || die "value of inject missing"
+        BATS_ARGS+=("--env" "BATSW_INJECT=$2")
+        shift 2
+        ;;
+      --quiet)
+        export BATSW_QUIET=1
+        shift
+        ;;
       -o | --output)
-        if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+        if [ "${2-}" ] && [ "${2:0:1}" != "-" ]; then
           mkdir -p "$2"
           BATS_ARGS+=("$1" "$2")
           shift 2
         else
-          echo " $(tput setaf 1)✘$(tput sgr0) missing argument for $1" >&2
-          exit 1
+          [ "${2-}" ] || die "value of $1 missing"
         fi
         ;;
       *)
@@ -278,7 +301,7 @@ function main() {
     esac
   done
 
-  [ -n "${BATS_TMPDIR:-}" ] || export BATS_TMPDIR=".bats-tmp"
+  [ "${BATS_TMPDIR-}" ] || export BATS_TMPDIR=".bats-tmp"
   [ -e "${BATS_TMPDIR}" ] && rm -rf "${BATS_TMPDIR:?}"
   [ -e "${BATS_TMPDIR}" ] || mkdir -p "${BATS_TMPDIR}" || die "'${BATS_TMPDIR}' could not be created"
   # shellcheck disable=SC2064
@@ -288,7 +311,7 @@ function main() {
   echo "$(tput setaf 7) ℹ$(tput sgr0) working directory: $PWD"
   echo "$(tput setaf 7) ℹ$(tput sgr0) batsw command line:" "${BATS_CMD}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
 
-  if [ -n "${DOCKER_BAKE:-}" ]; then
+  if [ "${DOCKER_BAKE-}" ]; then
     split_to_array "DOCKER_BAKE"
     if ! baked_tag="$(bake_local "${DOCKER_BAKE[@]+"${DOCKER_BAKE[@]}"}")"; then
       exit 1
