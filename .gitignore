@@ -1,0 +1,5 @@
+/.idea
+/.bats-tmp
+/.cache
+/.gradle
+/build

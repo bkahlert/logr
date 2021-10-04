@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="test ^X" type="BashProRunConfiguration">
+    <option name="scriptParameters" value="-f ^X test" />
+    <option name="scriptPath" value="batsw" />
+    <RunnerSettings bashdbVersion="Automatic" bashPathMapper="Automatic" RunnerId="pro.bashsupport.shDebugRunner" />
+    <method v="2" />
+  </configuration>
+</component>
