@@ -5,12 +5,7 @@ setup() {
   load_lib support
   load_lib assert
 
-  export TERM_OVERRIDE=''
   load "${BATS_CWD}/logr.sh"
-}
-
-teardown() {
-  unset TERM_OVERRIDE
 }
 
 @test "should print help" {

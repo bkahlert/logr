@@ -13,16 +13,6 @@ SECTION() {
   printf "\n\n ─────── %s %s\n\n" "$1" "${2//-/─}"
 }
 
-SECTION tput -------------------------------------------------------------------
-# bashsupport disable=SpellCheckingInspection
-printf '%s%s%s\n' "$(tput setaf 2)" "TERM=$TERM" "$(tput sgr0)"
-(
-  # shellcheck disable=SC2030
-  # bashsupport disable=BP5006
-  TERM_OVERRIDE=''
-  printf '%s%s%s\n' "$(tput setaf 2)" "TERM_OVERRIDE=$TERM_OVERRIDE" "$(tput sgr0)"
-)
-
 SECTION failr ------------------------------------------------------------------
 (failr) || true
 (failr --) || true
@@ -81,14 +71,14 @@ util print_line 'text-only' && sleep 0.3 && util print_line_end -n -i success
 util print_line -i not-exists 'not-existing icon + text' && sleep 0.3 && util print_line_end -n " -> text updated"
 
 SECTION "main" -----------------------------------------------------------------
-printf "%sBRIGHT%s %sBLACK%s\n" "$LOGR_COLOR_FG_BRIGHT_BLACK" "$LOGR_RESET" "$LOGR_COLOR_FG_BLACK" "$LOGR_RESET"
-printf "%sBRIGHT%s %sRED%s\n" "$LOGR_COLOR_FG_BRIGHT_RED" "$LOGR_RESET" "$LOGR_COLOR_FG_RED" "$LOGR_RESET"
-printf "%sBRIGHT%s %sGREEN%s\n" "$LOGR_COLOR_FG_BRIGHT_GREEN" "$LOGR_RESET" "$LOGR_COLOR_FG_GREEN" "$LOGR_RESET"
-printf "%sBRIGHT%s %sYELLOW%s\n" "$LOGR_COLOR_FG_BRIGHT_YELLOW" "$LOGR_RESET" "$LOGR_COLOR_FG_YELLOW" "$LOGR_RESET"
-printf "%sBRIGHT%s %sBLUE%s\n" "$LOGR_COLOR_FG_BRIGHT_BLUE" "$LOGR_RESET" "$LOGR_COLOR_FG_BLUE" "$LOGR_RESET"
-printf "%sBRIGHT%s %sMAGENTA%s\n" "$LOGR_COLOR_FG_BRIGHT_MAGENTA" "$LOGR_RESET" "$LOGR_COLOR_FG_MAGENTA" "$LOGR_RESET"
-printf "%sBRIGHT%s %sCYAN%s\n" "$LOGR_COLOR_FG_BRIGHT_CYAN" "$LOGR_RESET" "$LOGR_COLOR_FG_CYAN" "$LOGR_RESET"
-printf "%sBRIGHT%s %sWHITE%s\n" "$LOGR_COLOR_FG_BRIGHT_WHITE" "$LOGR_RESET" "$LOGR_COLOR_FG_WHITE" "$LOGR_RESET"
+printf "%sBRIGHT%s %sBLACK%s\n" "$tty_bright_black" "$tty_reset" "$tty_black" "$tty_reset"
+printf "%sBRIGHT%s %sRED%s\n" "$tty_bright_red" "$tty_reset" "$tty_red" "$tty_reset"
+printf "%sBRIGHT%s %sGREEN%s\n" "$tty_bright_green" "$tty_reset" "$tty_green" "$tty_reset"
+printf "%sBRIGHT%s %sYELLOW%s\n" "$tty_bright_yellow" "$tty_reset" "$tty_yellow" "$tty_reset"
+printf "%sBRIGHT%s %sBLUE%s\n" "$tty_bright_blue" "$tty_reset" "$tty_blue" "$tty_reset"
+printf "%sBRIGHT%s %sMAGENTA%s\n" "$tty_bright_magenta" "$tty_reset" "$tty_magenta" "$tty_reset"
+printf "%sBRIGHT%s %sCYAN%s\n" "$tty_bright_cyan" "$tty_reset" "$tty_cyan" "$tty_reset"
+printf "%sBRIGHT%s %sWHITE%s\n" "$tty_bright_white" "$tty_reset" "$tty_white" "$tty_reset"
 
 SECTION "logr" -----------------------------------------------------------------
 logr new "new message"
@@ -112,43 +102,3 @@ echo bar >&2 && sleep 1
 echo baz >&2 && sleep 1
 exit 2
 ') || true
-
-# TODO TEST
-SECTION "spinner" --------------------------------------------------------------
-util print_line -i item "<<<<<"
-spinner start
-sleep 2
-spinner stop
-util -n print_line -i success
-
-util print_line -i item "<<<<<"
-spinner start
-sleep 2
-spinner stop
-util -n print_line_end success 'Done'
-
-util print_line -i item "<<<<<"
-spinner start
-sleep 2
-spinner stop
-util -n print_line -i success 'Done'
-exit 0
-(failr) || true
-#myf ab c
-exit 0
-
-# bashsupport disable=BP5001
-set -euo pipefail
-
-# TODO rename LOG_PATH
-# TODO ko to die
-# TODO embed scripts
-# TODO color whole line when log_cmd finished
-# TODO set animation with array
-# TODO replace explicit escape sequences with tput
-
-
-ok "sample: ok" || true
-ko "sample: ko" || true
-warn "sample: warn" || true
-working "sample: working"

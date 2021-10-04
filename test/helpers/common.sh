@@ -18,11 +18,11 @@ set -euo pipefail
 #   * - echo arguments
 # Outputs:
 #   FD3 - echo message
-function trace() {
-  if (( ${#@} == 0 )) && [ -n "${output:-}" ]; then
-   set -- "${output:-}"
+trace() {
+  if ((${#@} == 0)) && [ -n "${output:-}" ]; then
+    set -- "${output:-}"
   fi
-  if { true >&3; } 2<> /dev/null; then
+  if { true >&3; } 2<>/dev/null; then
     echo '#' "$*" >&3
   else
     echo "$*"
@@ -34,14 +34,14 @@ function trace() {
 # Globals:
 #   BATS_SUITE_TMPDIR
 # Arguments:
-#   $1 - short name of the library, e.g. assert
+#   1 - short name of the library, e.g. assert
 # Returns:
 #   0 - download successful
 #   1 - otherwise
 # Outputs:
 #   STDOUT - directory containing the downloaded and extracted Bats library
 #   STDERR - details, on failure
-function download_lib() {
+download_lib() {
   local -r short_name="${1?}"
 
   local -r url="https://github.com/bats-core/bats-${short_name}/tarball/master"
@@ -65,14 +65,14 @@ function download_lib() {
   return 0
 }
 
-# Loads a Bats library from /opt
+# Loads a Bats library from /opt.
 #
 # Globals:
 #   none
 # Arguments:
-#   $1 - Short name of the library, e.g. assert
-function load_lib() {
-  local -r short_name="${1:?}"
+#   1 - Short name of the library, e.g. assert
+load_lib() {
+  local -r short_name=${1:?}
 
   local file="/opt/bats-${short_name}/load.bash"
   if [ ! -f "$file" ]; then
@@ -88,6 +88,35 @@ function load_lib() {
   fi
   # shellcheck disable=SC1090
   source "${file}"
+
+  patch_lib "$short_name"
+}
+
+# Applies patches to libs.
+# Arguments:
+#   1 - Short name of the library, e.g. assert
+patch_lib() {
+  local -r short_name=${1:?}
+
+  case $short_name in
+    assert)
+      local bats_assert_line
+      bats_assert_line=$(declare -f assert_line) || true
+      if [ -n "$bats_assert_line" ]; then
+        eval "bats_${bats_assert_line}"
+        # bashsupport disable=BP5008
+        assert_line() {
+          local shell_option=nullglob
+          if shopt -q "$shell_option"; then
+            printf '%s\n' "❗ Bats' assert_line seems broken if shell option $shell_option is enabled." >&2
+            printf '%s\n' "❗ Workaround: enable $shell_option only locally or use assert_output." >&2
+            exit 1
+          fi
+          bats_assert_line "$@"
+        }
+      fi
+      ;;
+  esac
 }
 
 # Checks the current status of a Docker container.
@@ -95,14 +124,14 @@ function load_lib() {
 # Globals:
 #   none
 # Arguments:
-#   $1 - Docker container ID
-#   $2 - expected value
+#   1 - Docker container ID
+#   2 - expected value
 # Returns:
 #   0 - statuses equal
 #   1 - otherwise
 # Outputs:
 #   STDERR - details, on failure
-function assert_container_status() {
+assert_container_status() {
   local -r actual_status=$(docker container inspect --format "{{.State.Status}}" "$1")
   local -r expected_status=$2
   assert_equal "${actual_status}" "${expected_status}"
@@ -115,14 +144,14 @@ function assert_container_status() {
 # Globals:
 #   none
 # Arguments:
-#   $1 - Docker container ID
-#   $2 - expected value
+#   1 - Docker container ID
+#   2 - expected value
 # Returns:
 #   0 - statuses equal
 #   1 - otherwise
 # Outputs:
 #   STDERR - details, on failure
-function assert_file_owner_group() {
+assert_file_owner_group() {
   local -r file="$1"
   local -r user="$2"
   local -r group="$3"
@@ -130,12 +159,12 @@ function assert_file_owner_group() {
   run ls -l "$file" # total 10444 -rw-r--r-- 1 tester tester 10692675 Sep 25 17:29 core.gz
 
   local -r s='\s+'
-  local regexp='.*\d+' # hard links
-  regexp="${regexp}${s}${user}" # file owner
-  regexp="${regexp}${s}${group}" # file group
-  regexp="${regexp}${s}"'\d+' # file size
+  local regexp='.*\d+'                             # hard links
+  regexp="${regexp}${s}${user}"                    # file owner
+  regexp="${regexp}${s}${group}"                   # file group
+  regexp="${regexp}${s}"'\d+'                      # file size
   regexp="${regexp}${s}"'\w+'"${s}"'\d+\s+\d+:\d+' # date and time
-  regexp="${regexp}${s}${file}" # file name
+  regexp="${regexp}${s}${file}"                    # file name
   assert_output --regexp "${regexp}"
 }
 
@@ -150,7 +179,7 @@ function assert_file_owner_group() {
 # Outputs:
 #   STDOUT - absolute path of the given fixture
 #   STDERR - details on failure
-function fixture() {
+fixture() {
   local -r dir="${2:-${BATS_TEST_DIRNAME:?}}"
   if [ -z "${dir#${BATS_CWD:?}}" ]; then
     echo "Cannot find fixture $1" >&2
@@ -173,6 +202,6 @@ function fixture() {
 #   2 - target
 # Outputs:
 #   STDERR - details on failure
-function cp_fixture() {
+cp_fixture() {
   cp "$(fixture "${1:?}")" "${2:?}"
 }

@@ -6,12 +6,7 @@ setup() {
   load_lib assert
   load_lib file
 
-  export TERM_OVERRIDE=''
   load "${BATS_CWD}/logr.sh"
-}
-
-teardown() {
-  unset TERM_OVERRIDE
 }
 
 @test "should print usage" {
@@ -44,7 +39,7 @@ teardown() {
   assert_failure
 }
 
-@test "TODO should print error log on error" {
+@test "should print error log on error" {
   run logr task -- bash -c '
 echo foo && sleep .1
 echo bar >&2 && sleep .1

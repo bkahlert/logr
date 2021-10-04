@@ -27,17 +27,6 @@
 
 set -euo pipefail
 
-# tput wrapper that only invokes tput if TERM is not empty
-# Globals:
-#   TERM - used by tput to query terminfo
-#   TERM_OVERRIDE - if set, overrules TERM
-# Arguments:
-#   * - tput arguments
-tput() {
-  local -r term=${TERM_OVERRIDE-${TERM:-}}
-  [ -z "$term" ] || TERM=$term command tput "$@"
-}
-
 # Indicates an occurred problem and exits.
 # Globals:
 #   FUNCNAME
@@ -52,7 +41,7 @@ failr() {
     [ "${BASH_LINENO[i]}" = 0 ] || stacktrace+=("${FUNCNAME[i+1]:-?}(${BASH_SOURCE[i+1]:-?}:${BASH_LINENO[i]:-?})")
   done
 
-  local code=$? failr_usage="[-n|--name NAME] [-u|--usage USAGE] [--] [ARGS...]" name=${FUNCNAME[1]:-UNKNOWN} message=() usage print_call=false
+  local code=$? failr_usage="[-n|--name NAME] [-u|--usage USAGE] [--] [ARGS...]" name=${FUNCNAME[1]:-?} message=() usage print_call=false
   while (("$#")); do
     case $1 in
       -n | --name)
@@ -85,18 +74,15 @@ failr() {
   local invocation="$name"
   if [[ "$print_call" == true ]]; then
     if [[ $# == 0 ]]; then
-      local sitm ritm
-      sitm=$(   tput sitm   || tput ZH      ) || true
-      ritm=$(   tput ritm   || tput ZR      ) || true
-      invocation="$name ${sitm}[no arguments]$ritm"
+      invocation="${name} ${tty_italic}[no arguments]${tty_italic_end}"
     else
-      invocation="$name $(tput smul)$*$(tput rmul)"
+      invocation="${name} ${tty_underline}$*${tty_underline_end}"
     fi
   fi
 
   local msg
-  printf -v msg '\n%s ✘ %s failed%s%s\n' "$(tput setaf 1)" "$invocation" \
-    "${message+: "$(tput bold)${message[*]}$(tput rmso)"}" "$(tput sgr0)"
+  printf -v msg '\n%s ✘ %s failed%s%s\n' "$tty_red" "$invocation" \
+    "${message+: "$tty_bold${message[*]}$tty_stout_end"}" "$tty_reset"
 
   [ "${#stacktrace[@]}" -eq 0 ] || msg+="$(printf '     at %s\n' "${stacktrace[@]}")"$'\n'
   [ -z "${usage:-}" ] || msg+="   Usage: $name ${usage//$'\n'/$'\n'   }"$'\n'
@@ -176,7 +162,7 @@ util() {
     set -- "${args[@]}"
     [[ "$#" -eq 1 ]] || failr "text missing" --usage "$usage" -- "$@"
 
-    local -i available_width=${#LOGR_MARGIN_LEFT} text_width="${util_center_width:-${#1}}"
+    local -i available_width=${#MARGIN} text_width="${util_center_width:-${#1}}"
     local -i lpad=$(( (available_width - text_width) / 2 ))
     [[ "$lpad" -gt 0 ]] || lpad=0
     local -i rpad=$(( available_width - text_width - lpad ))
@@ -192,11 +178,11 @@ util() {
     case $1 in
       show)
         shift
-        printf -v util_text '%s' "$LOGR_CURSOR_SHOW"
+        printf -v util_text '%s' "$tty_show"
         ;;
       hide)
         shift
-        printf -v util_text '%s' "$LOGR_CURSOR_HIDE"
+        printf -v util_text '%s' "$tty_hide"
         ;;
       *)
         failr "unknown command" --usage "$usage" -- "$@"
@@ -221,21 +207,12 @@ util() {
       esac
     done
     set -- "${args[@]}"
-    [[ "$#" -eq 1 ]] || failr "icon missing" --usage "$usage" -- "$@"
-    local icon_ref="LOGR_ICON_${1^^}" format_ref="LOGR_FORMAT_${1^^}"
-    local icon format
-    if [[ -v "$icon_ref" ]]; then
-      icon=${!icon_ref}
-    else
-      icon='?'
-    fi
-    if [[ -v "$format_ref" ]]; then
-      format=${!format_ref}
-    else
-      format=""
-    fi
-    [[ "${center:-}" != true ]] || util center -v icon "$icon"
-    printf -v util_text '%s%s%s' "$format" "$icon" "$LOGR_RESET"
+    [ $# -eq 1 ] || failr "icon missing" --usage "$usage" -- "$@"
+    local icon template
+    icon=${logr_icons[${1,,}]-'?'}
+    template=${logr_templates[${1,,}]-'%s'}
+    [ ! ${center-} ] || util center -v icon "$icon"
+    printf -v util_text "$template" "$icon"
     ;;
 
   # prints on the margin without changing the cursor
@@ -243,14 +220,14 @@ util() {
     usage="${usage%UTIL*}$1 TEXT"
     shift
     [[ "$#" -eq 1 ]] || failr "text missing" --usage "$usage" -- "$@"
-    printf -v util_text '%s%s%s%s' "$LOGR_CURSOR_SAVE" "$LOGR_CURSOR_COLUMN_MARGIN" "${1?text missing}" "$LOGR_CURSOR_RESTORE"
+    printf -v util_text '%s%s%s%s' "$tty_save" "$tty_hpa0" "${1?text missing}" "$tty_load"
     ;;
 
   # prints the optional icon and text from the start of the line
   print_line)
     args=() usage="${usage%UTIL*}$1 [-i|--icon ICON] [TEXT...]"
     shift
-    local print_line_icon="$LOGR_MARGIN_LEFT"
+    local print_line_icon="$MARGIN"
     while (("$#")); do
       case $1 in
         -i | --icon)
@@ -266,14 +243,14 @@ util() {
     done
     set -- "${args[@]}"
     local inlined && util --var inlined inline "$*"
-    printf -v util_text '%s%s%s' "$LOGR_CURSOR_COLUMN_MARGIN" "$print_line_icon" "$inlined"
+    printf -v util_text '%s%s%s' "$tty_hpa0" "$print_line_icon" "$inlined"
     ;;
 
   # prints the optional icon and text from the end of the line
   print_line_end)
     args=() usage="${usage%UTIL*}$1 [-i|--icon ICON] [TEXT...]"
     shift
-    local print_line_end_icon="$LOGR_MARGIN_LEFT"
+    local print_line_end_icon="$MARGIN"
     while (("$#")); do
       case $1 in
         -i | --icon)
@@ -340,7 +317,7 @@ spinner() {
     done
     while true; do
       for i in "${!frames[@]}"; do
-        util print_margin "$LOGR_COLOR_FG_BRIGHT_YELLOW${frames[$i]}$LOGR_CURSOR_RESTORE"
+        util print_margin "$tty_bright_yellow${frames[$i]}$tty_load"
         sleep 0.10
       done
     done
@@ -352,7 +329,7 @@ spinner() {
 
 # Logs according to the given type.
 # Globals:
-#   LOGR_MARGIN_LEFT
+#   MARGIN
 #   LOGR_SPINNER_PID
 #   LOGR_VERSION
 #   PWD
@@ -363,7 +340,7 @@ spinner() {
 #   0 - type
 #   * - type arguments
 # Returns:
-#   $task_exit_status ...
+#  task_exit_status ...
 #   0 - success
 #   1 - error
 #   * - signal
@@ -512,15 +489,15 @@ logr() {
 
     if [[ -n "${warn_only:-}" ]]; then
       util --newline print_line_end --icon warn
-      sed -e 's/^/'"$LOGR_MARGIN_LEFT$LOGR_COLOR_FG_YELLOW"'/' \
-          -e 's/$/'"$LOGR_RESET"'/' \
+      sed -e 's/^/'"$MARGIN$tty_yellow"'/' \
+          -e 's/$/'"$tty_reset"'/' \
         "$logfile" >&2
       return 0
     fi
 
     util --newline print_line_end --icon error
-    sed -e 's/^/'"$LOGR_MARGIN_LEFT$LOGR_COLOR_FG_RED"'/' \
-        -e 's/$/'"$LOGR_RESET"'/' \
+    sed -e 's/^/'"$MARGIN$tty_red"'/' \
+        -e 's/$/'"$tty_reset"'/' \
         "$logfile" >&2
     exit $task_exit_status
     ;;
@@ -534,125 +511,118 @@ logr() {
 main() {
   TMPDIR=${TMPDIR:-/tmp} TMPDIR=${TMPDIR%/}
 
-  # Checks if the given shell option is available and activates it.
-  # Otherwise fails.
+  # bashsupport disable=BP5006
+  declare -g -r \
+    LOGR_VERSION=0.1.0 \
+    MARGIN='   '
+
+  # bashsupport disable=BP2001
+  # shellcheck disable=SC2034
+  declare -g tty_alt='' tty_alt_end='' tty_hpa0='' tty_hide='' tty_show='' tty_save='' tty_load='' \
+    tty_dim='' tty_bold='' tty_stout='' tty_stout_end='' tty_underline='' tty_underline_end='' \
+    tty_reset='' tty_blink='' tty_italic='' tty_italic_end='' tty_black='' tty_white='' \
+    tty_bright_black='' tty_bright_white='' tty_default='' tty_eed='' tty_eel='' tty_ebl='' tty_ewl='' \
+    tty_red='' tty_green='' tty_yellow='' tty_blue='' tty_magenta='' tty_cyan='' \
+    tty_bright_red='' tty_bright_green='' tty_bright_yellow='' tty_bright_blue='' tty_bright_magenta='' tty_bright_cyan=''
+
+  # escape sequences if terminal is connected
+  # shellcheck disable=SC2034
+  [ -t 2 ] && [ ! "$TERM" = dumb ] && {
+    COLUMNS=$({ tput cols || tput co; } 2>&3) # columns per line
+    LINES=$({ tput lines || tput li; } 2>&3)  # lines on screen
+    tty_alt=$(tput smcup || tput ti)          # start alt display
+    tty_alt_end=$(tput rmcup || tput te)      # end alt display
+    tty_hpa0=$(tput hpa 0)                    # set horizontal abs pos 0
+    tty_hide=$(tput civis || tput vi)         # hide cursor
+    tty_show=$(tput cnorm || tput ve)         # show cursor
+    tty_save=$(tput sc)                       # save cursor
+    tty_load=$(tput rc)                       # load cursor
+    tty_dim=$(tput dim || tput mh)            # start dim
+    tty_bold=$(tput bold || tput md)          # start bold
+    tty_stout=$(tput smso || tput so)         # start stand-out
+    tty_stout_end=$(tput rmso || tput se)     # end stand-out
+    tty_underline=$(tput smul || tput us)     # start underline
+    tty_underline_end=$(tput rmul || tput ue) # end underline
+    tty_reset=$(tput sgr0 || tput me)         # reset cursor
+    tty_blink=$(tput blink || tput mb)        # start blinking
+    tty_italic=$(tput sitm || tput ZH)        # start italic
+    tty_italic_end=$(tput ritm || tput ZR)    # end italic
+
+    # escape sequences for terminals not in mono mode
+    [[ $TERM != *-m ]] && {
+      tty_red=$(tput setaf 1 || tput AF 1)
+      tty_green=$(tput setaf 2 || tput AF 2)
+      tty_yellow=$(tput setaf 3 || tput AF 3)
+      tty_blue=$(tput setaf 4 || tput AF 4)
+      tty_magenta=$(tput setaf 5 || tput AF 5)
+      tty_cyan=$(tput setaf 6 || tput AF 6)
+      tty_bright_red=$(tput setaf 9 || tput AF 9)
+      tty_bright_green=$(tput setaf 10 || tput AF 10)
+      tty_bright_yellow=$(tput setaf 11 || tput AF 11)
+      tty_bright_blue=$(tput setaf 12 || tput AF 12)
+      tty_bright_magenta=$(tput setaf 13 || tput AF 13)
+      tty_bright_cyan=$(tput setaf 14 || tput AF 14)
+    }
+    tty_black=$(tput setaf 0 || tput AF 0)
+    tty_white=$(tput setaf 7 || tput AF 7)
+    tty_bright_black=$(tput setaf 8 || tput AF 8)
+    tty_bright_white=$(tput setaf 15 || tput AF 15)
+    tty_default=$(tput op)
+    tty_eed=$(tput ed || tput cd)             # erase to end of display
+    tty_eel=$(tput el || tput ce)             # erase to end of line
+    tty_ebl=$(tput el1 || tput cb)            # erase to beginning of line
+    tty_ewl=$tty_eel$tty_ebl                  # erase whole line
+  } 3>&2 2>/dev/null || :
+
+  declare -A -g -r logr_icons=(
+    ['new']='✱'
+    ['item']='▪'
+    ['link']='↗'
+    ['file']='↗'
+    ['task']='☐'
+    ['success']='✔'
+    ['info']='ℹ'
+    ['warn']='⚠'
+    ['error']='✘'
+    ['fail']='⚡'
+ )
+
+   local r=$tty_reset
+  declare -A -g -r logr_templates=(
+    ['new']="${tty_yellow}%s$r"
+    ['link']="${tty_blue}%s$r"
+    ['file']="${tty_blue}%s$r"
+    ['task']="${tty_blue}%s$r"
+    ['success']="${tty_green}%s$r"
+    ['info']="${tty_white}%s$r"
+    ['warn']="${tty_bright_yellow}%s$r"
+    ['error']="${tty_red}%s$r"
+    ['fail']="${tty_red}%s$r"
+  )
+
+  # Checks if the given shell option is available and activates it. Fails otherwise.
   # Arguments:
   #   1 - shell option name
   require_shopt() {
-    ! shopt -q "${1:?option missing}" || failr "unsupported shell option" -- "$@"
-    shopt -s "$1"
+    test $# -eq 1 || failr --usage "option" -- "$@"
+    ! shopt -q "$1" || failr "unsupported shell option" -- "$@"
+    shopt -s "$1" || failr "failed to activate shell option" -- "$@"
   }
 
   require_shopt globstar # ** matches all files and any number of dirs and sub dirs
-
-  # not active because incompatible with Bats' assert_line (no matches at all)
-  # require_shopt nullglob # non-matching globs expand to null (-> no loop iteration)
-
   require_shopt checkjobs # check for running jobs before exiting
+  stty -echoctl 2>/dev/null || true # don't echo control characters in hat notation (e.g. `^C`)
 
-  # don't echo control characters in hat notation (e.g. `^C`)
-  stty -echoctl 2>/dev/null || true
+  unset BATS_VERSION
+  BATS_VERSION='x xx'
+  if [ "${BATS_VERSION-}" ]; then
+    echo "YES"
+  else
+    echo "NO"
+  fi
+  exit 0
 
-  # shellcheck disable=SC2155,SC2034
-  # bashsupport disable=BP2001,BP5006
-  declare -g \
-    LOGR_VERSION=0.1.0 \
-    LOGR_MARGIN_LEFT="   "
-
-  # escape sequences if terminal is connected
-  if [ -t 2 ] && [ ! $TERM = dumb ]; then
-    COLUMNS=$({ tput cols   || tput co;} 2>&3) # Columns in a line
-    LINES=$({   tput lines  || tput li;} 2>&3) # Lines on screen
-    alt=$(      tput smcup  || tput ti      ) # Start alt display
-    ealt=$(     tput rmcup  || tput te      ) # End   alt display
-    hide=$(     tput civis  || tput vi      ) # Hide cursor
-    show=$(     tput cnorm  || tput ve      ) # Show cursor
-    save=$(     tput sc                     ) # Save cursor
-    load=$(     tput rc                     ) # Load cursor
-    dim=$(      tput dim    || tput mh      ) # Start dim
-    bold=$(     tput bold   || tput md      ) # Start bold
-    stout=$(    tput smso   || tput so      ) # Start stand-out
-    estout=$(   tput rmso   || tput se      ) # End stand-out
-    under=$(    tput smul   || tput us      ) # Start underline
-    eunder=$(   tput rmul   || tput ue      ) # End   underline
-    reset=$(    tput sgr0   || tput me      ) # Reset cursor
-    blink=$(    tput blink  || tput mb      ) # Start blinking
-    italic=$(   tput sitm   || tput ZH      ) # Start italic
-    eitalic=$(  tput ritm   || tput ZR      ) # End   italic
-
-    # escape sequences for terminals not in mono mode
-    if [[ $TERM != *-m ]]; then
-        red=$(      tput setaf 1|| tput AF 1    )
-        green=$(    tput setaf 2|| tput AF 2    )
-        yellow=$(   tput setaf 3|| tput AF 3    )
-        blue=$(     tput setaf 4|| tput AF 4    )
-        magenta=$(  tput setaf 5|| tput AF 5    )
-        cyan=$(     tput setaf 6|| tput AF 6    )
-    fi
-    black=$(    tput setaf 0|| tput AF 0    )
-    white=$(    tput setaf 7|| tput AF 7    )
-    default=$(  tput op                     )
-    eed=$(      tput ed     || tput cd      )   # Erase to end of display
-    eel=$(      tput el     || tput ce      )   # Erase to end of line
-    ebl=$(      tput el1    || tput cb      )   # Erase to beginning of line
-    ewl=$eel$ebl                                # Erase whole line
-  fi 3>&2 2>/dev/null ||:
-
-  # shellcheck disable=SC2155,SC2034
-  # bashsupport disable=BP2001,BP5006
-  declare -g \
-    LOGR_RESET=$(tput sgr0) \
-    LOGR_COLOR_FG_BLACK=$(tput setaf 0) \
-    LOGR_COLOR_FG_RED=$(tput setaf 1) \
-    LOGR_COLOR_FG_GREEN=$(tput setaf 2) \
-    LOGR_COLOR_FG_YELLOW=$(tput setaf 3) \
-    LOGR_COLOR_FG_BLUE=$(tput setaf 4) \
-    LOGR_COLOR_FG_MAGENTA=$(tput setaf 5) \
-    LOGR_COLOR_FG_CYAN=$(tput setaf 6) \
-    LOGR_COLOR_FG_WHITE=$(tput setaf 7) \
-    LOGR_COLOR_FG_BRIGHT_BLACK=$(tput setaf 8) \
-    LOGR_COLOR_FG_BRIGHT_RED=$(tput setaf 9) \
-    LOGR_COLOR_FG_BRIGHT_GREEN=$(tput setaf 10) \
-    LOGR_COLOR_FG_BRIGHT_YELLOW=$(tput setaf 11) \
-    LOGR_COLOR_FG_BRIGHT_BLUE=$(tput setaf 12) \
-    LOGR_COLOR_FG_BRIGHT_MAGENTA=$(tput setaf 13) \
-    LOGR_COLOR_FG_BRIGHT_CYAN=$(tput setaf 14) \
-    LOGR_COLOR_FG_BRIGHT_WHITE=$(tput setaf 15) \
-    LOGR_CURSOR_END_MARGIN="$(tput hpa 0)" \
-    LOGR_CURSOR_COLUMN_MARGIN="$(tput hpa 0)" \
-    LOGR_CURSOR_COLUMN_NORMAL="$(tput hpa "${#LOGR_MARGIN_LEFT}")" \
-    LOGR_CURSOR_SAVE=$(tput sc) \
-    LOGR_CURSOR_RESTORE=$(tput rc) \
-    LOGR_CURSOR_HIDE=$(tput civis) \
-    LOGR_CURSOR_SHOW=$(tput cnorm)
-  # shellcheck disable=SC2155,SC2034
-  # bashsupport disable=BP2001,BP5006
-  declare -g \
-    LOGR_ICON_NEW='✱' \
-    LOGR_ICON_ITEM='▪' \
-    LOGR_FORMAT_ITEM='' \
-    LOGR_ICON_LINK='↗' \
-    LOGR_ICON_FILE='↗' \
-    LOGR_ICON_TASK='☐' \
-    LOGR_ICON_SUCCESS='✔' \
-    LOGR_ICON_INFO='ℹ' \
-    LOGR_ICON_WARN='⚠' \
-    LOGR_ICON_ERROR='✘' \
-    LOGR_ICON_FAIL='⚡'
-  # shellcheck disable=SC2155,SC2034
-  # bashsupport disable=BP2001,BP5006
-  declare -g -n \
-    LOGR_FORMAT_NEW=LOGR_COLOR_FG_YELLOW \
-    LOGR_FORMAT_LINK=LOGR_COLOR_FG_BLUE \
-    LOGR_FORMAT_FILE=LOGR_COLOR_FG_BLUE \
-    LOGR_FORMAT_TASK=LOGR_COLOR_FG_BLUE \
-    LOGR_FORMAT_SUCCESS=LOGR_COLOR_FG_GREEN \
-    LOGR_FORMAT_INFO=LOGR_COLOR_FG_WHITE \
-    LOGR_FORMAT_WARN=LOGR_COLOR_FG_BRIGHT_YELLOW \
-    LOGR_FORMAT_ERROR=LOGR_COLOR_FG_RED \
-    LOGR_FORMAT_FAIL=LOGR_COLOR_FG_RED
-
-  [[ -n "${BATS_VERSION:-}" ]] || logr _init
+  [ ${BATS_VERSION-} ] || logr _init
 }
 
 main "$@"

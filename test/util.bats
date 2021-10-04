@@ -5,15 +5,10 @@ setup() {
   load_lib support
   load_lib assert
 
-  export TERM_OVERRIDE=''
   load "${BATS_CWD}/logr.sh"
 }
 
-teardown() {
-  unset TERM_OVERRIDE
-}
-
-@test "TODO should print usage" {
+@test "should print usage" {
   run util
   assert_line --partial "failed: util missing"
   assert_line --partial "Usage: util [-v|--var VAR] [-n|--newline] UTIL [ARGS...]"
