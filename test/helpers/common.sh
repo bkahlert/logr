@@ -19,7 +19,7 @@ set -euo pipefail
 # Outputs:
 #   FD3 - echo message
 function trace() {
-  if ((${#@} == 0)) && [ "${output-}" ]; then
+  if [ $# -eq 0 ] && [ "${output-}" ]; then
     set -- "${output:-}"
   fi
   if { true >&3; } 2<>/dev/null; then

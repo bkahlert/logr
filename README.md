@@ -38,24 +38,28 @@
 In order to use it, it needs to be downloaded and put on your `$PATH`
 which is exactly what the following two lines are doing:
 ```shell
-sudo curl -LfsSo /usr/local/bin/logr https://raw.githubusercontent.com/bkahlert/logr/master/logr
-sudo chmod +x /usr/local/bin/logr
+sudo curl -LfsSo /usr/local/bin/logr.sh https://raw.githubusercontent.com/bkahlert/logr/master/logr.sh
+sudo chmod +x /usr/local/bin/logr.sh
 ```
 
 ## Usage
 
 ```shell
+# logr.sh needs to be sourced to be used
 source logr.sh
 
 # sample calls
 logr info "logr.sh sourced"
 logr task "do some work" -- sleep 2
+```
 
-# dozens of sample calls
-./demo
+```shell
+# invoke as binary to a feature overview
+chmod +x logr.sh
+./logr.sh
 
 # help
-logr --help
+./logr.sh --help
 ```
 
 
