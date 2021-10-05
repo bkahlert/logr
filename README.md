@@ -2,20 +2,20 @@
 
 * yet another bash logger
   ```shell
-  ✱ new
-  ▪ item
-  ↗ https://github.com/bkahlert/logr
-  ↗ file:///home/bkahlert/dev/logr.sh:42:10
-  ✔ success
-  ℹ info
-  ⚠ warn
-  ✘ error
+  ✱︎ new
+  ▪︎ item
+  ↗︎ https://github.com/bkahlert/logr
+  ↗︎ file:///home/bkahlert/dev/logr.sh:42:10
+  ✔︎ success
+  ℹ︎ info
+  ⚠︎ warn
+  ✘︎ error
   ⚡︎ fail
-  ☐ task
-  ⠏ running task
-  ✔ succeed task
-  ⚠ failed task with warning
-  ✘ bash -c; ...; exit 2
+  ☐︎ task
+  ⠏︎ running task
+  ✔︎ succeed task
+  ⚠︎ failed task with warning
+  ✘︎ bash -c; ...; exit 2
     error log
     of failed task
   ```
@@ -54,7 +54,7 @@ logr task "do some work" -- sleep 2
 ```
 
 ```shell
-# invoke as binary to a feature overview
+# invoke as binary for a feature overview
 chmod +x logr.sh
 ./logr.sh
 
