@@ -18,7 +18,7 @@ set -euo pipefail
 #   * - echo arguments
 # Outputs:
 #   FD3 - echo message
-function trace() {
+trace() {
   if [ $# -eq 0 ] && [ "${output-}" ]; then
     set -- "${output:-}"
   fi
@@ -41,7 +41,7 @@ function trace() {
 # Outputs:
 #   STDOUT - directory containing the downloaded and extracted Bats library
 #   STDERR - details, on failure
-function download_lib() {
+download_lib() {
   local -r short_name="${1?}"
 
   local -r url="https://github.com/bats-core/bats-${short_name}/tarball/master"
@@ -71,7 +71,7 @@ function download_lib() {
 #   none
 # Arguments:
 #   1 - Short name of the library, e.g. assert
-function load_lib() {
+load_lib() {
   local -r short_name=${1:?}
 
   local file="/opt/bats-${short_name}/load.bash"
@@ -95,7 +95,7 @@ function load_lib() {
 # Applies patches to libs.
 # Arguments:
 #   1 - Short name of the library, e.g. assert
-function patch_lib() {
+patch_lib() {
   local -r short_name=${1:?}
 
   case $short_name in
@@ -105,7 +105,7 @@ function patch_lib() {
       if [ "${bats_assert_line-}" ]; then
         eval "bats_${bats_assert_line}"
         # bashsupport disable=BP5008
-        function assert_line() {
+        assert_line() {
           local shell_option=nullglob
           if shopt -q "$shell_option"; then
             printf '%s\n' "❗ Bats' assert_line seems broken if shell option $shell_option is enabled." >&2
@@ -131,7 +131,7 @@ function patch_lib() {
 #   1 - otherwise
 # Outputs:
 #   STDERR - details, on failure
-function assert_container_status() {
+assert_container_status() {
   local -r actual_status=$(docker container inspect --format "{{.State.Status}}" "$1")
   local -r expected_status=$2
   assert_equal "${actual_status}" "${expected_status}"
@@ -151,7 +151,7 @@ function assert_container_status() {
 #   1 - otherwise
 # Outputs:
 #   STDERR - details, on failure
-function assert_file_owner_group() {
+assert_file_owner_group() {
   local -r file="$1"
   local -r user="$2"
   local -r group="$3"
@@ -179,7 +179,7 @@ function assert_file_owner_group() {
 # Outputs:
 #   STDOUT - absolute path of the given fixture
 #   STDERR - details on failure
-function fixture() {
+fixture() {
   local -r dir="${2:-${BATS_TEST_DIRNAME:?}}"
   if [ ! "${dir#${BATS_CWD:?}}" ]; then
     echo "Cannot find fixture $1" >&2
@@ -202,18 +202,18 @@ function fixture() {
 #   2 - target
 # Outputs:
 #   STDERR - details on failure
-function cp_fixture() {
+cp_fixture() {
   cp "$(fixture "${1:?}")" "${2:?}"
 }
 
-# Checks if this test run was invoked via BashSupport Pro.
+# Tests if this test run was invoked via BashSupport Pro.
 # Globals:
 #   BASH_SOURCE
 #   BATS_SHELL
 # Returns:
 #   0 - successful
 #   1 - not successful
-function check_bashsupport_pro() {
+test_bashsupport_pro() {
   local i
   for i in "${!BASH_SOURCE[@]}"; do
     [[ ${BASH_SOURCE[i]} =~ IntelliJ|intellij && ${BASH_SOURCE[i]} =~ "bashsupport-pro" ]] || continue
@@ -222,28 +222,23 @@ function check_bashsupport_pro() {
   return 1
 }
 
-# Checks if the currently running Bats has the required minimal version.
+# Tests if the currently running Bats has the required minimal version.
 # Returns:
 #   0 - successful
 #   1 - not successful
-function check_bats_version() {
+test_min_bats_version() {
   local version
   version=$(bats --version) 2>/dev/null
-  echo "$version"
   version=${version#Bats }
-  echo "$version"
   [[ ${version} == 1.4* ]]
 }
 
 # Sanity checks
-function main() {
+main() {
 
-  if check_bats_version; then
-    exit 0
-    return 0
-  fi
+  ! test_min_bats_version || return 0
 
-  if check_bashsupport_pro; then
+  if test_bashsupport_pro; then
     # shellcheck disable=SC2016
     printf '%s' '
 ❗ You are running these tests with a version of BashSupport Pro that uses an outdated Bats.
@@ -282,4 +277,4 @@ Please update or use the Bats wrapper `batsw`.
 
 }
 
-#main "$@"
+main "$@"
