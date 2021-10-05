@@ -13,12 +13,12 @@ setup() {
   assert_output " ℹ foo"
 }
 
-@test "should empty" {
+@test "should print icon only" {
   run logr info
   assert_output " ℹ "
 }
 
-@test "should print array" {
-  run logr info foo bar
-  assert_output " ℹ foo bar"
+@test "should printf" {
+  run logr info 'foo %*s' 5 bar
+  assert_output " ℹ foo   bar"
 }

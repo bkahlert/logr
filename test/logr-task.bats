@@ -11,14 +11,20 @@ setup() {
 
 @test "should print usage" {
   run logr task
-  assert_line --partial "failed: message or command missing"
-  assert_line --partial "Usage: logr task [MESSAGE] [-w|--warn-only] [-- COMMAND [ARGS...]]"
+  assert_line --partial "failed: format or command missing"
+  assert_line --partial "Usage: logr task [-w|--warn-only] [FORMAT [ARGS...]] [-- COMMAND [ARGS...]]"
 }
 
-@test "should print message" {
-  run logr task "message"
-  assert_output " ☐ message"
+@test "should print" {
+  run logr task "foo"
+  assert_output " ☐ foo"
 }
+
+@test "should printf" {
+  run logr task 'foo %*s' 5 bar
+  assert_output " ☐ foo   bar"
+}
+
 
 @test "should inline multi-line message" {
   run logr task 'message

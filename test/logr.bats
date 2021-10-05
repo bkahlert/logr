@@ -20,8 +20,8 @@ setup() {
      file        Log a file link
 
      success     Log a success message
-     info        Log an informational message
-     warn        Log a warn
+     info        Log an information
+     warn        Log a warning
      error       Log an error
      fail        Log an error and terminate'
 }

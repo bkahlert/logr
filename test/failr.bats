@@ -68,7 +68,7 @@ setup() {
 }
 
 @test "should print own usage if called incorrectly" {
-  local usage='Usage: failr [-n|--name NAME] [-u|--usage USAGE] [--] [ARGS...]'
+  local usage='Usage: failr [-n|--name NAME] [-u|--usage USAGE] [FORMAT [ARGS...]] [--] [INVOCATION...]'
 
   run failr --name
   assert_line --partial "failr --name failed: value of name missing"

@@ -13,12 +13,12 @@ setup() {
   assert_output " ▪ foo"
 }
 
-@test "should empty" {
+@test "should print icon only" {
   run logr list
   [ ! "${output-}" ]
 }
 
-@test "should print array" {
+@test "should print list" {
   run logr list foo bar
   assert_output ' ▪ foo
  ▪ bar'
