@@ -349,8 +349,6 @@ spinner() {
 #   LOGR_VERSION
 #   PWD
 #   TMPDIR
-#   item
-#   pid
 # Arguments:
 #   0 - type
 #   * - type arguments
@@ -389,8 +387,9 @@ logr() {
     _cleanup)
       shift
       util cursor show
-      for pid in $(jobs -p); do
-        kill "$pid" &>/dev/null || true
+      local job_pid
+      for job_pid in $(jobs -p); do
+        kill "$job_pid" &>/dev/null || true
       done
       ;;
     _abort)
@@ -406,6 +405,7 @@ logr() {
       ;;
     list)
       shift
+      local item
       for item in "$@"; do logr item "$item"; done
       ;;
     link)
