@@ -10,7 +10,7 @@
   ℹ info
   ⚠ warn
   ✘ error
-  ⚡ fail
+  ⚡︎ fail
   ☐ task
   ⠏ running task
   ✔ succeed task
