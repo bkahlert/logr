@@ -38,37 +38,33 @@ set -euo pipefail
 #   - - optional; used declare remaining arguments as positional arguments
 #   * - arguments the original unit was called with
 failr() {
+  local code=$? failr_usage="[-n|--name NAME] [-u|--usage USAGE] [FORMAT [ARGS...]] [--] [INVOCATION...]"
+  local name=${FUNCNAME[1]:-?} format=() usage print_call
   local -a stacktrace=()
   for i in "${!BASH_LINENO[@]}"; do
     [ "${BASH_LINENO[i]}" = 0 ] || stacktrace+=("${FUNCNAME[i + 1]:-?}(${BASH_SOURCE[i + 1]:-?}:${BASH_LINENO[i]:-?})")
   done
 
-  local code=$? failr_usage="[-n|--name NAME] [-u|--usage USAGE] [FORMAT [ARGS...]] [--] [INVOCATION...]" name=${FUNCNAME[1]:-?} format=() usage print_call
   while (($#)); do
     case $1 in
       -n | --name)
         [ "${2-}" ] || failr "value of name missing" --usage "$failr_usage" -- "$@"
-        name=$2
-        shift 2
+        name=$2 && shift 2
         ;;
       -u | --usage)
         [ "${2-}" ] || failr "value of usage missing" --usage "$failr_usage" -- "$@"
-        usage=$2
-        shift 2
+        usage=$2 && shift 2
         ;;
       -c | --code)
         [ "${2-}" ] || failr "value of code missing" --usage "$failr_usage" -- "$@"
-        code=$2
-        shift 2
+        code=$2 && shift 2
         ;;
       --)
-        shift
-        print_call=true
+        print_call=true && shift
         break
         ;;
       *)
-        format+=("$1")
-        shift
+        format+=("$1") && shift
         ;;
     esac
   done
