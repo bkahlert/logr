@@ -396,8 +396,13 @@ logr() {
       failr --code "${code:-1}" "Aborted" || true
       ;;
 
-    new | item | success | info | warn | error | fail)
+    new | item | success | info | warn)
       util --newline print_line --icon "$1" "${@:2}"
+      [ ! "$1" = "error" ] || return 1
+      [ ! "$1" = "fail" ] || exit 1
+      ;;
+    error | fail)
+      util --newline print_line --icon "$1" "${@:2}" >&2
       [ ! "$1" = "error" ] || return 1
       [ ! "$1" = "fail" ] || exit 1
       ;;
