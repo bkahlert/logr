@@ -22,3 +22,9 @@ setup() {
   run logr error 'foo %*s' 5 bar
   assert_output " ✘ foo   bar"
 }
+
+# shellcheck disable=SC2154
+@test "should return 1" {
+  run logr fail foo
+  assert_equal "$status" "1"
+}

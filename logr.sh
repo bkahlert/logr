@@ -398,7 +398,8 @@ logr() {
 
     new | item | success | info | warn | error | fail)
       util --newline print_line --icon "$1" "${@:2}"
-      [ ! "$1" = "fail" ] || return 1
+      [ ! "$1" = "error" ] || return 1
+      [ ! "$1" = "fail" ] || exit 1
       ;;
     list)
       shift
@@ -666,7 +667,7 @@ main() {
   # shellcheck disable=SC2016
   usage() {
     printf '\n'
-    logr error "To use logr you need to source it at the top of your script."
+    logr error "To use logr you need to source it at the top of your script." || true
     printf '\n'
     logr info 'If logr is on your $PATH type:
 source logr.sh
@@ -702,8 +703,8 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE
   logr success "success message"
   logr info "info"
   logr warn "warning"
-  logr error "error"
-  logr fail "failure" || true
+  logr error "error" ||
+  (logr fail "failure") || true
 
   logr task "task message"
   logr task "task message and cmdline" -- sleep 2
