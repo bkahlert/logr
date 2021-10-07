@@ -126,21 +126,6 @@ util() {
   # utilities
   local util_text
   case $1 in
-    inline)
-      usage="${usage%UTIL*}$1 TEXT"
-      shift
-
-      [ $# -ge 1 ] || failr "text missing" --usage "$usage" -- "$@"
-
-      local text="$*"
-      text=${text#$LF}
-      text=${text%$LF}
-      text=${text//$LF*$LF/; ...; }
-      text=${text//$LF/; }
-
-      printf -v util_text "%s" "$text"
-      ;;
-
     center)
       args=() usage="${usage%UTIL*}$1 [-w|--width WIDTH] TEXT"
       shift
@@ -216,6 +201,22 @@ util() {
       printf -v util_text "$template" "$icon"
       ;;
 
+    inline)
+      usage="${usage%UTIL*}$1 FORMAT [ARGS...]"
+      shift
+
+      [ $# -ge 1 ] || failr "format missing" --usage "$usage" -- "$@"
+
+      # shellcheck disable=SC2059
+      local text && printf -v text "${@}"
+      text=${text#$LF}
+      text=${text%$LF}
+      text=${text//$LF*$LF/; ...; }
+      text=${text//$LF/; }
+
+      util_text="$text"
+      ;;
+
     # prints on the margin without changing the cursor
     print_margin)
       usage="${usage%UTIL*}$1 TEXT"
@@ -226,18 +227,18 @@ util() {
 
     # prints the optional icon and text from the start of the line
     print_line)
-      args=() usage="${usage%UTIL*}$1 [-i|--icon ICON] [--inline] [TEXT...]"
+      args=() usage="${usage%UTIL*}$1 [-i|--icon ICON] [TEXT...]"
       shift
-      local print_line_icon="$MARGIN" inline
+      local print_line_icon="$MARGIN"
       while (($#)); do
         case $1 in
           -i | --icon)
             [ "${2-}" ] || usage
-            util icon -v print_line_icon --center "$2"
+            util -v print_line_icon icon --center "$2"
             shift 2
             ;;
-          --inline)
-            inline=true
+          --skip-icon)
+            print_line_icon="${tty_hpa_margin-}"
             shift
             ;;
           *)
@@ -251,11 +252,7 @@ util() {
       local _text=''
       # shellcheck disable=SC2059
       [ $# -eq 0 ] || printf -v _text "$@"
-      if [ "${inline-}" ]; then
-        util -v _text inline "$_text"
-      else
-        _text=${_text//$LF/$LF$MARGIN}
-      fi
+      _text=${_text//$LF/$LF$MARGIN}
       printf -v util_text '%s%s%s' "$tty_hpa0" "$print_line_icon" "$_text"
       ;;
 
@@ -268,7 +265,7 @@ util() {
         case $1 in
           -i | --icon)
             [ "${2-}" ] || usage
-            util icon -v print_line_end_icon --center "$2"
+            util -v print_line_end_icon icon --center "$2"
             shift 2
             ;;
           *)
@@ -453,15 +450,11 @@ logr() {
       util --newline print_line --icon file '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "$text"
       ;;
     task)
-      usage="${usage%COMMAND*}$1 [-w|--warn-only] [FORMAT [ARGS...]] [-- COMMAND [ARGS...]]"
+      usage="${usage%COMMAND*}$1 [FORMAT [ARGS...]] [-- COMMAND [ARGS...]]"
       shift
-      local format=() warn_only
+      local format=()
       while (($#)); do
         case $1 in
-          -w | --warn-only)
-            warn_only=true
-            shift
-            ;;
           --)
             shift
             break
@@ -474,46 +467,77 @@ logr() {
       done
       local -a cmdline=("$@")
 
+      local logr_task
       if [ "${#format[@]}" -eq 0 ]; then
         [ "${#cmdline[@]}" -gt 0 ] || failr "format or command missing" --usage "$usage" -- "$@"
-        format=("${cmdline[*]}")
+        util inline -v logr_task "${cmdline[*]}"
+      else
+        # shellcheck disable=SC2059
+        util inline -v logr_task "${format[@]}"
       fi
-
-      util print_line --icon task --inline "${format[@]}"
 
       if [ "${#cmdline[@]}" -eq 0 ]; then
-        printf '%s\n' ''
+        util print_line --icon task "$logr_task"
+        printf '\n'
         return 0
       fi
 
-      spinner start
+      local logr_tasks
+      if [ "$logr_parent_tasks" ]; then
+        local sep && util -v sep icon --center nest
+        logr_tasks="$logr_parent_tasks$sep$logr_task"
+      else
+        logr_tasks=$logr_task
+      fi
 
-      local logfile
-      logfile=${TMPDIR:-/tmp}/logr.$$.log
-      "${cmdline[@]}" 1>"$logfile" 2>"$logfile" &
-      local task_pid=$! task_exit_status=0
-      wait "$task_pid" || task_exit_status=$? || true
+      local task_line && util -v task_line print_line --skip-icon "$logr_tasks"
+      local task_file && task_file=${TMPDIR:-/tmp}/logr.$$.task
+      local log_file && log_file=${TMPDIR:-/tmp}/logr.$$.log
 
-      spinner stop
+      local task_exit_status=0
+      if [ ! "$logr_parent_tasks" ]; then
+        [ ! -f "$task_file" ] || rm -- "$task_file"
+        [ ! -f "$log_file" ] || rm -- "$log_file"
+        printf '%s' "$task_line" "$tty_eel"
+        spinner start
+        # run command line; redirect stdout+stderr to log_file; provide FD3 and FD4 as means to still print
+        (logr_parent_tasks=$logr_tasks "${cmdline[@]}" 3>&1 1>"$log_file" 4>&2 2>"$log_file") || task_exit_status=$?
+      else
+        printf '%s' "$task_line" "$tty_eel" >&3
+        # run command line; redirects from parent task already apply
+        (logr_parent_tasks=$logr_tasks "${cmdline[@]}") || task_exit_status=$?
+      fi
 
-      if [ "${task_exit_status-0}" -eq 0 ]; then
+      if [ ! "$task_exit_status" -eq 0 ] && [ ! -f "$task_file" ]; then
+        printf '%s' "$task_line" "$tty_eel" >"$task_file"
+      fi
+
+      # pass exit code up to initial task
+      if [ "$logr_parent_tasks" ]; then
+        [ "$task_exit_status" -eq 0 ] || exit "$task_exit_status"
+        # erase what has been printed on same line by printing task_line again
+        printf '%s' "$task_line" "$tty_eel" >&3
+      else
+        # --- only initial task here
+        spinner stop
+
+        # error
+        if [ ! "$task_exit_status" -eq 0 ]; then
+          printf '%s' "$(cat "$task_file")" "$tty_eel"
+          util --newline print_line_end --icon error
+          perl \
+              -pe 's/\e\[[0-9;(]*[a-zA-Z]//g;' \
+              -pe 's/^/'"$MARGIN$tty_red"'/;' \
+              -pe 's/$/'"$tty_reset"'/;' \
+           "$log_file"
+          exit $task_exit_status
+        fi
+
+        # success
+        # erase what has been printed on same line by printing task_line again
+        printf '%s' "$task_line" "$tty_eel"
         util --newline print_line_end --icon success
-        return 0
       fi
-
-      if [ "${warn_only-}" ]; then
-        util --newline print_line_end --icon warn
-        sed -e 's/^/'"$MARGIN$tty_yellow"'/' \
-          -e 's/$/'"$tty_reset"'/' \
-          "$logfile" >&2
-        return 0
-      fi
-
-      util --newline print_line_end --icon error
-      sed -e 's/^/'"$MARGIN$tty_red"'/' \
-        -e 's/$/'"$tty_reset"'/' \
-        "$logfile" >&2
-      exit $task_exit_status
       ;;
     *)
       failr "unknown command" --usage "$usage" -- "$@"
@@ -545,6 +569,7 @@ main() {
     tty_alt=$(tput smcup || tput ti)          # start alt display
     tty_alt_end=$(tput rmcup || tput te)      # end alt display
     tty_hpa0=$(tput hpa 0)                    # set horizontal abs pos 0
+    tty_hpa_margin=$(tput hpa ${#MARGIN})     # set horizontal abs end of margin
     tty_hide=$(tput civis || tput vi)         # hide cursor
     tty_show=$(tput cnorm || tput ve)         # show cursor
     tty_save=$(tput sc)                       # save cursor
@@ -592,6 +617,9 @@ main() {
     ['link']='↗'
     ['file']='↗'
     ['task']='☐'
+    ['nest']='❱'
+    ['scheduled']='⚙'
+    #'running'-> spinner
     ['success']='✔'
     ['info']='ℹ'
     ['warn']='⚠'
@@ -599,12 +627,16 @@ main() {
     ['fail']='⚡'
   )
 
+  declare -g logr_parent_tasks=''
+
   local r=$tty_reset
   declare -A -g -r logr_templates=(
     ['new']="${tty_yellow}%s$r"
     ['link']="${tty_blue}%s$r"
     ['file']="${tty_blue}%s$r"
     ['task']="${tty_blue}%s$r"
+    ['nest']="${tty_yellow}%s$r"
+    ['scheduled']="${tty_yellow}%s$r"
     ['success']="${tty_green}%s$r"
     ['info']="${tty_white}%s$r"
     ['warn']="${tty_bright_yellow}%s$r"
@@ -664,7 +696,7 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE
   logr new "new message"
   logr item "item message"
   logr list "list message" "list message" "list message"
-  logr link "https://github.com/bkahlert"
+  logr link "https://github.com/bkahlert/logr"
   logr link "https://example.com" "link text"
   logr file "logr.sh" --line 300 --column 10
   logr success "success message"
@@ -675,13 +707,35 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE
 
   logr task "task message"
   logr task "task message and cmdline" -- sleep 2
-  logr task --warn-only -- exit 2
   (logr task -- bash -c '
 echo foo && sleep 1
 echo bar >&2 && sleep 1
 echo baz >&2 && sleep 1
 exit 2
-  ') || true
+') || true
+
+  # vanilla recursion
+  foo() {
+    logr info "foo args: $*"
+    [ "$1" -eq 0 ] || foo $(($1 - 1)) "$2"
+    sleep 1
+    [ ! "$1" = "$2" ] || exit 1
+  }
+  logr task -- foo 3 -
+  (logr task -- foo 3 2) || true
+
+  # logr task recursion
+  bar() {
+    logr info "bar args: $*"
+    [ "$1" -eq 0 ] || logr task -- bar $(($1 - 1)) "$2"
+    sleep 1
+    [ ! "$1" = "$2" ] || exit 1
+  }
+  logr task -- bar 3 -
+  (logr task -- bar 3 2) || true
+
+  sleep 1
+
 
   SECTION escape sequences -----------------------------------------------------
   printf "%sBRIGHT%s %sBLACK%s\n" "$tty_bright_black" "$tty_reset" "$tty_black" "$tty_reset"
@@ -697,7 +751,7 @@ exit 2
   (failr) || true
   (failr --) || true
   (
-    # bashsupport disable=BP5008
+    # pretends to need argument
     foo() {
       [ "$1" = baz ] || failr "baz expected" --usage "baz" -- "$*"
     }
@@ -729,7 +783,7 @@ baz
   SECTION icon
   printf ' ' && util icon success
   printf ' ' && util icon warn
-  printf ' ' && util icon -v var error && echo "$var"
+  printf ' ' && util -v var icon error && echo "$var"
   printf '%s' '->' && util icon --center new && printf '%s\n' '<-'
 
   SECTION print_margin
@@ -747,9 +801,9 @@ baz
   util --newline print_line --icon not-exists 'not existing icon + text'
 
   SECTION print_line_end
-  util print_line --icon success 'existing-icon + text' && sleep 0.3 && util print_line_end --new-line --icon success " -> icon + text updated"
-  util print_line 'text-only' && sleep 0.3 && util print_line_end --new-line --icon success
-  util print_line --icon not-exists 'not-existing icon + text' && sleep 0.3 && util print_line_end --new-line " -> text updated"
+  util print_line --icon success 'existing-icon + text' && sleep 0.3 && util print_line_end --newline --icon success " -> icon + text updated"
+  util print_line 'text-only' && sleep 0.3 && util print_line_end --newline --icon success
+  util print_line --icon not-exists 'not-existing icon + text' && sleep 0.3 && util print_line_end --newline " -> text updated"
 
   SECTION END OF FEATURES ----------------------------------------------------
 

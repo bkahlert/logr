@@ -12,7 +12,7 @@ setup() {
 @test "should print usage" {
   run logr task
   assert_line --partial "failed: format or command missing"
-  assert_line --partial "Usage: logr task [-w|--warn-only] [FORMAT [ARGS...]] [-- COMMAND [ARGS...]]"
+  assert_line --partial "Usage: logr task [FORMAT [ARGS...]] [-- COMMAND [ARGS...]]"
 }
 
 @test "should print" {
@@ -55,9 +55,4 @@ exit 2
   refute_line --partial 'foo'
   assert_line --partial 'bar'
   assert_line --partial 'baz'
-}
-
-@test "should not fail if warn-only specified" {
-  run logr task --warn-only -- exit 2
-  assert_success
 }
