@@ -71,14 +71,13 @@ cd logr
 # Use Bats wrapper to run tests
 chmod +x ./batsw
 ./batsw test
-
-# Pass -f to filter to matching tests
-./batsw -f ^X test
 ```
 
 `batsw` is a wrapper for the Bash testing framework [Bats](https://github.com/bats-core/bats-core).   
 It builds a Docker image on-the-fly containing Bats incl. several libraries and runs all tests
 contained in the specified directory.
+
+> :bulb: To accelerate testing, the Bats Wrapper checks if any test is prefixed with a capital X and if so, only runs those tests.
 
 
 ## Contributing

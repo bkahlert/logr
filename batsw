@@ -14,7 +14,6 @@ set -Eeuo pipefail
 #   BATSW_QUIET - if set, suppresses output
 # Arguments:
 #   None
-#######################################
 echo() {
   [ "${BATSW_QUIET-}" ] || printf '%s\n' "$*" >&2
 }
@@ -321,7 +320,19 @@ main() {
     echo "🐳 built Docker image: ${baked_tag}"
   fi
 
-  "${BATS_CMD}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
+  # Checks for tests starting with capital X.
+  # If such exist, focus on them and ignore the others.
+  local highlighted_tests_args=('--filter' '^X')
+  local highlighted_tests=0
+  if ! highlighted_tests=$(TERM=dumb "${BATS_CMD}" --count "${highlighted_tests_args[@]}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"); then
+    echo "Failed to find highlighted tests"
+  fi
+
+  if [ "$highlighted_tests" = "0" ]; then
+    "${BATS_CMD}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
+  else
+    "${BATS_CMD}" "${highlighted_tests_args[@]}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
+  fi
 }
 
 main "$@"
