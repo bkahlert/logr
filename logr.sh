@@ -531,10 +531,10 @@ logr() {
         if [ ! "$task_exit_status" -eq 0 ]; then
           printf '%s' "$(cat "$task_file")" "$tty_eel"
           util --newline print_line_end --icon error
-          perl \
-              -pe 's/\e\[[0-9;(]*[a-zA-Z]//g;' \
-              -pe 's/^/'"$MARGIN$tty_red"'/;' \
-              -pe 's/$/'"$tty_reset"'/;' \
+          sed \
+              -e 's/[\[(][(0-9;]*[a-zA-Z]//g;' \
+              -e 's/^/'"$MARGIN$tty_red"'/;' \
+              -e 's/$/'"$tty_reset"'/;' \
            "$log_file"
           exit $task_exit_status
         fi

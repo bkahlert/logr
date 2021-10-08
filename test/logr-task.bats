@@ -56,3 +56,11 @@ exit 2
   assert_line --partial 'bar'
   assert_line --partial 'baz'
 }
+
+@test "should filter escape sequences" {
+  run logr task -- bash -c '
+echo "foo[1G[37m ℹ (B[mbar" >&2
+exit 2
+'
+  assert_line --partial 'foo ℹ bar'
+}

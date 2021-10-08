@@ -9,6 +9,12 @@
 
 set -Eeuo pipefail
 
+# echo wrapper that allows to suppress output.
+# Globals:
+#   BATSW_QUIET - if set, suppresses output
+# Arguments:
+#   None
+#######################################
 echo() {
   [ "${BATSW_QUIET-}" ] || printf '%s\n' "$*" >&2
 }
@@ -98,11 +104,11 @@ ENTRYPOINT
 #   * - docker build arguments
 docker_build() {
   DOCKER_BUILDKIT=1 \
-  DOCKER_SCAN_SUGGEST=false \
+    DOCKER_SCAN_SUGGEST=false \
     docker build \
-      --quiet \
-      --build-arg ENTRYPOINT_SCRIPT="$(entrypoint_script)" \
-      "$@" - <<'DOCKERFILE'
+    --quiet \
+    --build-arg ENTRYPOINT_SCRIPT="$(entrypoint_script)" \
+    "$@" - <<'DOCKERFILE'
 FROM bats/bats
 RUN mkdir -p /opt
 RUN apk \
@@ -182,7 +188,7 @@ DOCKERFILE
 # Includes bash-support, bash-assert, bash-file and a Docker CLI.
 #
 # Globals:
-#   TERM - used to determine the terminal capabilities (default: xterm-256color)
+#   TERM - used to determine the terminal capabilities
 #   PWD - the current working directory
 #   BATS_IMAGE_ID - ID of the Docker image containing Bats (default: built ad-hoc)
 #   BATS_IMAGE_LOCAL_TAG - Tag of the locally built Bats Docker image (default: bats:local)
@@ -197,7 +203,7 @@ bats() {
   local -a BATS_ARGS=()
   while (($#)); do
     case "$1" in
-      -e|--env)
+      -e | --env)
         if [ "${2-}" ] && [ "${2:0:1}" != "-" ]; then
           DOCKER_ARGS+=("$1" "$2")
           shift 2
@@ -243,7 +249,7 @@ bats() {
 
   echo "$(tput setaf 7) ℹ$(tput sgr0) bats command line: bats" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
   docker run --rm --name "bats-$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom | head -c 3 || true)" \
-    -e TERM="${TERM:-xterm-256color}" \
+    -e TERM="${TERM-}" \
     -e TMPDIR="${PWD:?}/${BATS_TMPDIR%${PWD}}" \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v "${PWD:?}:${PWD:?}" \
@@ -257,7 +263,7 @@ bats() {
 # runs the specified tests using the included Bats wrapper.
 #
 # Globals:
-#   TERM - used to determine the terminal capabilities (default: xterm-256color)
+#   TERM - used to determine the terminal capabilities
 #   BATS_TMPDIR - base temporary directory used by Bats (default: build/bats-tmp)
 #   BATSW_QUIET - if set, suppresses any output related to the wrapper
 #   DOCKER_BAKE - if set, its value is passed to `docker buildx bake` (example: DOCKER_BAKE=--set=*.tags=test)
@@ -267,8 +273,6 @@ bats() {
 #   *      - bats arguments
 # bashsupport disable=BP2001,BP5006
 main() {
-  export TERM="${TERM:-xterm-256color}"
-
   local -r BATS_CMD=bats
 
   local -a BATS_ARGS=()
