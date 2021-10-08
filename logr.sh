@@ -391,9 +391,9 @@ logr() {
       ;;
     _abort)
       shift
-      local code=${1+$((128 + $1))}
+      local code=${1:-1}
       logr _cleanup
-      failr --code "${code:-1}" "Aborted" || true
+      failr --name "${0##*/}" --code "$code" "Aborted" || true
       ;;
 
     new | item | success | info | warn)
