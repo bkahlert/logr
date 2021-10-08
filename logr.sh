@@ -217,6 +217,41 @@ util() {
       util_text="$text"
       ;;
 
+    # fits the given pattern in the current row by truncating the middle with ... if necessary
+    fit)
+      shift
+      # shellcheck disable=SC2059
+      local _fit_text && printf -v _fit_text "$@"
+      local _fit_columns=$((${COLUMNS:-80} - 8)) && ((_fit_columns % 2)) && _fit_columns=$((_fit_columns - 1))
+      if [ "$_fit_columns" -lt "${#_fit_text}" ]; then
+        local _fit_half=$((_fit_columns / 2))
+        local _fit_left=${_fit_text:0:_fit_half} _fit_right=${_fit_text:$((${#_fit_text} - _fit_half)):_fit_half}
+        printf -v util_text "%s ... %s" "${_fit_left%% }" "${_fit_right## }"
+      else
+        util_text=$_fit_text
+      fi
+      ;;
+
+    fit_concat)
+      usage="${usage%UTIL*}$1 ICON TEXT1 TEXT2"
+      shift
+      [ $# -eq 3 ] || failr --usage "$usage" -- "$@"
+
+      local _fit_concat_icon && util -v _fit_concat_icon icon --center "$1" && shift
+      local _fit_concat_text
+      if [ "$1" ] && [ "$2" ]; then
+        _fit_concat_text="$1$_fit_concat_icon$2"
+      else
+        _fit_concat_text="$1$2"
+      fi
+
+      _fit_concat_text=${_fit_concat_text//$_fit_concat_icon/$''}
+      util fit -v _fit_concat_text "$_fit_concat_text"
+      _fit_concat_text=${_fit_concat_text//$''/$_fit_concat_icon}
+
+      util_text=$_fit_concat_text
+      ;;
+
     # prints on the margin without changing the cursor
     print_margin)
       usage="${usage%UTIL*}$1 TEXT"
@@ -496,13 +531,7 @@ logr() {
         return 0
       fi
 
-      local logr_tasks
-      if [ "$logr_parent_tasks" ]; then
-        local sep && util -v sep icon --center nest
-        logr_tasks="$logr_parent_tasks$sep$logr_task"
-      else
-        logr_tasks=$logr_task
-      fi
+      local logr_tasks && util -v logr_tasks fit_concat nest "$logr_parent_tasks" "$logr_task"
 
       local task_file && task_file=${TMPDIR:-/tmp}/logr.$$.task
       local log_file && log_file=${TMPDIR:-/tmp}/logr.$$.log
@@ -573,27 +602,32 @@ main() {
   # escape sequences if terminal is connected
   # shellcheck disable=SC2015,SC2034
   [ -t 2 ] && [ ! "$TERM" = dumb ] && {
-    tty_connected=true
-    COLUMNS=$({ tput cols || tput co; } 2>&3) # columns per line
-    LINES=$({ tput lines || tput li; } 2>&3)  # lines on screen
-    tty_alt=$(tput smcup || tput ti)          # start alt display
-    tty_alt_end=$(tput rmcup || tput te)      # end alt display
-    tty_hpa0=$(tput hpa 0)                    # set horizontal abs pos 0
-    tty_hpa_margin=$(tput hpa ${#MARGIN})     # set horizontal abs end of margin
-    tty_hide=$(tput civis || tput vi)         # hide cursor
-    tty_show=$(tput cnorm || tput ve)         # show cursor
-    tty_save=$(tput sc)                       # save cursor
-    tty_load=$(tput rc)                       # load cursor
-    tty_dim=$(tput dim || tput mh)            # start dim
-    tty_bold=$(tput bold || tput md)          # start bold
-    tty_stout=$(tput smso || tput so)         # start stand-out
-    tty_stout_end=$(tput rmso || tput se)     # end stand-out
-    tty_underline=$(tput smul || tput us)     # start underline
-    tty_underline_end=$(tput rmul || tput ue) # end underline
-    tty_reset=$(tput sgr0 || tput me)         # reset cursor
-    tty_blink=$(tput blink || tput mb)        # start blinking
-    tty_italic=$(tput sitm || tput ZH)        # start italic
-    tty_italic_end=$(tput ritm || tput ZR)    # end italic
+    # updates COLUMNS and LINES and calls optional callback with these dimensions
+    tty_change_handler() {
+      COLUMNS=$({ tput cols || tput co; }) && LINES=$({ tput lines || tput li; })
+      [ ! "${1-}" ] || [ ! "$(type -t "$1")" = function ] || "$1" "$COLUMNS" "$LINES"
+    }
+    trap 'tty_change_handler tty_changed' WINCH # calls 'tty_changed' if defined and dimensions changed
+    tty_change_handler tty_init 2>&3            # calls 'tty_init' if defined
+    tty_connected=true                          # if set, signifies a connected terminal
+    tty_alt=$(tput smcup || tput ti)            # start alt display
+    tty_alt_end=$(tput rmcup || tput te)        # end alt display
+    tty_hpa0=$(tput hpa 0)                      # set horizontal abs pos 0
+    tty_hpa_margin=$(tput hpa ${#MARGIN})       # set horizontal abs end of margin
+    tty_hide=$(tput civis || tput vi)           # hide cursor
+    tty_show=$(tput cnorm || tput ve)           # show cursor
+    tty_save=$(tput sc)                         # save cursor
+    tty_load=$(tput rc)                         # load cursor
+    tty_dim=$(tput dim || tput mh)              # start dim
+    tty_bold=$(tput bold || tput md)            # start bold
+    tty_stout=$(tput smso || tput so)           # start stand-out
+    tty_stout_end=$(tput rmso || tput se)       # end stand-out
+    tty_underline=$(tput smul || tput us)       # start underline
+    tty_underline_end=$(tput rmul || tput ue)   # end underline
+    tty_reset=$(tput sgr0 || tput me)           # reset cursor
+    tty_blink=$(tput blink || tput mb)          # start blinking
+    tty_italic=$(tput sitm || tput ZH)          # start italic
+    tty_italic_end=$(tput ritm || tput ZR)      # end italic
 
     # escape sequences for terminals not in mono mode
     [[ $TERM != *-m ]] && {
@@ -712,8 +746,8 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE
   logr success "success message"
   logr info "info"
   logr warn "warning"
-  logr error "error" ||
-  (logr fail "failure") || true
+  logr error "error" \
+    || (logr fail "failure") || true
 
   logr task "task message"
   logr task "task message and cmdline" -- sleep 2
@@ -744,8 +778,18 @@ exit 2
   logr task -- bar 3 -
   (logr task -- bar 3 2) || true
 
-  sleep 1
+  # provoking line overflow
+  supercalifragilisticexpialidocious() {
+    local long="${FUNCNAME[0]}"
+    sleep 1
+    logr task -- logr task -- echo "$long $long $long $long $long"
+    sleep 1
+    logr task -- logr task -- echo "$long $long $long $long $long"
+    sleep 1
+  }
+  logr task "running supercalifragilisticexpialidocious without breaking output" -- supercalifragilisticexpialidocious
 
+  sleep 1
 
   SECTION escape sequences -----------------------------------------------------
   printf "%sBRIGHT%s %sBLACK%s\n" "$tty_bright_black" "$tty_reset" "$tty_black" "$tty_reset"
