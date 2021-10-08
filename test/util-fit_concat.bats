@@ -20,5 +20,5 @@ teardown() {
 
 @test "should truncate on insufficient space" {
   run util fit_concat nest "abc-def-ghi-jkl" "123"
-  assert_output "abc-de ... kl ❱ 123"
+  assert_output "abc-def ... l ❱ 123"
 }

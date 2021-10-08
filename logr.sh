@@ -220,13 +220,15 @@ util() {
     # fits the given pattern in the current row by truncating the middle with ... if necessary
     fit)
       shift
+      local truncation=' ... ' slack=5
       # shellcheck disable=SC2059
       local _fit_text && printf -v _fit_text "$@"
-      local _fit_columns=$((${COLUMNS:-80} - 8)) && ((_fit_columns % 2)) && _fit_columns=$((_fit_columns - 1))
+      local _fit_columns=$((${COLUMNS:-80} - ${#MARGIN} - "$slack"))
+      [ "$_fit_columns" -gt 20 ] || _fit_columns=20
       if [ "$_fit_columns" -lt "${#_fit_text}" ]; then
-        local _fit_half=$((_fit_columns / 2))
+        local _fit_half=$(( (_fit_columns-${#truncation}-1) / 2))
         local _fit_left=${_fit_text:0:_fit_half} _fit_right=${_fit_text:$((${#_fit_text} - _fit_half)):_fit_half}
-        printf -v util_text "%s ... %s" "${_fit_left%% }" "${_fit_right## }"
+        printf -v util_text "%s%s%s" "${_fit_left%% }" "$truncation" "${_fit_right## }"
       else
         util_text=$_fit_text
       fi
@@ -245,9 +247,9 @@ util() {
         _fit_concat_text="$1$2"
       fi
 
-      _fit_concat_text=${_fit_concat_text//$_fit_concat_icon/$''}
+      _fit_concat_text=${_fit_concat_text//$_fit_concat_icon/$''}
       util fit -v _fit_concat_text "$_fit_concat_text"
-      _fit_concat_text=${_fit_concat_text//$''/$_fit_concat_icon}
+      _fit_concat_text=${_fit_concat_text//$''/$_fit_concat_icon}
 
       util_text=$_fit_concat_text
       ;;
