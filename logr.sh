@@ -102,16 +102,16 @@ failr() {
 #   n - if set, appends a newline
 #   * - args passed to the utility function.
 util() {
-  local args=() util_var newline usage="[-v VAR] [-n|--newline] UTIL [ARGS...]"
+  local args=() _util_var _util_newline usage="[-v VAR] [-n|--newline] UTIL [ARGS...]"
   while (($#)); do
     case $1 in
       -v)
         [ "${2-}" ] || failr "value of var missing" --usage "$usage" -- "$@"
-        util_var=$2
+        _util_var=$2
         shift 2
         ;;
       -n | --newline)
-        newline=$2
+        _util_newline=true
         shift
         ;;
       *)
@@ -178,11 +178,11 @@ util() {
     icon)
       args=() usage="${usage%UTIL*}$1 [-c|--center] ICON"
       shift
-      local center
+      local _icon_center
       while (($#)); do
         case $1 in
           -c | --center)
-            center=true
+            _icon_center=true
             shift
             ;;
           *)
@@ -193,12 +193,12 @@ util() {
       done
       set -- "${args[@]}"
       [ $# -eq 1 ] || failr "icon missing" --usage "$usage" -- "$@"
-      local icon template
-      icon=${logr_icons[${1,,}]-'?'}
-      template=${logr_templates[${1,,}]-'%s'}
-      [ ! ${center-} ] || util center -v icon "$icon"
+      local _icon_icon _icon_template
+      _icon_icon=${logr_icons[${1,,}]-'?'}
+      _icon_template=${logr_templates[${1,,}]-'%s'}
+      [ ! ${_icon_center-} ] || util center -v _icon_icon "$_icon_icon"
       # shellcheck disable=SC2059
-      printf -v util_text "$template" "$icon"
+      printf -v util_text "$_icon_template" "$_icon_icon"
       ;;
 
     inline)
@@ -256,16 +256,16 @@ util() {
       printf -v util_text '%s%s%s' "$tty_hpa0" "$print_line_icon" "$_text"
       ;;
 
-    # prints the optional icon and text from the end of the line
-    print_line_end)
-      args=() usage="${usage%UTIL*}$1 [-i|--icon ICON] [TEXT...]"
+    reprint_line)
+      args=() usage="${usage%UTIL*}$1 [-i|--icon ICON] FORMAT [ARGS...]"
       shift
-      local print_line_end_icon="$MARGIN"
+      local _reprint_line_icon=${tty_hpa_margin-}
+      [ "$tty_connected" ] || util -v _reprint_line_icon icon --center running
       while (($#)); do
         case $1 in
-          -i | --icon)
+          --icon)
             [ "${2-}" ] || usage
-            util -v print_line_end_icon icon --center "$2"
+            util -v _reprint_line_icon icon --center "$2"
             shift 2
             ;;
           *)
@@ -275,8 +275,15 @@ util() {
         esac
       done
       set -- "${args[@]}"
-      util -v print_line_end_icon print_margin "$print_line_end_icon"
-      printf -v util_text '%s%s' "$print_line_end_icon" "${*}"
+
+      # shellcheck disable=SC2059
+      local _reprint_line && printf -v _reprint_line "$@"
+      if [ "$tty_connected" ]; then
+        printf -v util_text '%s%s%s%s' "$tty_hpa0" "$_reprint_line_icon" "$_reprint_line" "$tty_eel"
+      else
+        printf -v util_text '%s%s' "$_reprint_line_icon" "$_reprint_line"
+        _util_newline=true
+      fi
       ;;
 
     *)
@@ -285,9 +292,9 @@ util() {
   esac
 
   # output
-  [ ! "${newline-}" ] || printf -v "util_text" '%s\n' "$util_text"
-  if [ "${util_var-}" ]; then
-    printf -v "$util_var" '%s' "$util_text"
+  [ ! "${_util_newline-}" ] || printf -v "util_text" '%s\n' "$util_text"
+  if [ "${_util_var-}" ]; then
+    printf -v "$_util_var" '%s' "$util_text"
   else
     printf '%s' "$util_text"
   fi
@@ -297,6 +304,7 @@ util() {
 # Arguments:
 #   * - args passed to the spinner function.
 spinner() {
+  [ "$tty_connected" ] || return 0
   local usage="start | is_active | stop"
   [ $# -gt 0 ] || failr "command missing" --usage "$usage" -- "$@"
   case $1 in
@@ -496,7 +504,6 @@ logr() {
         logr_tasks=$logr_task
       fi
 
-      local task_line && util -v task_line print_line --skip-icon "$logr_tasks"
       local task_file && task_file=${TMPDIR:-/tmp}/logr.$$.task
       local log_file && log_file=${TMPDIR:-/tmp}/logr.$$.log
 
@@ -504,33 +511,30 @@ logr() {
       if [ ! "$logr_parent_tasks" ]; then
         [ ! -f "$task_file" ] || rm -- "$task_file"
         [ ! -f "$log_file" ] || rm -- "$log_file"
-        printf '%s' "$task_line" "$tty_eel"
+        util reprint_line "$logr_tasks"
         spinner start
         # run command line; redirect stdout+stderr to log_file; provide FD3 and FD4 as means to still print
         (logr_parent_tasks=$logr_tasks "${cmdline[@]}" 3>&1 1>"$log_file" 4>&2 2>"$log_file") || task_exit_status=$?
       else
-        printf '%s' "$task_line" "$tty_eel" >&3
+        util reprint_line "$logr_tasks" >&3
         # run command line; redirects from parent task already apply
         (logr_parent_tasks=$logr_tasks "${cmdline[@]}") || task_exit_status=$?
       fi
 
       if [ ! "$task_exit_status" -eq 0 ] && [ ! -f "$task_file" ]; then
-        printf '%s' "$task_line" "$tty_eel" >"$task_file"
+        printf %s "$logr_tasks" >"$task_file"
       fi
 
       # pass exit code up to initial task
       if [ "$logr_parent_tasks" ]; then
         [ "$task_exit_status" -eq 0 ] || exit "$task_exit_status"
-        # erase what has been printed on same line by printing task_line again
-        printf '%s' "$task_line" "$tty_eel" >&3
       else
         # --- only initial task here
         spinner stop
 
         # error
         if [ ! "$task_exit_status" -eq 0 ]; then
-          printf '%s' "$(cat "$task_file")" "$tty_eel"
-          util --newline print_line_end --icon error
+          util --newline reprint_line --icon error "$(cat "$task_file")"
           sed \
               -e 's/[\[(][(0-9;]*[a-zA-Z]//g;' \
               -e 's/^/'"$MARGIN$tty_red"'/;' \
@@ -541,8 +545,7 @@ logr() {
 
         # success
         # erase what has been printed on same line by printing task_line again
-        printf '%s' "$task_line" "$tty_eel"
-        util --newline print_line_end --icon success
+        util --newline reprint_line --icon success "$logr_tasks"
       fi
       ;;
     *)
@@ -560,7 +563,7 @@ main() {
 
   # bashsupport disable=BP2001
   # shellcheck disable=SC2034
-  declare -g tty_alt='' tty_alt_end='' tty_hpa0='' tty_hide='' tty_show='' tty_save='' tty_load='' \
+  declare -g tty_connected='' tty_alt='' tty_alt_end='' tty_hpa0='' tty_hide='' tty_show='' tty_save='' tty_load='' \
     tty_dim='' tty_bold='' tty_stout='' tty_stout_end='' tty_underline='' tty_underline_end='' \
     tty_reset='' tty_blink='' tty_italic='' tty_italic_end='' tty_black='' tty_white='' \
     tty_bright_black='' tty_bright_white='' tty_default='' tty_eed='' tty_eel='' tty_ebl='' tty_ewl='' \
@@ -570,6 +573,7 @@ main() {
   # escape sequences if terminal is connected
   # shellcheck disable=SC2015,SC2034
   [ -t 2 ] && [ ! "$TERM" = dumb ] && {
+    tty_connected=true
     COLUMNS=$({ tput cols || tput co; } 2>&3) # columns per line
     LINES=$({ tput lines || tput li; } 2>&3)  # lines on screen
     tty_alt=$(tput smcup || tput ti)          # start alt display
@@ -624,7 +628,7 @@ main() {
     ['file']='↗'
     ['task']='☐'
     ['nest']='❱'
-    ['scheduled']='⚙'
+    ['running']='⚙' # no terminal
     #'running'-> spinner
     ['success']='✔'
     ['info']='ℹ'
@@ -806,10 +810,10 @@ baz
   util --newline print_line 'text only'
   util --newline print_line --icon not-exists 'not existing icon + text'
 
-  SECTION print_line_end
-  util print_line --icon success 'existing-icon + text' && sleep 0.3 && util print_line_end --newline --icon success " -> icon + text updated"
-  util print_line 'text-only' && sleep 0.3 && util print_line_end --newline --icon success
-  util print_line --icon not-exists 'not-existing icon + text' && sleep 0.3 && util print_line_end --newline " -> text updated"
+  SECTION reprint_line
+  util print_line --icon success 'existing-icon + text' && sleep 0.3 && util --newline reprint_line --icon success " -> icon + text updated"
+  util print_line 'text-only' && sleep 0.3 && util --newline reprint_line --icon success
+  util print_line --icon not-exists 'not-existing icon + text' && sleep 0.3 && util --newline reprint_line " -> text updated"
 
   SECTION END OF FEATURES ----------------------------------------------------
 

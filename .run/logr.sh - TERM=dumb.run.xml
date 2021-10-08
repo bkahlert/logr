@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="logr.sh - TERM=dumb" type="BashProRunConfiguration">
+    <envs>
+      <env name="TERM" value="dumb" />
+    </envs>
+    <option name="scriptPath" value="$PROJECT_DIR$/logr.sh" />
+    <RunnerSettings bashdbVersion="Automatic" bashPathMapper="Automatic" RunnerId="pro.bashsupport.shDebugRunner" />
+    <method v="2" />
+  </configuration>
+</component>
