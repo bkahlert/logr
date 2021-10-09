@@ -36,7 +36,7 @@
 `logr` is a Bash library. 
 
 In order to use it, it needs to be downloaded and put on your `$PATH`
-which is exactly what the following two lines are doing:
+which is exactly what the following line is doing:
 ```shell
 sudo curl -LfsSo /usr/local/bin/logr.sh https://raw.githubusercontent.com/bkahlert/logr/master/logr.sh
 ```
