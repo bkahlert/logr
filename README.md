@@ -13,7 +13,7 @@
   ⚡︎ fail
   ☐︎ task
   ⠏︎ running task
-  ✔︎ succeed task
+  ✔︎ succeeded task
   ⚠︎ failed task with warning
   ✘︎ bash -c; ...; exit 2
     error log
@@ -77,7 +77,7 @@ chmod +x ./batsw
 It builds a Docker image on-the-fly containing Bats incl. several libraries and runs all tests
 contained in the specified directory.
 
-> :bulb: To accelerate testing, the Bats Wrapper checks if any test is prefixed with a capital X and if so, only runs those tests.
+> 💡 To accelerate testing, the Bats Wrapper checks if any test is prefixed with a capital X and if so, only runs those tests.
 
 
 ## Contributing
