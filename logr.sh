@@ -591,7 +591,8 @@ main() {
   TMPDIR=${TMPDIR:-/tmp} TMPDIR=${TMPDIR%/}
 
   # bashsupport disable=BP5006
-  declare -g -r LOGR_VERSION=0.1.0 MARGIN='   ' LF=$'\n'
+  declare -g -r LOGR_VERSION=0.1.0 LF=$'\n'
+  declare -g MARGIN='   '
 
   # bashsupport disable=BP2001
   # shellcheck disable=SC2034
