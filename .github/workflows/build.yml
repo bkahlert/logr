@@ -15,7 +15,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,24 +25,27 @@ jobs:
       - name: Prepare
         id: prep
         run: |
-          echo ::set-output name=test_reports::build/test-reports
+          echo ::set-output name=test_dir::test
+          echo ::set-output name=test_reports_dir::build/test-reports
+          echo ::set-output name=test_reports_format::junit
 
       - name: Run tests
         run: |
           chmod +x batsw
-          ./batsw test \
-            --report-formatter junit \
-            --output "${{ steps.prep.outputs.test_reports }}"
+          ./batsw "${{ steps.prep.outputs.test_dir }}" \
+            --env BUILD_TAG="${{ steps.prep.outputs.build_tag }}" \
+            --report-formatter "${{ steps.prep.outputs.test_reports_format }}" \
+            --output "${{ steps.prep.outputs.test_reports_dir }}"
 
       - name: Upload test reports
         uses: actions/upload-artifact@v2
         if: success() || failure()
         with:
           name: test-reports
-          path: ${{ steps.prep.outputs.test_reports }}/*.xml
+          path: ${{ steps.prep.outputs.test_reports_dir }}/*.xml
 
   publish:
-    needs: test
+    needs: build
     runs-on: ubuntu-latest
 
     steps:

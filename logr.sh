@@ -424,7 +424,7 @@ logr() {
       shift
       trap 'logr _abort $?' INT TERM
       trap 'logr _cleanup' EXIT
-      util cursor hide
+      util cursor hide >&2
       ;;
     _cleanup)
       shift
@@ -528,8 +528,7 @@ logr() {
       fi
 
       if [ "${#cmdline[@]}" -eq 0 ]; then
-        util print_line --icon task "$logr_task"
-        printf '\n'
+        util --newline print_line --icon task "$logr_task"
         return 0
       fi
 
@@ -655,7 +654,7 @@ main() {
     tty_eel=$(tput el || tput ce)  # erase to end of line
     tty_ebl=$(tput el1 || tput cb) # erase to beginning of line
     tty_ewl=$tty_eel$tty_ebl       # erase whole line
-  } 3>&2 2>/dev/null || :
+  } 3>&2 2>/dev/null || true
 
   declare -A -g -r logr_icons=(
     ['new']='✱'
