@@ -42,10 +42,10 @@ trace() {
 #   STDOUT - directory containing the downloaded and extracted Bats library
 #   STDERR - details, on failure
 download_lib() {
-  local -r short_name="${1?}"
+  local short_name="${1?}"
 
-  local -r url="https://github.com/bats-core/bats-${short_name}/tarball/master"
-  local -r target="${BATS_SUITE_TMPDIR:?}/_libs/${short_name}"
+  local url="https://github.com/bats-core/bats-${short_name}/tarball/master"
+  local target="${BATS_SUITE_TMPDIR:?}/_libs/${short_name}"
 
   if [ ! -d "$target" ] || [ ! -f "$target/load.bash" ]; then
     rm -rf "${target:?}"
@@ -72,12 +72,12 @@ download_lib() {
 # Arguments:
 #   1 - Short name of the library, e.g. assert
 load_lib() {
-  local -r short_name=${1:?}
+  local short_name=${1:?}
 
   local file="/opt/bats-${short_name}/load.bash"
   if [ ! -f "$file" ]; then
     trace "No local copy of library ${short_name} found at ${file}. Downloading..."
-    local -r download="$(download_lib "${short_name}")"
+    local download && download="$(download_lib "${short_name}")"
     if [ -f "${download}/load.bash" ]; then
       file="${download}/load.bash"
     fi
@@ -96,7 +96,7 @@ load_lib() {
 # Arguments:
 #   1 - Short name of the library, e.g. assert
 patch_lib() {
-  local -r short_name=${1:?}
+  local short_name=${1:?}
 
   case $short_name in
     assert)
@@ -116,11 +116,35 @@ patch_lib() {
         }
       fi
       ;;
+    file)
+      local bats_fn bats_decl
+      for bats_fn in $(set | grep -e "^assert_file_*"); do
+        [[ $bats_fn == assert_file_* ]] || continue
+        bats_decl=$(declare -f "$bats_fn") || true
+        if [ "${bats_decl-}" ]; then
+          eval "bats_$bats_decl"
+          eval "$bats_fn() {
+            BATSLIB_FILE_PATH_REM=\${BATSLIB_FILE_PATH_REM:-} \
+            BATSLIB_FILE_PATH_ADD=\${BATSLIB_FILE_PATH_ADD:-} \
+            bats_$bats_fn \"\$@\"
+          }"
+        fi
+      done
+      ;;
   esac
 }
 
-# Checks the current status of a Docker container.
-#
+# Tests if at least one log line matches the provided arguments.
+# Arguments:
+#   1 - Docker container ID
+#   * - assert_line arguments
+assert_container_log() {
+  local container=${1:?container missing} && shift
+  run docker logs "$container"
+  assert_line "$@"
+}
+
+# Tests the current status of a Docker container.
 # Globals:
 #   none
 # Arguments:
@@ -132,15 +156,14 @@ patch_lib() {
 # Outputs:
 #   STDERR - details, on failure
 assert_container_status() {
-  local -r actual_status=$(docker container inspect --format "{{.State.Status}}" "$1")
-  local -r expected_status=$2
+  local actual_status && actual_status=$(docker container inspect --format "{{.State.Status}}" "$1")
+  local expected_status=$2
   assert_equal "${actual_status}" "${expected_status}"
 }
 
-# Checks the owner of a file.
+# Tests the owner of a file.
 # The original implementation suffers from its reliance on sudo.
 # see https://github.com/bats-core/bats-file#assert_file_permission
-#
 # Globals:
 #   none
 # Arguments:
@@ -152,13 +175,13 @@ assert_container_status() {
 # Outputs:
 #   STDERR - details, on failure
 assert_file_owner_group() {
-  local -r file="$1"
-  local -r user="$2"
-  local -r group="$3"
+  local file="$1"
+  local user="$2"
+  local group="$3"
 
   run ls -l "$file" # total 10444 -rw-r--r-- 1 tester tester 10692675 Sep 25 17:29 core.gz
 
-  local -r s='\s+'
+  local s='\s+'
   local regexp='.*\d+'                             # hard links
   regexp="${regexp}${s}${user}"                    # file owner
   regexp="${regexp}${s}${group}"                   # file group
@@ -166,6 +189,30 @@ assert_file_owner_group() {
   regexp="${regexp}${s}"'\w+'"${s}"'\d+\s+\d+:\d+' # date and time
   regexp="${regexp}${s}${file}"                    # file name
   assert_output --regexp "${regexp}"
+}
+
+# Calls the specified command once a seconds for at most the
+# specified amount of time and returns 0 if the command succeeds within time.
+assert_within() {
+  local -i time=${1%s} && shift
+  [ ! "${1-}" = "--" ] || shift
+  local -a cmdline=("$@")
+
+  local -i timeout=$((SECONDS + time))
+  while true; do
+    run "${cmdline[@]}"
+    [ ! "${status-}" -eq 0 ] || { assert_success; return 0; }
+    [ "$SECONDS" -le "$timeout" ] || { assert_success; break; }
+    sleep 1
+  done
+  echo " $(tput setaf 1)✘$(tput sgr0) '${cmdline[*]}' did not succeed within ${time}s"
+  exit 1
+}
+
+# Prints the IP of the specified container.
+#   1 - Docker container ID
+container_ip() {
+  docker inspect "${1:?container missing}" | jq --join-output '.[].NetworkSettings.Networks.bridge.IPAddress'
 }
 
 # Finds the absolute path for the given fixture.
@@ -180,7 +227,7 @@ assert_file_owner_group() {
 #   STDOUT - absolute path of the given fixture
 #   STDERR - details on failure
 fixture() {
-  local -r dir="${2:-${BATS_TEST_DIRNAME:?}}"
+  local dir="${2:-${BATS_TEST_DIRNAME:?}}"
   if [ ! "${dir#${BATS_CWD:?}}" ]; then
     echo "Cannot find fixture $1" >&2
     exit 1

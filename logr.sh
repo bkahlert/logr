@@ -591,7 +591,9 @@ main() {
   TMPDIR=${TMPDIR:-/tmp} TMPDIR=${TMPDIR%/}
 
   # bashsupport disable=BP5006
-  declare -g -r LOGR_VERSION=0.1.0 MARGIN='   ' LF=$'\n'
+  declare -g -r LOGR_VERSION=0.1.0 LF=$'\n'
+  # bashsupport disable=BP5006
+  declare -g MARGIN='   '
 
   # bashsupport disable=BP2001
   # shellcheck disable=SC2034
@@ -604,7 +606,7 @@ main() {
 
   # escape sequences if terminal is connected
   # shellcheck disable=SC2015,SC2034
-  [ -t 2 ] && [ ! "$TERM" = dumb ] && {
+  [ -t 2 ] && [ ! "${TERM-}" = dumb ] && {
     # updates COLUMNS and LINES and calls optional callback with these dimensions
     tty_change_handler() {
       COLUMNS=$({ tput cols || tput co; }) && LINES=$({ tput lines || tput li; })
