@@ -422,7 +422,8 @@ logr() {
       ;;
     _init)
       shift
-      trap 'logr _abort $?' INT TERM
+      trap 'logr _cleanup || true; printf "\n"; logr error "${0##*/} aborted"; trap - INT; kill -s INT "$$"' INT
+      trap 'logr _abort $?' TERM
       trap 'logr _cleanup' EXIT
       util cursor hide >&2
       ;;
@@ -443,8 +444,6 @@ logr() {
 
     new | item | success | info | warn)
       util --newline print_line --icon "$1" "${@:2}"
-      [ ! "$1" = "error" ] || return 1
-      [ ! "$1" = "fail" ] || exit 1
       ;;
     error | fail)
       util --newline print_line --icon "$1" "${@:2}" >&2
@@ -499,6 +498,9 @@ logr() {
       local url="file://$path" text=${2:-file://$path}
       # shellcheck disable=SC1003
       util --newline print_line --icon file '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "$text"
+      ;;
+    running)
+      util --newline print_line --icon "$1" "${@:2}"
       ;;
     task)
       usage="${usage%COMMAND*}$1 [FORMAT [ARGS...]] [-- COMMAND [ARGS...]]"
@@ -681,7 +683,7 @@ main() {
     ['file']="${tty_blue}%s$r"
     ['task']="${tty_blue}%s$r"
     ['nest']="${tty_yellow}%s$r"
-    ['scheduled']="${tty_yellow}%s$r"
+    ['running']="${tty_yellow}%s$r"
     ['success']="${tty_green}%s$r"
     ['info']="${tty_white}%s$r"
     ['warn']="${tty_bright_yellow}%s$r"
@@ -738,19 +740,20 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE
   SECTION FEATURES -------------------------------------------------------------
 
   SECTION logr -----------------------------------------------------------------
-  logr new "new message"
-  logr item "item message"
-  logr list "list message" "list message" "list message"
+  logr new "new item"
+  logr item "item"
+  logr list "item 1" "item 2" "item 3"
   logr link "https://github.com/bkahlert/logr"
   logr link "https://example.com" "link text"
   logr file "logr.sh" --line 300 --column 10
-  logr success "success message"
+  logr success "success"
   logr info "info"
   logr warn "warning"
   logr error "error" \
     || (logr fail "failure") || true
 
-  logr task "task message"
+  logr task "task"
+  logr running "running task"
   logr task "task message and cmdline" -- sleep 2
   (logr task -- bash -c '
 echo foo && sleep 1
