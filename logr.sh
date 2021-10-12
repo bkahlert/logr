@@ -36,7 +36,7 @@ set -euo pipefail
 #   n - optional name of the failed unit (determined using FUNCNAME by default)
 #   u - optional usage information; output is automatically preceded with the name
 #   - - optional; used declare remaining arguments as positional arguments
-#   * - arguments the original unit was called with
+#   $* - arguments the original unit was called with
 failr() {
   local code=$? failr_usage="[-n|--name NAME] [-u|--usage USAGE] [FORMAT [ARGS...]] [--] [INVOCATION...]"
   local name=${FUNCNAME[1]:-?} format=() usage print_call
@@ -100,7 +100,7 @@ failr() {
 # Arguments:
 #   v - same behavior as `printf -v`
 #   n - if set, appends a newline
-#   * - args passed to the utility function.
+#   $* - args passed to the utility function.
 util() {
   local args=() _util_var _util_newline usage="[-v VAR] [-n|--newline] UTIL [ARGS...]"
   while (($#)); do
@@ -339,7 +339,7 @@ util() {
 
 # Invokes a spinner function.
 # Arguments:
-#   * - args passed to the spinner function.
+#   $* - args passed to the spinner function.
 spinner() {
   [ "$tty_connected" ] || return 0
   local usage="start | is_active | stop"
@@ -385,22 +385,15 @@ spinner() {
 }
 
 # Logs according to the given type.
-# Globals:
-#   MARGIN
-#   LOGR_SPINNER_PID
-#   LOGR_VERSION
-#   PWD
-#   TMPDIR
 # Arguments:
-#   0 - type
-#   * - type arguments
+#   $1 - command
+#   $* - command arguments
 # Returns:
-#  task_exit_status ...
 #   0 - success
 #   1 - error
 #   * - signal
 logr() {
-  local usage="COMMAND"
+  local usage="COMMAND [ARGS...]"
   case ${1:-'_help'} in
     _help)
       printf '\n   logr v%s\n\n   Usage: logr %s%s' "$LOGR_VERSION" "$usage" '
@@ -695,7 +688,7 @@ main() {
 
   # Checks if the given shell option is available and activates it. Fails otherwise.
   # Arguments:
-  #   1 - shell option name
+  #   $1 - shell option name
   require_shopt() {
     test $# -eq 1 || failr --usage "option" -- "$@"
     ! shopt -q "$1" || failr "unsupported shell option" -- "$@"
@@ -732,11 +725,11 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE
 
   # Prints the specified text as a section headline.
   # Arguments:
-  #   1 - headline
-  #   2 - separator
+  #   $1 - headline
+  #   $2 - separator
   # bashsupport disable=BP5005
   SECTION() {
-    printf "\n\n ─────── %s\n" "${*//-/─}"
+    printf "%s\n\n ━━━━━━━ %s%s\n" "$tty_white" "${*//-/━}" "$tty_reset"
   }
 
   SECTION FEATURES -------------------------------------------------------------
@@ -817,6 +810,15 @@ exit 2
     }
     foo bar
   ) || true
+
+  SECTION escape sequences -----------------------------------------------------
+  for color in BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE; do
+    local tty_bright_color="tty_bright_${color,,}"
+    local tty_color="tty_${color,,}"
+    printf "%10s %sNORMAL%sDIMMED%s %sBRIGHT%sDIMMED%s\n" "${color^^}" \
+              "${!tty_color}" "$tty_dim" "$tty_reset" \
+              "${!tty_bright_color}" "$tty_dim" "$tty_reset"
+  done
 
   SECTION util - misc utilities ------------------------------------------------
 

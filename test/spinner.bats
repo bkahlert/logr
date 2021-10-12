@@ -6,7 +6,7 @@ setup() {
   load_lib assert
 
   export TERM=xterm
-  load "${BATS_CWD}/logr.sh"
+  load "$BATS_CWD/logr.sh"
   export tty_connected=true
 }
 

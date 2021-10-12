@@ -5,7 +5,7 @@ setup() {
   load_lib support
   load_lib assert
 
-  load "${BATS_CWD}/logr.sh"
+  load "$BATS_CWD/logr.sh"
 }
 
 @test "should print icon and text" {

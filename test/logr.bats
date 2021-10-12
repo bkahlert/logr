@@ -5,12 +5,12 @@ setup() {
   load_lib support
   load_lib assert
 
-  load "${BATS_CWD}/logr.sh"
+  load "$BATS_CWD/logr.sh"
 
   declare -g usage='
    logr v0.1.0
 
-   Usage: logr COMMAND
+   Usage: logr COMMAND [ARGS...]
 
    Commands:
      new         Log a new item
@@ -35,24 +35,24 @@ setup() {
   run logr --illegal
   assert_failure
   assert_line --partial "failed: unknown command"
-  assert_line --partial "Usage: logr COMMAND"
+  assert_line --partial "Usage: logr COMMAND [ARGS...]"
 }
 
 
 @test "should fail if executed" {
-  run bash "${BATS_CWD}/logr.sh"
+  run bash "$BATS_CWD/logr.sh"
   assert_failure
   assert_line --partial "✘ To use logr you need to source it at the top of your script."
 }
 
 @test "should print help if executed with -h flag" {
-  run bash "${BATS_CWD}/logr.sh" -h
+  run bash "$BATS_CWD/logr.sh" -h
   assert_output "$usage"
   assert_success
 }
 
 @test "should print help if executed with --help flag" {
-  run bash "${BATS_CWD}/logr.sh" --help
+  run bash "$BATS_CWD/logr.sh" --help
   assert_output "$usage"
   assert_success
 }

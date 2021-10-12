@@ -6,7 +6,7 @@ setup() {
   load_lib assert
   load_lib file
 
-  load "${BATS_CWD}/logr.sh"
+  load "$BATS_CWD/logr.sh"
 }
 
 @test "should print usage" {

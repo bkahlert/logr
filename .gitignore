@@ -1,5 +1,5 @@
 /.idea
-/.bats-tmp
+/*.iml
 /.cache
 /.gradle
 /build

@@ -15,7 +15,7 @@ set -euo pipefail
 # Globals:
 #   none
 # Arguments:
-#   * - echo arguments
+#   $* - echo arguments
 # Outputs:
 #   FD3 - echo message
 trace() {
@@ -34,7 +34,7 @@ trace() {
 # Globals:
 #   BATS_SUITE_TMPDIR
 # Arguments:
-#   1 - short name of the library, e.g. assert
+#   $1 - short name of the library, e.g. assert
 # Returns:
 #   0 - download successful
 #   1 - otherwise
@@ -52,7 +52,7 @@ download_lib() {
     mkdir -p "$target"
     (
       cd "$target" || exit
-      curl --location --insecure --silent --show-error "$url" \
+      curl -LfsS "$url" \
         | tar --extract --gunzip --strip-components=1
     )
   fi
@@ -70,7 +70,7 @@ download_lib() {
 # Globals:
 #   none
 # Arguments:
-#   1 - Short name of the library, e.g. assert
+#   $1 - Short name of the library, e.g. assert
 load_lib() {
   local short_name=${1:?}
 
@@ -94,7 +94,7 @@ load_lib() {
 
 # Applies patches to libs.
 # Arguments:
-#   1 - Short name of the library, e.g. assert
+#   $1 - Short name of the library, e.g. assert
 patch_lib() {
   local short_name=${1:?}
 
@@ -136,8 +136,8 @@ patch_lib() {
 
 # Tests if at least one log line matches the provided arguments.
 # Arguments:
-#   1 - Docker container ID
-#   * - assert_line arguments
+#   $1 - Docker container ID
+#   $* - assert_line arguments
 assert_container_log() {
   local container=${1:?container missing} && shift
   run docker logs "$container"
@@ -148,8 +148,8 @@ assert_container_log() {
 # Globals:
 #   none
 # Arguments:
-#   1 - Docker container ID
-#   2 - expected value
+#   $1 - Docker container ID
+#   $2 - expected value
 # Returns:
 #   0 - statuses equal
 #   1 - otherwise
@@ -167,8 +167,8 @@ assert_container_status() {
 # Globals:
 #   none
 # Arguments:
-#   1 - Docker container ID
-#   2 - expected value
+#   $1 - Docker container ID
+#   $2 - expected value
 # Returns:
 #   0 - statuses equal
 #   1 - otherwise
@@ -210,7 +210,7 @@ assert_within() {
 }
 
 # Prints the IP of the specified container.
-#   1 - Docker container ID
+#   $1 - Docker container ID
 container_ip() {
   docker inspect "${1:?container missing}" | jq --join-output '.[].NetworkSettings.Networks.bridge.IPAddress'
 }
@@ -221,8 +221,8 @@ container_ip() {
 # until the parent of the test directory (e.g. fixture) is reached.
 #
 # Arguments:
-#   1 - name of the fixture
-#   2 - the directory in which to look for (default: $BATS_TEST_DIRNAME)
+#   $1 - name of the fixture
+#   $2 - the directory in which to look for (default: $BATS_TEST_DIRNAME)
 # Outputs:
 #   STDOUT - absolute path of the given fixture
 #   STDERR - details on failure
@@ -245,12 +245,28 @@ fixture() {
 # See `fixture`
 #
 # Arguments:
-#   1 - name of the fixture
-#   2 - target
+#   $1 - name of the fixture
+#   $2 - target
 # Outputs:
 #   STDERR - details on failure
 cp_fixture() {
   cp "$(fixture "${1:?}")" "${2:?}"
+}
+
+# Interactive counterpart to Bats' run function that uses `expect`.
+# The piped script must not include a shebang.
+# Globals:
+#   Same as run, i.e. `output`, `lines` and `status`
+# Arguments:
+#   $* - run arguments
+# Inputs:
+#   STDIN - content of the expect script
+interact() { # [!|=N] [--keep-empty-lines] [--output merged|separate|stderr|stdout] [--] <command to run...>
+  local expect_script && expect_script="$(mktemp "${BATS_TEST_TMPDIR}/script.exp-XXXXXX")"
+  printf '%s\n' '#!/usr/bin/expect' > "$expect_script"
+  cat - >> "$expect_script"
+  chmod +x "$expect_script"
+  run "$@" "$expect_script"
 }
 
 # Tests if this test run was invoked via BashSupport Pro.

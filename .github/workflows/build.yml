@@ -10,9 +10,9 @@ on:
     tags: ['dependencies']
     paths-ignore: ['**.md']
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -33,7 +33,6 @@ jobs:
         run: |
           chmod +x batsw
           ./batsw "${{ steps.prep.outputs.test_dir }}" \
-            --env BUILD_TAG="${{ steps.prep.outputs.build_tag }}" \
             --report-formatter "${{ steps.prep.outputs.test_reports_format }}" \
             --output "${{ steps.prep.outputs.test_reports_dir }}"
 
@@ -42,11 +41,14 @@ jobs:
         if: success() || failure()
         with:
           name: test-reports
+          if-no-files-found: error
           path: ${{ steps.prep.outputs.test_reports_dir }}/*.xml
 
-  publish:
+  release-draft:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Draft release
@@ -54,5 +56,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           draft: true
-          body_part: CHANGELOG.md
+          body_path: CHANGELOG.md
+          files: logr.sh
           token: ${{ secrets.GITHUB_TOKEN }}
