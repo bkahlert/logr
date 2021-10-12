@@ -332,6 +332,10 @@ main() {
     echo "Failed to find highlighted tests"
   fi
 
+# TODO
+  cat /home/runner/work/logr/logr/CHANGELOG.md
+  ls -lisaR /home/runner/work
+
   if [ "$highlighted_tests" = "0" ]; then
     "${BATS_CMD}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
   else
