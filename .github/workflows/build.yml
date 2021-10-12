@@ -47,6 +47,8 @@ jobs:
   release-draft:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout

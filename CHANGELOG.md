@@ -16,6 +16,24 @@
 ### Fixed
 *none*
 
+## [0.3.0] - 2021-10-13
+
+### Added
+- `banr` function to print iconic banner
+  ```shell
+  $ banr
+  ░░░░░░░
+  
+  $ banr foo
+  ░░░░░░░ FOO
+  
+  $ banr fooBar
+  ░░░░░░░ FOO BAR
+  
+  $ banr fooBar baz
+  ░░░░░░░ FOO BAR BAZ
+  ```
+
 ## [0.2.0] - 2021-10-12
 
 ### Added
@@ -71,6 +89,7 @@
     Usage: foo baz
   ```
 
-[unreleased]: https://github.com/bkahlert/logr/compare/v0.2.0...HEAD
+[unreleased]: https://github.com/bkahlert/logr/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/bkahlert/logr/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/bkahlert/logr/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/bkahlert/logr/releases/tag/v0.1.0

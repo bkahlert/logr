@@ -36,7 +36,7 @@ set -euo pipefail
 #   n - optional name of the failed unit (determined using FUNCNAME by default)
 #   u - optional usage information; output is automatically preceded with the name
 #   - - optional; used declare remaining arguments as positional arguments
-#   $* - arguments the original unit was called with
+#   * - arguments the original unit was called with
 failr() {
   local code=$? failr_usage="[-n|--name NAME] [-u|--usage USAGE] [FORMAT [ARGS...]] [--] [INVOCATION...]"
   local name=${FUNCNAME[1]:-?} format=() usage print_call
@@ -100,7 +100,7 @@ failr() {
 # Arguments:
 #   v - same behavior as `printf -v`
 #   n - if set, appends a newline
-#   $* - args passed to the utility function.
+#   * - args passed to the utility function.
 util() {
   local args=() _util_var _util_newline usage="[-v VAR] [-n|--newline] UTIL [ARGS...]"
   while (($#)); do
@@ -154,6 +154,32 @@ util() {
       [ "$rpad" -gt 0 ] || rpad=0
 
       printf -v util_text "%*s%s%*s" "$lpad" '' "$1" "$rpad" ''
+      ;;
+
+    banner)
+      shift
+      # shellcheck disable=SC2059
+      local _text && [ $# -eq 0 ] || printf -v _text "$@"
+      # shellcheck disable=SC2015
+      local -a words=() && [ ! "${_text-}" ] || IFS=' ' read -r -a words <<< "$_text"
+      local -a colored=() && util prefix -v "colored[0]"
+      for i in "${!words[@]}"; do
+        if [ "$i" -eq 0 ]; then
+          # shellcheck disable=SC2001
+          local -a words0 && read -r -a words0 <<< "$(echo "${words[$i]}" | sed -e 's/\([A-Z]\)/ \1/g')"
+          if [ ${#words0[@]} -gt 0 ]; then
+            colored+=("$tty_bright_cyan${words0[0]^^}$tty_reset")
+            if [ ${#words0[@]} -gt 1 ]; then
+              local word=${words0[*]:1}
+              word=${word// /}
+              colored+=("$tty_cyan${word^^}$tty_reset")
+            fi
+          fi
+        else
+          colored+=("$tty_bright_magenta${words[$i]^^}$tty_reset")
+        fi
+      done
+      printf -v util_text %s "${colored[*]}"
       ;;
 
     cursor)
@@ -226,7 +252,7 @@ util() {
       local _fit_columns=$((${COLUMNS:-80} - ${#MARGIN} - "$slack"))
       [ "$_fit_columns" -gt 20 ] || _fit_columns=20
       if [ "$_fit_columns" -lt "${#_fit_text}" ]; then
-        local _fit_half=$(( (_fit_columns-${#truncation}-1) / 2))
+        local _fit_half=$(((_fit_columns - ${#truncation} - 1) / 2))
         local _fit_left=${_fit_text:0:_fit_half} _fit_right=${_fit_text:$((${#_fit_text} - _fit_half)):_fit_half}
         printf -v util_text "%s%s%s" "${_fit_left%% }" "$truncation" "${_fit_right## }"
       else
@@ -293,6 +319,23 @@ util() {
       printf -v util_text '%s%s%s' "$tty_hpa0" "$print_line_icon" "$_text"
       ;;
 
+    prefix)
+      local prefix="" _text color bright_color
+      shift
+      for color in black cyan blue green yellow magenta red; do
+        bright_color="tty_bright_$color"
+        color="tty_$color"
+        prefix+="${!color}${!bright_color}░$tty_reset"
+      done
+      # shellcheck disable=SC2059
+      [ $# -eq 0 ] || printf -v _text "$@"
+      if [ "${_text-}" ]; then
+        util_text="$prefix $_text"
+      else
+        util_text="$prefix"
+      fi
+      ;;
+
     reprint_line)
       args=() usage="${usage%UTIL*}$1 [-i|--icon ICON] FORMAT [ARGS...]"
       shift
@@ -339,7 +382,7 @@ util() {
 
 # Invokes a spinner function.
 # Arguments:
-#   $* - args passed to the spinner function.
+#   * - args passed to the spinner function.
 spinner() {
   [ "$tty_connected" ] || return 0
   local usage="start | is_active | stop"
@@ -384,10 +427,18 @@ spinner() {
   esac
 }
 
+
+# Prints a colorful banner.
+# Arguments:
+#   * - words
+banr() {
+  util --newline banner "$*"
+}
+
 # Logs according to the given type.
 # Arguments:
-#   $1 - command
-#   $* - command arguments
+#   1 - command
+#   * - command arguments
 # Returns:
 #   0 - success
 #   1 - error
@@ -561,10 +612,10 @@ logr() {
         if [ ! "$task_exit_status" -eq 0 ]; then
           util --newline reprint_line --icon error "$(cat "$task_file")"
           sed \
-              -e 's/[\[(][(0-9;]*[a-zA-Z]//g;' \
-              -e 's/^/'"$MARGIN$tty_red"'/;' \
-              -e 's/$/'"$tty_reset"'/;' \
-           "$log_file"
+            -e 's/[\[(][(0-9;]*[a-zA-Z]//g;' \
+            -e 's/^/'"$MARGIN$tty_red"'/;' \
+            -e 's/$/'"$tty_reset"'/;' \
+            "$log_file"
           exit $task_exit_status
         fi
 
@@ -581,8 +632,8 @@ logr() {
 
 # Prompts for user input of the specified type.
 # Arguments:
-#   $1 - type
-#   $* - type arguments
+#   1 - type
+#   * - type arguments
 # Returns:
 #   0 - success
 #   1 - error
@@ -621,16 +672,17 @@ prompt4() {
       fi
 
       case $_yn_answer in
-      n* | **)
-        local _icon && util -v _icon icon --center error
-        util print_margin "$_icon"
-        printf '%s%s%s\n' "$tty_dim" "no" "$tty_reset"
-        exit 1
-        ;;
-      *)
-        local _icon && util -v _icon icon --center success
-        util print_margin "$_icon"
-        printf '%s%s%s\n' "$tty_dim" "yes" "$tty_reset"
+        n* | **)
+          local _icon && util -v _icon icon --center error
+          util print_margin "$_icon"
+          printf '%s%s%s\n' "$tty_dim" "no" "$tty_reset"
+          exit 1
+          ;;
+        *)
+          local _icon && util -v _icon icon --center success
+          util print_margin "$_icon"
+          printf '%s%s%s\n' "$tty_dim" "yes" "$tty_reset"
+          ;;
       esac
       ;;
     *)
@@ -748,7 +800,7 @@ main() {
 
   # Checks if the given shell option is available and activates it. Fails otherwise.
   # Arguments:
-  #   $1 - shell option name
+  #   1 - shell option name
   require_shopt() {
     test $# -eq 1 || failr --usage "option" -- "$@"
     ! shopt -q "$1" || failr "unsupported shell option" -- "$@"
@@ -785,14 +837,20 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE
 
   # Prints the specified text as a section headline.
   # Arguments:
-  #   $1 - headline
-  #   $2 - separator
+  #   1 - headline
+  #   2 - separator
   # bashsupport disable=BP5005
   SECTION() {
     printf "%s\n\n ━━━━━━━ %s%s\n" "$tty_white" "${*//-/━}" "$tty_reset"
   }
 
   SECTION FEATURES -------------------------------------------------------------
+
+  SECTION banr -----------------------------------------------------------------
+  banr
+  banr foo
+  banr fooBar
+  banr fooBar baz
 
   SECTION logr -----------------------------------------------------------------
   logr new "new item"
@@ -875,8 +933,8 @@ exit 2
     local tty_bright_color="tty_bright_${color,,}"
     local tty_color="tty_${color,,}"
     printf "%10s %sNORMAL%sDIMMED%s %sBRIGHT%sDIMMED%s\n" "${color^^}" \
-              "${!tty_color}" "$tty_dim" "$tty_reset" \
-              "${!tty_bright_color}" "$tty_dim" "$tty_reset"
+      "${!tty_color}" "$tty_dim" "$tty_reset" \
+      "${!tty_bright_color}" "$tty_dim" "$tty_reset"
   done
 
   SECTION util - misc utilities ------------------------------------------------

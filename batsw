@@ -23,7 +23,7 @@ echo() {
 # Globals:
 #   none
 # Arguments:
-#   $* - echo arguments
+#   * - echo arguments
 die() {
   printf ' %s %s\n' "$(tput setaf 1)✘$(tput sgr0)" "$*" >&2
   exit 1
@@ -33,7 +33,7 @@ die() {
 # that is, its value is word-split along the whitespaces while *honoring* quotes.
 #
 # Arguments:
-#   $1 - name of the variable
+#   1 - name of the variable
 split_to_array() {
   # Called like a program in conjunction with eval.
   # Assigns the arguments array to the variable with the name of the first element.
@@ -48,7 +48,7 @@ split_to_array() {
 # Bakes a new Docker image
 #
 # Arguments:
-#   $* - `docker buildx bake` arguments
+#   * - `docker buildx bake` arguments
 # Outputs:
 #   STDOUT - image ID
 #   STDERR - build progress
@@ -100,7 +100,7 @@ ENTRYPOINT
 # Globals:
 #   none
 # Arguments:
-#   $* - docker build arguments
+#   * - docker build arguments
 docker_build() {
   DOCKER_BUILDKIT=1 \
     DOCKER_SCAN_SUGGEST=false \
@@ -195,7 +195,7 @@ DOCKERFILE
 #   BATS_IMAGE_LOCAL_TAG - Tag of the locally built Bats Docker image (default: bats:local)
 #   BATS_TMPDIR - base temporary directory used by Bats
 # Arguments:
-#   $* - docker run arguments
+#   * - docker run arguments
 # bashsupport disable=BP2001,BP5006
 bats() {
   local -a DOCKER_ARGS=()
@@ -331,10 +331,6 @@ main() {
   if ! highlighted_tests=$(TERM=dumb "${BATS_CMD}" --count "${highlighted_tests_args[@]}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"); then
     echo "Failed to find highlighted tests"
   fi
-
-# TODO
-  cat /home/runner/work/logr/logr/CHANGELOG.md
-  ls -lisaR /home/runner/work
 
   if [ "$highlighted_tests" = "0" ]; then
     "${BATS_CMD}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
