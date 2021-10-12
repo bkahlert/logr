@@ -16,6 +16,27 @@
 ### Fixed
 *none*
 
+## [0.2.0] - 2021-10-12
+
+### Added
+- Support for yes-no prompts
+  ```shell
+  $ prompt4 Yn
+  
+    Do you want to continue? [Y/n]
+  
+  # Hit enter
+  ✔ Do you want to continue? [Y/n] yes
+  ```
+  ```shell
+  $ prompt4 Yn "How about an alternative question?"
+  
+    How about an alternative question? [Y/n]
+  
+  # Hit escape
+  ✘︎ How about an alternative question? [Y/n] no 
+  ```
+
 ## [0.1.0] - 2021-10-12
 
 ### Added
@@ -50,5 +71,6 @@
     Usage: foo baz
   ```
 
-[unreleased]: https://github.com/bkahlert/logr/compare/v0.1.0...HEAD
+[unreleased]: https://github.com/bkahlert/logr/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/bkahlert/logr/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/bkahlert/logr/releases/tag/v0.1.0

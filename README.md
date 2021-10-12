@@ -19,7 +19,16 @@
     error log
     of failed task
   ```
+* prompts
+  ```shell
+  Continue? [Y/n]
 
+  # Hit ⏎, y, or any other key
+  ✔︎ Continue? [Y/n] yes
+  
+  # Hit ␛, n, or ⌃C
+  ✘︎ Continue? [Y/n] no
+  ```
 * to-do list like execution of tasks
 * spinner based visual feedback
 * hyperlink support

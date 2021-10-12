@@ -579,6 +579,66 @@ logr() {
   esac
 }
 
+# Prompts for user input of the specified type.
+# Arguments:
+#   $1 - type
+#   $* - type arguments
+# Returns:
+#   0 - success
+#   1 - error
+#   * - signal
+prompt4() {
+  local usage="TYPE [ARGS...]"
+  case ${1:-'_help'} in
+    _help | -h | --help)
+      printf '\n   prompt4 v%s\n\n   Usage: prompt4 %s%s' "$LOGR_VERSION" "$usage" '
+
+   Type:
+     continue    "Do you want to continue?"
+'
+      exit 0
+      ;;
+    Yn)
+      shift
+      local _yn_question="Do you want to continue?" _yn_answer
+      if [ $# -gt 0 ]; then
+        printf -v _yn_question "$@"
+      fi
+      util print_line '\n%s%s %s %s' "$tty_bold" "${_yn_question%%$'\n'}" "[Y/n]" "$tty_stout_end"
+
+      if [ -t 0 ]; then
+        local _yn_tty_settings
+        _yn_tty_settings=$(stty -g)
+        # shellcheck disable=SC2064
+        trap "stty '$_yn_tty_settings'" EXIT
+        trap "_yn_answer=n" INT TERM
+        stty raw isig || true
+        _yn_answer=$(head -c 1) || true
+        stty "${_yn_tty_settings}" || true
+        trap - INT TERM EXIT
+      else
+        _yn_answer=$(head -c 1) || true
+      fi
+
+      case $_yn_answer in
+      n* | **)
+        local _icon && util -v _icon icon --center error
+        util print_margin "$_icon"
+        printf '%s%s%s\n' "$tty_dim" "no" "$tty_reset"
+        exit 1
+        ;;
+      *)
+        local _icon && util -v _icon icon --center success
+        util print_margin "$_icon"
+        printf '%s%s%s\n' "$tty_dim" "yes" "$tty_reset"
+      esac
+      ;;
+    *)
+      failr "unknown type" --usage "$usage" -- "$@"
+      ;;
+  esac
+}
+
 # Initializes environment
 main() {
   TMPDIR=${TMPDIR:-/tmp} TMPDIR=${TMPDIR%/}
@@ -790,15 +850,14 @@ exit 2
 
   sleep 1
 
-  SECTION escape sequences -----------------------------------------------------
-  printf "%sBRIGHT%s %sBLACK%s\n" "$tty_bright_black" "$tty_reset" "$tty_black" "$tty_reset"
-  printf "%sBRIGHT%s %sRED%s\n" "$tty_bright_red" "$tty_reset" "$tty_red" "$tty_reset"
-  printf "%sBRIGHT%s %sGREEN%s\n" "$tty_bright_green" "$tty_reset" "$tty_green" "$tty_reset"
-  printf "%sBRIGHT%s %sYELLOW%s\n" "$tty_bright_yellow" "$tty_reset" "$tty_yellow" "$tty_reset"
-  printf "%sBRIGHT%s %sBLUE%s\n" "$tty_bright_blue" "$tty_reset" "$tty_blue" "$tty_reset"
-  printf "%sBRIGHT%s %sMAGENTA%s\n" "$tty_bright_magenta" "$tty_reset" "$tty_magenta" "$tty_reset"
-  printf "%sBRIGHT%s %sCYAN%s\n" "$tty_bright_cyan" "$tty_reset" "$tty_cyan" "$tty_reset"
-  printf "%sBRIGHT%s %sWHITE%s\n" "$tty_bright_white" "$tty_reset" "$tty_white" "$tty_reset"
+  SECTION prompt4 --------------------------------------------------------------
+
+  echo y | prompt4 Yn || true
+  echo y | prompt4 Yn "Single line" || true
+  echo y | prompt4 Yn "%s\n%s\n" "Multi-" "line" || true
+  (echo n | prompt4 Yn) || true
+  (echo n | prompt4 Yn "Single line") || true
+  (echo n | prompt4 Yn "%s\n%s\n" "Multi-" "line") || true
 
   SECTION failr - error message util -------------------------------------------
   (failr) || true
