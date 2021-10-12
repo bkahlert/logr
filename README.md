@@ -2,6 +2,8 @@
 
 * yet another bash logger
   ```shell
+  ░░░░░░░ YET ANOTHER BASH LOGGER
+
   ✱︎ new
   ▪︎ item
   ↗︎ https://github.com/bkahlert/logr
