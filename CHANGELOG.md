@@ -2,7 +2,14 @@
 
 ## [Unreleased]
 ### Added
-*none*
+- Default question for `prompt4` using `-`  
+  ```shell
+  prompt4 Yn '%s\n' "This is a message." -
+  ```  
+  ```text
+     This is a message.
+     Do you want to continue?
+  ```
 
 ### Changed
 *none*

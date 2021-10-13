@@ -651,8 +651,19 @@ prompt4() {
       ;;
     Yn)
       shift
-      local _yn_question="Do you want to continue?" _yn_answer
+      local -a args=()
+      local _arg _yn_question="Do you want to continue?" _yn_answer
+      for _arg in "$@"; do
+        if [ "${_arg-}" = - ]; then
+          args+=("$_yn_question")
+        else
+          args+=("${_arg-}")
+        fi
+      done
+      set -- "${args[@]}"
+
       if [ $# -gt 0 ]; then
+        # shellcheck disable=SC2059
         printf -v _yn_question "$@"
       fi
       util print_line '\n%s%s %s %s' "$tty_bold" "${_yn_question%%$'\n'}" "[Y/n]" "$tty_stout_end"
@@ -913,9 +924,11 @@ exit 2
   echo y | prompt4 Yn || true
   echo y | prompt4 Yn "Single line" || true
   echo y | prompt4 Yn "%s\n%s\n" "Multi-" "line" || true
+  echo y | prompt4 Yn "%s\n" "Multi-" "line" - || true
   (echo n | prompt4 Yn) || true
   (echo n | prompt4 Yn "Single line") || true
   (echo n | prompt4 Yn "%s\n%s\n" "Multi-" "line") || true
+  (echo n | prompt4 Yn "%s\n" "Multi-" "line" -) || true
 
   SECTION failr - error message util -------------------------------------------
   (failr) || true

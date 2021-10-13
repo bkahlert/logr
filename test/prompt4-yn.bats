@@ -12,21 +12,21 @@ logr_script() {
   cat <<SCRIPT >"$script"
 #!/usr/bin/env bash
 source $BATS_CWD/logr.sh
-$(printf "$@")
+$*
+echo CONFIRMED
 SCRIPT
   chmod +x "$script"
   echo "$script"
 }
 
 run_prompt() {
-  local input=${1?input missing}
+  local input=${1?input missing} script quoted
   shift
+  quoted=$(printf "'%s' " "$@")
+  script=$(logr_script "prompt4" "$quoted")
   interact <<EXPECT
 set timeout 5
-spawn "$(logr_script "
-prompt4 $*
-echo CONFIRMED
-")"
+spawn "$script"
 expect "Y/n "
 send "$input"
 expect "(\r\n)+"
@@ -46,6 +46,14 @@ EXPECT
   run_prompt ' ' Yn "Ok?"
 
   assert_line --partial "Ok?"
+}
+
+@test "should prompt replace - with default question" {
+
+  run_prompt ' ' Yn '%s\n' "This is a message." -
+
+  assert_line --partial "This is a message."
+  assert_line --partial "Do you want to continue?"
 }
 
 @test "should confirm on y" {
