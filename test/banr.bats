@@ -8,33 +8,24 @@ setup() {
   load "$BATS_CWD/logr.sh"
 }
 
-@test "should print banner" {
-  run banr foo
-  assert_output "░░░░░░░ FOO"
-}
 
-@test "should print empty banner" {
+@test "should format nothing" {
   run banr
   assert_output "░░░░░░░"
 }
-
-@test "should print two words banner" {
-  run banr foo bar
+@test "should one-component word" {
+  run banr foo
+  assert_output "░░░░░░░ FOO"
+}
+@test "should two-component word" {
+  run banr fooBar
   assert_output "░░░░░░░ FOO BAR"
 }
-
-@test "should print three words banner" {
-  run banr foo bar baz
-  assert_output "░░░░░░░ FOO BAR BAZ"
-}
-
-@test "should print camelCase banner" {
+@test "should two-component word and words" {
   run banr fooBar baz
   assert_output "░░░░░░░ FOO BAR BAZ"
-
-  run banr foo barBaz
-  assert_output "░░░░░░░ FOO BAR""BAZ"
-
-  run banr fooBarBaz
-  assert_output "░░░░░░░ FOO BAR""BAZ"
+}
+@test "should one-component word and words" {
+  run banr foo bar baz
+  assert_output "░░░░░░░ FOO BAR BAZ"
 }

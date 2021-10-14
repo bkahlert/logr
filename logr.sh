@@ -39,10 +39,10 @@ set -euo pipefail
 #   * - arguments the original unit was called with
 failr() {
   local code=$? failr_usage="[-n|--name NAME] [-u|--usage USAGE] [FORMAT [ARGS...]] [--] [INVOCATION...]"
-  local name=${FUNCNAME[1]:-?} format=() usage print_call
+  local name=${FUNCNAME[1]:-?} format=() usage print_call idx
   local -a stacktrace=()
-  for i in "${!BASH_LINENO[@]}"; do
-    [ "${BASH_LINENO[i]}" = 0 ] || stacktrace+=("${FUNCNAME[i + 1]:-?}(${BASH_SOURCE[i + 1]:-?}:${BASH_LINENO[i]:-?})")
+  for idx in "${!BASH_LINENO[@]}"; do
+    [ "${BASH_LINENO[idx]}" = 0 ] || stacktrace+=("${FUNCNAME[idx + 1]:-?}(${BASH_SOURCE[idx + 1]:-?}:${BASH_LINENO[idx]:-?})")
   done
 
   while (($#)); do
@@ -154,32 +154,6 @@ util() {
       [ "$rpad" -gt 0 ] || rpad=0
 
       printf -v util_text "%*s%s%*s" "$lpad" '' "$1" "$rpad" ''
-      ;;
-
-    banner)
-      shift
-      # shellcheck disable=SC2059
-      local _text && [ $# -eq 0 ] || printf -v _text "$@"
-      # shellcheck disable=SC2015
-      local -a words=() && [ ! "${_text-}" ] || IFS=' ' read -r -a words <<< "$_text"
-      local -a colored=() && util prefix -v "colored[0]"
-      for i in "${!words[@]}"; do
-        if [ "$i" -eq 0 ]; then
-          # shellcheck disable=SC2001
-          local -a words0 && read -r -a words0 <<< "$(echo "${words[$i]}" | sed -e 's/\([A-Z]\)/ \1/g')"
-          if [ ${#words0[@]} -gt 0 ]; then
-            colored+=("$tty_bright_cyan${words0[0]^^}$tty_reset")
-            if [ ${#words0[@]} -gt 1 ]; then
-              local word=${words0[*]:1}
-              word=${word// /}
-              colored+=("$tty_cyan${word^^}$tty_reset")
-            fi
-          fi
-        else
-          colored+=("$tty_bright_magenta${words[$i]^^}$tty_reset")
-        fi
-      done
-      printf -v util_text %s "${colored[*]}"
       ;;
 
     cursor)
@@ -320,20 +294,59 @@ util() {
       ;;
 
     prefix)
-      local prefix="" _text color bright_color
+      args=() usage="${usage%UTIL*}$1 [--config CONFIG] [FORMAT [ARGS...]]"
+      local colors=(black cyan blue green yellow magenta red) config
       shift
-      for color in black cyan blue green yellow magenta red; do
-        bright_color="tty_bright_$color"
-        color="tty_$color"
-        prefix+="${!color}${!bright_color}░$tty_reset"
+      while (($#)); do
+        case $1 in
+          --config)
+            [ "${2-}" ] || failr "value for config missing" --usage "$usage" -- "$@"
+            config=$2
+            shift 2
+            ;;
+          *)
+            args+=("$1")
+            shift
+            ;;
+        esac
       done
+      set -- "${args[@]}"
+
+      local prefix='' color props char state val
+      while IFS=' ' read -r -d: -a props || props=''; do
+        [ "${#colors[@]}" -gt 0 ] || break
+        color=${colors[0]} char=░ state=1 && colors=("${colors[@]:1}")
+        for prop in "${props[@]}"; do
+          [ "${prop-}" ] || continue
+          case $prop in
+            c=* | char=*)
+              char=${prop#*=}
+              continue
+              ;;
+            s=* | state=*)
+              state=${prop#*=}
+              continue
+              ;;
+          esac
+          failr "unknown prop '$prop'; expected colon (:) separated list of space ( ) separated key=value pairs"
+        done
+
+        [ "${char-}" ] || continue
+
+        case $state in
+          0)
+            color="tty_$color"
+            ;;
+          *)
+            color="tty_bright_$color"
+            ;;
+        esac
+        prefix+="${!color}$char$tty_reset"
+      done <<<"${config-} :"
+
       # shellcheck disable=SC2059
-      [ $# -eq 0 ] || printf -v _text "$@"
-      if [ "${_text-}" ]; then
-        util_text="$prefix $_text"
-      else
-        util_text="$prefix"
-      fi
+      local parts=("$prefix") && [ $# -eq 0 ] || printf -v parts[1] "$@"
+      printf -v util_text %s "${parts[*]}"
       ;;
 
     reprint_line)
@@ -364,6 +377,37 @@ util() {
         printf -v util_text '%s%s' "$_reprint_line_icon" "$_reprint_line"
         _util_newline=true
       fi
+      ;;
+
+    # colored banner words
+    words)
+      shift
+      # shellcheck disable=SC2059
+      local _words_text && [ $# -eq 0 ] || printf -v _words_text "$@"
+      # shellcheck disable=SC2015
+      local -a _words=() && [ ! "${_words_text-}" ] || IFS=' ' read -r -a _words <<<"$_words_text"
+      local -a _colored=()
+      local i
+      for i in "${!_words[@]}"; do
+        # color all but first words bright magenta
+        if [ "$i" -gt 0 ]; then
+          _colored+=("$tty_bright_magenta${_words[$i]^^}$tty_reset")
+          continue
+        fi
+
+        # split first word camelCase; first word -> bright cyan; rest -> cyan
+        # shellcheck disable=SC2001
+        local -a _words0 && read -r -a _words0 <<<"$(echo "${_words[$i]}" | sed -e 's/\([A-Z]\)/ \1/g')"
+        if [ ${#_words0[@]} -gt 0 ]; then
+          _colored+=("$tty_bright_cyan${_words0[0]^^}$tty_reset")
+          if [ ${#_words0[@]} -gt 1 ]; then
+            local _word=${_words0[*]:1}
+            _word=${_word// /}
+            _colored+=("$tty_cyan${_word^^}$tty_reset")
+          fi
+        fi
+      done
+      printf -v util_text %s "${_colored[*]}"
       ;;
 
     *)
@@ -411,12 +455,13 @@ spinner() {
       [ $# = 0 ] || failr "unexpected argument" --usage "$usage" -- "$@"
       local -a frames=()
       read -ra frames <<<"⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏"
-      for i in "${!frames[@]}"; do
-        util center -v "frames[$i]" "${frames[$i]}"
+      local _i
+      for _i in "${!frames[@]}"; do
+        util center -v "frames[$_i]" "${frames[$_i]}"
       done
       while true; do
-        for i in "${!frames[@]}"; do
-          util print_margin "$tty_bright_yellow${frames[$i]}$tty_load"
+        for _i in "${!frames[@]}"; do
+          util print_margin "$tty_bright_yellow${frames[$_i]}$tty_load"
           sleep 0.10
         done
       done
@@ -427,12 +472,29 @@ spinner() {
   esac
 }
 
-
 # Prints a colorful banner.
 # Arguments:
 #   * - words
 banr() {
-  util --newline banner "$*"
+  local -a args=()
+  local config
+  while (($#)); do
+    case $1 in
+      --config)
+        [ "${2-}" ] || failr "value of config missing" --usage "[--config CONFIG] [WORDS]"
+        config=$2
+        shift 2
+        ;;
+      *)
+        args+=("$1")
+        shift
+        ;;
+    esac
+  done
+
+  # shellcheck disable=SC2015
+  local text && [ "${#args[@]}" -eq 0 ] || util -v text words ${args+"${args[*]}"}
+  util --newline prefix ${config+--config $config} ${text+"${text}"}
 }
 
 # Logs according to the given type.
@@ -884,6 +946,7 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE
   banr foo
   banr fooBar
   banr fooBar baz
+  banr foo bar baz
 
   SECTION logr -----------------------------------------------------------------
   logr new "new item"
@@ -1001,8 +1064,9 @@ baz
   printf '%s' '->' && util icon --center new && printf '%s\n' '<-'
 
   SECTION print_margin
-  for i in 0 1 2 3 4 5; do
-    printf '%d' "$i"
+  local num
+  for num in 0 1 2 3 4 5; do
+    printf '%d' "$num"
     sleep 0.05
     util print_margin "⠤⠶⠿"
     sleep 0.05
@@ -1018,6 +1082,11 @@ baz
   util print_line --icon success 'existing-icon + text' && sleep 0.3 && util --newline reprint_line --icon success " -> icon + text updated"
   util print_line 'text-only' && sleep 0.3 && util --newline reprint_line --icon success
   util print_line --icon not-exists 'not-existing icon + text' && sleep 0.3 && util --newline reprint_line " -> text updated"
+
+  SECTION tracr ----------------------------------------------------------------
+  tracr
+  tracr foo
+  tracr foo bar
 
   SECTION END OF FEATURES ----------------------------------------------------
 
