@@ -262,20 +262,20 @@ util() {
       printf -v util_text '%s%s%s%s' "$tty_save" "$tty_hpa0" "${1?text missing}" "$tty_load"
       ;;
 
-    # prints the optional icon and text from the start of the line
-    print_line)
+    # prints the optional icon and text
+    print)
       args=() usage="${usage%UTIL*}$1 [-i|--icon ICON] [TEXT...]"
       shift
-      local print_line_icon="$MARGIN"
+      local print_icon="$MARGIN"
       while (($#)); do
         case $1 in
           -i | --icon)
             [ "${2-}" ] || usage
-            util -v print_line_icon icon --center "$2"
+            util -v print_icon icon --center "$2"
             shift 2
             ;;
           --skip-icon)
-            print_line_icon="${tty_hpa_margin-}"
+            print_icon="${tty_hpa_margin-}"
             shift
             ;;
           *)
@@ -286,11 +286,11 @@ util() {
       done
       set -- "${args[@]}"
 
-      local _text=''
+      local text=''
       # shellcheck disable=SC2059
-      [ $# -eq 0 ] || printf -v _text "$@"
-      _text=${_text//$LF/$LF$MARGIN}
-      printf -v util_text '%s%s%s' "$tty_hpa0" "$print_line_icon" "$_text"
+      [ $# -eq 0 ] || printf -v text "$@"
+      text=${text//$LF/$LF$MARGIN}
+      printf -v util_text '%s%s' "$print_icon" "$text"
       ;;
 
     prefix)
@@ -349,16 +349,16 @@ util() {
       printf -v util_text %s "${parts[*]}"
       ;;
 
-    reprint_line)
+    reprint)
       args=() usage="${usage%UTIL*}$1 [-i|--icon ICON] FORMAT [ARGS...]"
       shift
-      local _reprint_line_icon=${tty_hpa_margin-}
-      [ "$tty_connected" ] || util -v _reprint_line_icon icon --center running
+      local _reprint_icon=${tty_hpa_margin-}
+      [ "$tty_connected" ] || util -v _reprint_icon icon --center running
       while (($#)); do
         case $1 in
           --icon)
             [ "${2-}" ] || usage
-            util -v _reprint_line_icon icon --center "$2"
+            util -v _reprint_icon icon --center "$2"
             shift 2
             ;;
           *)
@@ -370,11 +370,11 @@ util() {
       set -- "${args[@]}"
 
       # shellcheck disable=SC2059
-      local _reprint_line && printf -v _reprint_line "$@"
+      local _reprint && printf -v _reprint "$@"
       if [ "$tty_connected" ]; then
-        printf -v util_text '%s%s%s%s' "$tty_hpa0" "$_reprint_line_icon" "$_reprint_line" "$tty_eel"
+        printf -v util_text '%s%s%s%s' "$tty_hpa0" "$_reprint_icon" "$_reprint" "$tty_eel"
       else
-        printf -v util_text '%s%s' "$_reprint_line_icon" "$_reprint_line"
+        printf -v util_text '%s%s' "$_reprint_icon" "$_reprint"
         _util_newline=true
       fi
       ;;
@@ -549,10 +549,10 @@ logr() {
       ;;
 
     new | item | success | info | warn)
-      util --newline print_line --icon "$1" "${@:2}"
+      util --newline print --icon "$1" "${@:2}"
       ;;
     error | fail)
-      util --newline print_line --icon "$1" "${@:2}" >&2
+      util --newline print --icon "$1" "${@:2}" >&2
       [ ! "$1" = "error" ] || return 1
       [ ! "$1" = "fail" ] || exit 1
       ;;
@@ -567,7 +567,7 @@ logr() {
       [ $# -ge "1" ] || failr "url missing" --usage "$usage" -- "$@"
       local url="$1" text=${2:-$1}
       # shellcheck disable=SC1003
-      util --newline print_line --icon link '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "$text"
+      util --newline print --icon link '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "$text"
       ;;
     file)
       usage="${usage%COMMAND*}$1 [-l|--line LINE [-c|--column COLUMN]] PATH [TEXT]"
@@ -603,10 +603,10 @@ logr() {
       fi
       local url="file://$path" text=${2:-file://$path}
       # shellcheck disable=SC1003
-      util --newline print_line --icon file '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "$text"
+      util --newline print --icon file '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "$text"
       ;;
     running)
-      util --newline print_line --icon "$1" "${@:2}"
+      util --newline print --icon "$1" "${@:2}"
       ;;
     task)
       usage="${usage%COMMAND*}$1 [FORMAT [ARGS...]] [-- COMMAND [ARGS...]]"
@@ -636,7 +636,7 @@ logr() {
       fi
 
       if [ "${#cmdline[@]}" -eq 0 ]; then
-        util --newline print_line --icon task "$logr_task"
+        util --newline print --icon task "$logr_task"
         return 0
       fi
 
@@ -649,12 +649,12 @@ logr() {
       if [ ! "$logr_parent_tasks" ]; then
         [ ! -f "$task_file" ] || rm -- "$task_file"
         [ ! -f "$log_file" ] || rm -- "$log_file"
-        util reprint_line "$logr_tasks"
+        util reprint "$logr_tasks"
         spinner start
         # run command line; redirect stdout+stderr to log_file; provide FD3 and FD4 as means to still print
         (logr_parent_tasks=$logr_tasks "${cmdline[@]}" 3>&1 1>"$log_file" 4>&2 2>"$log_file") || task_exit_status=$?
       else
-        util reprint_line "$logr_tasks" >&3
+        util reprint "$logr_tasks" >&3
         # run command line; redirects from parent task already apply
         (logr_parent_tasks=$logr_tasks "${cmdline[@]}") || task_exit_status=$?
       fi
@@ -672,7 +672,7 @@ logr() {
 
         # error
         if [ ! "$task_exit_status" -eq 0 ]; then
-          util --newline reprint_line --icon error "$(cat "$task_file")"
+          util --newline reprint --icon error "$(cat "$task_file")"
           sed \
             -e 's/[\[(][(0-9;]*[a-zA-Z]//g;' \
             -e 's/^/'"$MARGIN$tty_red"'/;' \
@@ -683,7 +683,7 @@ logr() {
 
         # success
         # erase what has been printed on same line by printing task_line again
-        util --newline reprint_line --icon success "$logr_tasks"
+        util --newline reprint --icon success "$logr_tasks"
       fi
       ;;
     *)
@@ -728,7 +728,7 @@ prompt4() {
         # shellcheck disable=SC2059
         printf -v _yn_question "$@"
       fi
-      util print_line '\n%s%s %s %s' "$tty_bold" "${_yn_question%%$'\n'}" "[Y/n]" "$tty_stout_end"
+      util print '\n%s%s %s %s' "$tty_bold" "${_yn_question%%$'\n'}" "[Y/n]" "$tty_stout_end"
 
       if [ -t 0 ]; then
         local _yn_tty_settings
@@ -1073,15 +1073,15 @@ baz
   done
   echo
 
-  SECTION print_line
-  util --newline print_line --icon success 'existing icon + text'
-  util --newline print_line 'text only'
-  util --newline print_line --icon not-exists 'not existing icon + text'
+  SECTION print
+  util --newline print --icon success 'existing icon + text'
+  util --newline print 'text only'
+  util --newline print --icon not-exists 'not existing icon + text'
 
-  SECTION reprint_line
-  util print_line --icon success 'existing-icon + text' && sleep 0.3 && util --newline reprint_line --icon success " -> icon + text updated"
-  util print_line 'text-only' && sleep 0.3 && util --newline reprint_line --icon success
-  util print_line --icon not-exists 'not-existing icon + text' && sleep 0.3 && util --newline reprint_line " -> text updated"
+  SECTION reprint
+  util print --icon success 'existing-icon + text' && sleep 0.3 && util --newline reprint --icon success " -> icon + text updated"
+  util print 'text-only' && sleep 0.3 && util --newline reprint --icon success
+  util print --icon not-exists 'not-existing icon + text' && sleep 0.3 && util --newline reprint " -> text updated"
 
   SECTION tracr ----------------------------------------------------------------
   tracr

@@ -23,7 +23,8 @@
   ```
 
 ### Changed
-*none*
+- renamed util function `print_line` to `print`
+- renamed util function `reprint_line` to `reprint`
 
 ### Deprecated
 *none*
