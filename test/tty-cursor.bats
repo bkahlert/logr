@@ -9,19 +9,17 @@ setup() {
 }
 
 @test "should print usage" {
-  run util cursor
+  run tty cursor
   assert_line --partial "failed: command missing"
-  assert_line --partial "Usage: util [-v VAR] [-n|--newline] cursor show | hide"
+  assert_line --partial "Usage: tty [-v VAR] cursor show | hide"
 }
 
 @test "should show cursor" {
-  run util cursor show
-  trace
+  run tty cursor show
   [ ! "${output-}" ]
 }
 
 @test "should hide cursor" {
-  run util cursor hide
-  trace
+  run tty cursor hide
   [ ! "${output-}" ]
 }

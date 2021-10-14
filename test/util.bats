@@ -10,7 +10,7 @@ setup() {
 
 @test "should print usage" {
   run util
-  assert_line --partial "failed: util missing"
+  assert_line --partial "failed: command missing"
   assert_line --partial "Usage: util [-v VAR] [-n|--newline] UTIL [ARGS...]"
 }
 

@@ -25,6 +25,7 @@
 ### Changed
 - renamed util function `print_line` to `print`
 - renamed util function `reprint_line` to `reprint`
+- terminal related features are now located in `tty`
 
 ### Deprecated
 *none*

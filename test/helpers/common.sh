@@ -100,37 +100,37 @@ patch_lib() {
 
   case $short_name in
     assert)
-      local bats_assert_line
-      bats_assert_line=$(declare -f assert_line) || true
-      if [ "${bats_assert_line-}" ]; then
-        eval "bats_${bats_assert_line}"
-        # bashsupport disable=BP5008
-        assert_line() {
-          local shell_option=nullglob
-          if shopt -q "$shell_option"; then
-            printf '%s\n' "❗ Bats' assert_line seems broken if shell option $shell_option is enabled." >&2
-            printf '%s\n' "❗ Workaround: enable $shell_option only locally or use assert_output." >&2
-            exit 1
-          fi
-          bats_assert_line "$@"
-        }
-      fi
-      ;;
-    file)
-      local bats_fn bats_decl
-      for bats_fn in $(set | grep -e "^assert_file_*"); do
-        [[ $bats_fn == assert_file_* ]] || continue
-        bats_decl=$(declare -f "$bats_fn") || true
-        if [ "${bats_decl-}" ]; then
-          eval "bats_$bats_decl"
-          eval "$bats_fn() {
-            BATSLIB_FILE_PATH_REM=\${BATSLIB_FILE_PATH_REM:-} \
-            BATSLIB_FILE_PATH_ADD=\${BATSLIB_FILE_PATH_ADD:-} \
-            bats_$bats_fn \"\$@\"
-          }"
+    local bats_assert_line
+    bats_assert_line=$(declare -f assert_line) || true
+    if [ "${bats_assert_line-}" ]; then
+      eval "bats_${bats_assert_line}"
+      # bashsupport disable=BP5008
+      assert_line() {
+        local shell_option=nullglob
+        if shopt -q "$shell_option"; then
+          printf '%s\n' "❗ Bats' assert_line seems broken if shell option $shell_option is enabled." >&2
+          printf '%s\n' "❗ Workaround: enable $shell_option only locally or use assert_output." >&2
+          exit 1
         fi
-      done
-      ;;
+        bats_assert_line "$@"
+      }
+    fi
+    ;;
+  file)
+    local bats_fn bats_decl
+    for bats_fn in $(set | grep -e "^assert_file_*"); do
+      [[ $bats_fn == assert_file_* ]] || continue
+      bats_decl=$(declare -f "$bats_fn") || true
+      if [ "${bats_decl-}" ]; then
+        eval "bats_$bats_decl"
+        eval "$bats_fn() {
+          BATSLIB_FILE_PATH_REM=\${BATSLIB_FILE_PATH_REM:-} \
+          BATSLIB_FILE_PATH_ADD=\${BATSLIB_FILE_PATH_ADD:-} \
+          bats_$bats_fn \"\$@\"
+        }"
+      fi
+    done
+    ;;
   esac
 }
 

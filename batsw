@@ -204,18 +204,18 @@ bats() {
   local -a BATS_ARGS=()
   while (($#)); do
     case "$1" in
-      -e | --env)
-        if [ "${2-}" ] && [ "${2:0:1}" != "-" ]; then
-          DOCKER_ARGS+=("$1" "$2")
-          shift 2
-        else
-          die "value of $1 missing"
-        fi
-        ;;
-      *)
-        BATS_ARGS+=("$1")
-        shift
-        ;;
+    -e | --env)
+      if [ "${2-}" ] && [ "${2:0:1}" != "-" ]; then
+        DOCKER_ARGS+=("$1" "$2")
+        shift 2
+      else
+        die "value of $1 missing"
+      fi
+      ;;
+    *)
+      BATS_ARGS+=("$1")
+      shift
+      ;;
     esac
   done
 
@@ -281,28 +281,28 @@ main() {
   local -a BATS_ARGS=()
   while (($#)); do
     case "$1" in
-      --inject)
-        [ "${2-}" ] || die "value of inject missing"
-        BATS_ARGS+=("--env" "BATSW_INJECT=$2")
+    --inject)
+      [ "${2-}" ] || die "value of inject missing"
+      BATS_ARGS+=("--env" "BATSW_INJECT=$2")
+      shift 2
+      ;;
+    --quiet)
+      export BATSW_QUIET=1
+      shift
+      ;;
+    -o | --output)
+      if [ "${2-}" ] && [ "${2:0:1}" != "-" ]; then
+        mkdir -p "$2"
+        BATS_ARGS+=("$1" "$2")
         shift 2
-        ;;
-      --quiet)
-        export BATSW_QUIET=1
-        shift
-        ;;
-      -o | --output)
-        if [ "${2-}" ] && [ "${2:0:1}" != "-" ]; then
-          mkdir -p "$2"
-          BATS_ARGS+=("$1" "$2")
-          shift 2
-        else
-          [ "${2-}" ] || die "value of $1 missing"
-        fi
-        ;;
-      *)
-        BATS_ARGS+=("$1")
-        shift
-        ;;
+      else
+        [ "${2-}" ] || die "value of $1 missing"
+      fi
+      ;;
+    *)
+      BATS_ARGS+=("$1")
+      shift
+      ;;
     esac
   done
 
