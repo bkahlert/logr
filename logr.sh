@@ -702,6 +702,28 @@ prompt4() {
   esac
 }
 
+# Kommons' tracer [1] inspired helper function that supports print debugging [2]
+# by printing details about the passed arguments.
+# Arguments:
+#   * - arguments to print debugging information for
+# References:
+#   1 - https://github.com/bkahlert/kommons/blob/35e2ac1c4246decdf7e7a1160bfdd5c9e28fd066/src/commonMain/kotlin/com/bkahlert/kommons/debug/Insights.kt#L149
+#   2 - https://en.wikipedia.org/wiki/Debugging#Print_debugging
+tracr() {
+  local debug="$tty_cyan%s$tty_reset"
+  local quote && printf -v quote "$debug%%s$debug" "'" "'"
+
+  # shellcheck disable=SC2059
+  local argc && printf -v argc "$debug" "$#"
+
+  # shellcheck disable=SC2059
+  [ $# -eq 0 ] || printf "$quote " "$@"
+  local location && [ ! "${BASH_SOURCE[1]-}" ] || location="${BASH_SOURCE[1]}:${BASH_LINENO[0]}"
+  local prefix_length && printf -v prefix_length " ! %s %s" "$location" "$#" && prefix_length=$(( ${#prefix_length} + 8 ))
+  printf %s "$argc" "   " "$(tput hpa 80)" "$(logr file "$location")"
+  printf '\n'
+}
+
 # Initializes environment
 main() {
   TMPDIR=${TMPDIR:-/tmp} TMPDIR=${TMPDIR%/}

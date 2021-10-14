@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 ### Added
+- `tracr` in order to facilitate print debugging
+  ```shell
+  tracr
+  tracr foo
+  tracr "$@"
+  ```  
+  ```text
+  0               ↗ file:///home/john/logr.sh:947
+  'foo' 1         ↗ file:///home/john/logr.sh:948
+  'foo' 'bar' 2   ↗ file:///home/john/logr.sh:949
+  ```
 - Default question for `prompt4` using `-`  
   ```shell
   prompt4 Yn '%s\n' "This is a message." -
