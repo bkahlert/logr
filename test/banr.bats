@@ -11,21 +11,30 @@ setup() {
 
 @test "should format nothing" {
   run banr
-  assert_output "░░░░░░░"
+  assert_output " ░░░░░░░"
 }
-@test "should one-component word" {
+@test "should format one-component word" {
   run banr foo
-  assert_output "░░░░░░░ FOO"
+  assert_output " ░░░░░░░ FOO"
 }
-@test "should two-component word" {
+@test "should format two-component word" {
   run banr fooBar
-  assert_output "░░░░░░░ FOO BAR"
+  assert_output " ░░░░░░░ FOO BAR"
 }
-@test "should two-component word and words" {
+@test "should format two-component word and words" {
   run banr fooBar baz
-  assert_output "░░░░░░░ FOO BAR BAZ"
+  assert_output " ░░░░░░░ FOO BAR BAZ"
 }
-@test "should one-component word and words" {
+@test "should format one-component word and words" {
   run banr foo bar baz
-  assert_output "░░░░░░░ FOO BAR BAZ"
+  assert_output " ░░░░░░░ FOO BAR BAZ"
+}
+
+@test "should apply default config" {
+  run banr --static foo bar baz
+  assert_output " ░░░░░░░ FOO BAR BAZ"
+}
+@test "should apply specified config" {
+  run banr --static='c=>:c=<:c=>:c=<:c=>:c=<:c=>' foo bar baz
+  assert_output " ><><><> FOO BAR BAZ"
 }

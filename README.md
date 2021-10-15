@@ -1,5 +1,7 @@
 # logr [![Build Status](https://img.shields.io/github/workflow/status/bkahlert/logr/build?label=Build&logo=github&logoColor=fff)](https://github.com/bkahlert/logr/actions/workflows/build-and-publish.yml) [![Repository Size](https://img.shields.io/github/repo-size/bkahlert/logr?color=01818F&label=Repo%20Size&logo=Git&logoColor=fff)](https://github.com/bkahlert/logr) [![Repository Size](https://img.shields.io/github/license/bkahlert/logr?color=29ABE2&label=License&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1OTAgNTkwIiAgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBkPSJNMzI4LjcgMzk1LjhjNDAuMy0xNSA2MS40LTQzLjggNjEuNC05My40UzM0OC4zIDIwOSAyOTYgMjA4LjljLTU1LjEtLjEtOTYuOCA0My42LTk2LjEgOTMuNXMyNC40IDgzIDYyLjQgOTQuOUwxOTUgNTYzQzEwNC44IDUzOS43IDEzLjIgNDMzLjMgMTMuMiAzMDIuNCAxMy4yIDE0Ny4zIDEzNy44IDIxLjUgMjk0IDIxLjVzMjgyLjggMTI1LjcgMjgyLjggMjgwLjhjMCAxMzMtOTAuOCAyMzcuOS0xODIuOSAyNjEuMWwtNjUuMi0xNjcuNnoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxOS4yMTIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4%3D)](https://github.com/bkahlert/logr/blob/master/LICENSE)
 
+TODO demo
+
 * yet another bash logger
   ```shell
   ░░░░░░░ YET ANOTHER BASH LOGGER
@@ -31,6 +33,14 @@
   # Hit ␛, n, or ⌃C
   ✘︎ Continue? [Y/n] no
   ```
+* banners
+  ```shell
+  banr "fooBar baz"
+  # ░░░░░░░ FOO BAR BAZ
+  
+  banr "fooBar baz" --static='c=>:c=<:c=>:c=<:c=>:c=<:c=>'
+  # ><><><> FOO BAR BAZ
+  ```  
 * to-do list like execution of tasks
 * spinner based visual feedback
 * hyperlink support

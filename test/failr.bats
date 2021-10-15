@@ -23,6 +23,18 @@ setup() {
   assert_equal "$status" "2"
 }
 
+@test "should print error icon default" {
+  run failr
+  assert_output --regexp " ✘ .*"
+}
+
+@test "should print warn icon if specified" {
+  run failr -w
+  assert_output --regexp " ⚠ .*"
+  run failr --warn
+  assert_output --regexp " ⚠ .*"
+}
+
 @test "should print generic message by default" {
   run failr
   assert_output --regexp " ✘ .* failed"

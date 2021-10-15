@@ -33,6 +33,7 @@ set -euo pipefail
 # Globals:
 #   FUNCNAME
 # Arguments:
+#   w - optional flag; if set only returns instead of exits
 #   n - optional name of the failed unit (determined using FUNCNAME by default)
 #   u - optional usage information; output is automatically preceded with the name
 #   - - optional; used declare remaining arguments as positional arguments

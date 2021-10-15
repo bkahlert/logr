@@ -16,31 +16,36 @@ setup() {
 
 @test "should print file link" {
   run logr file /foo/bar
-  assert_output --partial ''
-  assert_output --partial "file:///foo/bar"
+  assert_output " ↗ file:///foo/bar"
 }
 
 @test "should print file link with custom text" {
   run logr file /foo/bar baz
-  assert_output --partial ''
-  assert_output --partial "/foo/bar"
-  assert_output --partial "baz"
+  assert_output " ↗ [file:///foo/bar](baz)"
 }
 
 @test "should encode line if specified" {
-  run logr file -l 42 /foo/bar
+  __CFBundleIdentifier='' run logr file -l 42 /foo/bar
+  assert_output --partial "file:///foo/bar#42"
+
+  __CFBundleIdentifier='' run logr file --line 42 /foo/bar
+  assert_output --partial "file:///foo/bar#42"
+}
+
+@test "should hash encode line if jetBrains is present" {
+  __CFBundleIdentifier=com.jetbrains.intellij run logr file -l 42 /foo/bar
   assert_output --partial "file:///foo/bar:42"
 
-  run logr file --line 42 /foo/bar
+  __CFBundleIdentifier=com.jetbrains.intellij run logr file --line 42 /foo/bar
   assert_output --partial "file:///foo/bar:42"
 }
 
 @test "should encode column if specified" {
-  run logr file -l 42 -c 24 /foo/bar
-  assert_output --partial "file:///foo/bar:42:24"
+  __CFBundleIdentifier='' run logr file -l 42 -c 24 /foo/bar
+  assert_output --partial "file:///foo/bar#42:24"
 
-  run logr file -l 42 --column 24 /foo/bar
-  assert_output --partial "file:///foo/bar:42:24"
+  __CFBundleIdentifier='' run logr file -l 42 --column 24 /foo/bar
+  assert_output --partial "file:///foo/bar#42:24"
 }
 
 @test "should not encode column on missing line" {

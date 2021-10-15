@@ -29,19 +29,19 @@ setup() {
   run util words
   assert_output ""
 }
-@test "should one-component word" {
+@test "should format one-component word" {
   run util words '%s ' foo
   assert_output "FOO"
 }
-@test "should two-component word" {
+@test "should format two-component word" {
   run util words '%s ' fooBar
   assert_output "FOO BAR"
 }
-@test "should two-component word and words" {
+@test "should format two-component word and words" {
   run util words '%s ' fooBar baz
   assert_output "FOO BAR BAZ"
 }
-@test "should one-component word and words" {
+@test "should format one-component word and words" {
   run util words '%s ' foo bar baz
   assert_output "FOO BAR BAZ"
 }

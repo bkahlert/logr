@@ -2,30 +2,10 @@
 
 ## [Unreleased]
 ### Added
-- `tracr` in order to facilitate print debugging
-  ```shell
-  tracr
-  tracr foo
-  tracr "$@"
-  ```  
-  ```text
-  0               ↗ file:///home/john/logr.sh:947
-  'foo' 1         ↗ file:///home/john/logr.sh:948
-  'foo' 'bar' 2   ↗ file:///home/john/logr.sh:949
-  ```
-- Default question for `prompt4` using `-`  
-  ```shell
-  prompt4 Yn '%s\n' "This is a message." -
-  ```  
-  ```text
-     This is a message.
-     Do you want to continue?
-  ```
+*none*
 
 ### Changed
-- renamed util function `print_line` to `print`
-- renamed util function `reprint_line` to `reprint`
-- terminal related features are now located in `tty`
+*none*
 
 ### Deprecated
 *none*
@@ -35,6 +15,46 @@
 
 ### Fixed
 *none*
+
+
+## [0.4.0] - 2021-10-15
+
+### Added
+- `tracr` in order to facilitate print debugging
+  ```shell
+  tracr
+  tracr foo
+  tracr "$@"
+  ```  
+  ```text
+  0               ↗ file:///home/john/logr.sh#947
+  'foo' 1         ↗ file:///home/john/logr.sh#948
+  'foo' 'bar' 2   ↗ file:///home/john/logr.sh#949
+  ```
+- Default question for `prompt4` using `-`  
+  ```shell
+  prompt4 Yn '%s\n' "This is a message." -
+  ```  
+  ```text
+     This is a message.
+     Do you want to continue?
+  ```
+- Customizable banner with a colon separated list of properties  
+  - `char`/`c`: character to use instead of default one
+  - `state`/`s`: `0` corresponds to dimmed color; otherwise default
+  ```shell
+  banr --static='c=>:c=<:c=>:c=<:c=>:c=<:c=>' fooBar baz
+  ```  
+  ```text
+  ><><><> FOO BAR BAZ
+  ```
+- Animated banner if no --static flag is used  
+
+### Changed
+- renamed util function `print_line` to `print`
+- renamed util function `reprint_line` to `reprint`
+- terminal related features are now located in `esc`
+
 
 ## [0.3.0] - 2021-10-13
 
@@ -109,7 +129,8 @@
     Usage: foo baz
   ```
 
-[unreleased]: https://github.com/bkahlert/logr/compare/v0.3.0...HEAD
+[unreleased]: https://github.com/bkahlert/logr/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/bkahlert/logr/compare/v0.2.0...v0.4.0
 [0.3.0]: https://github.com/bkahlert/logr/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/bkahlert/logr/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/bkahlert/logr/releases/tag/v0.1.0

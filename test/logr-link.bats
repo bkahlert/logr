@@ -16,13 +16,10 @@ setup() {
 
 @test "should print link" {
   run logr link https://foo/bar
-  assert_output --partial ''
-  assert_output --partial "https://foo/bar"
+  assert_output " ↗ https://foo/bar"
 }
 
 @test "should print link with custom text" {
   run logr link https://foo/bar baz
-  assert_output --partial ''
-  assert_output --partial "https://foo/bar"
-  assert_output --partial "baz"
+  assert_output " ↗ [https://foo/bar](baz)"
 }
