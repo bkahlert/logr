@@ -8,7 +8,7 @@ setup() {
   load "$BATS_CWD/logr.sh"
 
   declare -g usage='
-   logr v0.1.0
+   logr SNAPSHOT
 
    Usage: logr COMMAND [ARGS...]
 
@@ -39,10 +39,17 @@ setup() {
 }
 
 
-@test "should fail if executed" {
+@test "should warn if executed" {
   run bash "$BATS_CWD/logr.sh"
-  assert_failure
   assert_line --partial "✘ To use logr you need to source it at the top of your script."
+}
+
+@test "should offer feature overview" {
+  run bash "$BATS_CWD/logr.sh"
+  assert_success
+  assert_line --partial " Would you like to explore the provides functions beforehand? [Y/n]"
+  assert_line --partial "$ logr success text"
+  assert_line --partial "✔ text"
 }
 
 @test "should print help if executed with -h flag" {

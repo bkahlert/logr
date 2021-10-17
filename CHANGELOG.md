@@ -62,16 +62,16 @@
 - `banr` function to print iconic banner
   ```shell
   $ banr
-  ░░░░░░░
+  ▒▒▒▒▒▒▒
   
   $ banr foo
-  ░░░░░░░ FOO
+  ▒▒▒▒▒▒▒ FOO
   
   $ banr fooBar
-  ░░░░░░░ FOO BAR
+  ▒▒▒▒▒▒▒ FOO BAR
   
   $ banr fooBar baz
-  ░░░░░░░ FOO BAR BAZ
+  ▒▒▒▒▒▒▒ FOO BAR BAZ
   ```
 
 ## [0.2.0] - 2021-10-12
@@ -108,7 +108,7 @@
   ℹ︎ info
   ⚠︎ warn
   ✘︎ error
-  ⚡︎ fail
+  ϟ︎ fail
   ☐︎ task
   ⠏︎ running task
   ✔︎ succeeded task

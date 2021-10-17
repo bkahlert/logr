@@ -4,7 +4,7 @@ TODO demo
 
 * yet another bash logger
   ```shell
-  ░░░░░░░ YET ANOTHER BASH LOGGER
+  ▒▒▒▒▒▒▒ YET ANOTHER BASH LOGGER
 
   ✱︎ new
   ▪︎ item
@@ -14,7 +14,7 @@ TODO demo
   ℹ︎ info
   ⚠︎ warn
   ✘︎ error
-  ⚡︎ fail
+  ϟ︎ fail
   ☐︎ task
   ⠏︎ running task
   ✔︎ succeeded task
@@ -36,7 +36,7 @@ TODO demo
 * banners
   ```shell
   banr "fooBar baz"
-  # ░░░░░░░ FOO BAR BAZ
+  # ▒▒▒▒▒▒▒ FOO BAR BAZ
   
   banr "fooBar baz" --static='c=>:c=<:c=>:c=<:c=>:c=<:c=>'
   # ><><><> FOO BAR BAZ

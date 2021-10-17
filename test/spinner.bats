@@ -26,7 +26,8 @@ teardown() {
 @test "should spin" {
   # shellcheck disable=SC2034
   output=$(
-    spinner start 3>&-
+    printf '\n'
+    spinner start 2>&1
     sleep 3
     spinner stop
   )

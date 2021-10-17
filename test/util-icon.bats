@@ -11,7 +11,7 @@ setup() {
 @test "should print usage" {
   run util icon
   assert_line --partial "failed: icon missing"
-  assert_line --partial "Usage: util [-v VAR] [-n|--newline] icon [-c|--center] ICON"
+  assert_line --partial "Usage: util [-v VAR] icon [-c|--center] ICON"
 }
 
 @test "should print icon" {

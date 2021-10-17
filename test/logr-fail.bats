@@ -10,17 +10,17 @@ setup() {
 
 @test "should print" {
   run logr fail foo
-  assert_output " ⚡ foo"
+  assert_output " ϟ foo"
 }
 
 @test "should print icon only" {
   run logr fail
-  assert_output " ⚡ "
+  assert_output " ϟ "
 }
 
 @test "should printf" {
   run logr fail 'foo %*s' 5 bar
-  assert_output " ⚡ foo   bar"
+  assert_output " ϟ foo   bar"
 }
 
 # shellcheck disable=SC2154

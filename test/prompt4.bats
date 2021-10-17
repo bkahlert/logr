@@ -13,12 +13,12 @@ SCRIPT
   chmod +x script.sh
 
   declare -g usage='
-   prompt4 v0.1.0
+   prompt4 SNAPSHOT
 
    Usage: prompt4 TYPE [ARGS...]
 
    Type:
-     continue    "Do you want to continue?"'
+     Yn    "Do you want to continue?"'
 }
 
 @test "should prompt specified type" {
