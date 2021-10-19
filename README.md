@@ -2,6 +2,38 @@
 
 TODO demo
 
+![tracr function](docs/tracr.svg)
+tracr function
+
+> ![tracr function](docs/tracr.svg)
+  tracr function
+
+![Semantic description of image](docs/tracr.svg "Image Title")
+
+![Semantic description of image][identifier]
+
+![Semantic description of image](docs/tracr.svg)*My caption*
+
+[![Semantic description of image](docs/tracr.svg "Hello World")*My caption*][about.gitlab.com]
+
+![image alternative text](docs/tracr.svg){: .shadow}
+
+
+[identifier]: https://example.com "This example has a title
+[about.gitlab.com]: https://about.com "This example has a title
+
+
+<figure><img src="docs/tracr.svg" alt="tracr function" style="width:100%">
+ <figcaption align="center"><b>tracr function</b></figcaption></figure>
+
+| ![space-1.jpg](docs/tracr.svg) |
+| :--: |
+| <b>tracr function</b> |
+
+<p align="center"><img src="docs/tracr.svg"></p>
+<p align = "center">tracr function</p>
+
+
 * yet another bash logger
   ```shell
   ▒▒▒▒▒▒▒ YET ANOTHER BASH LOGGER
