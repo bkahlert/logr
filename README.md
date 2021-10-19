@@ -2,10 +2,9 @@
 
 TODO demo
 
-![recorded terminal session demonstrating the tracr function
-](docs/tracr.svg "tracr function")*tracr function*
+![recorded terminal session demonstrating the tracr function](docs/tracr.svg "tracr function") *tracr function*
 
-[![Semantic description of image](docs/tracr.svg "Hello World")*My caption*][logr.sh]
+[![Semantic description of image](docs/tracr.svg "Hello World") My caption][logr.sh]
 
 
 * yet another bash logger
