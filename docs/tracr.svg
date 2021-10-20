@@ -1,1 +1,979 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1380" height="622.75"><rect width="1380" height="622.75" rx="5" ry="5" class="a"/><svg y="0%" x="0%"><circle cx="20" cy="20" r="6" fill="#ff5f58"/><circle cx="40" cy="20" r="6" fill="#ffbd2e"/><circle cx="60" cy="20" r="6" fill="#18c132"/></svg><svg height="542.75" viewBox="0 0 132 54.275" width="1320" x="25" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" y="60"><style>@keyframes r{0%{transform:translateX(0)}.1%{transform:translateX(-132px)}2.7%{transform:translateX(-396px)}2.8%{transform:translateX(-528px)}2.9%{transform:translateX(-660px)}3%{transform:translateX(-792px)}6.6%{transform:translateX(-924px)}10.3%{transform:translateX(-1056px)}10.4%{transform:translateX(-1188px)}10.5%{transform:translateX(-1320px)}10.6%{transform:translateX(-1584px)}10.8%{transform:translateX(-1980px)}10.9%{transform:translateX(-2112px)}11%{transform:translateX(-2376px)}11.1%{transform:translateX(-2772px)}11.2%{transform:translateX(-3168px)}11.4%{transform:translateX(-3564px)}11.5%{transform:translateX(-3960px)}11.6%{transform:translateX(-4092px)}11.7%{transform:translateX(-4356px)}11.8%{transform:translateX(-4752px)}11.9%{transform:translateX(-5148px)}12.1%{transform:translateX(-5544px)}12.2%{transform:translateX(-5940px)}12.3%{transform:translateX(-6072px)}12.4%{transform:translateX(-6336px)}12.5%{transform:translateX(-6732px)}12.6%{transform:translateX(-7128px)}12.8%{transform:translateX(-8316px)}12.9%{transform:translateX(-8448px)}13.1%{transform:translateX(-9108px)}13%{transform:translateX(-8712px)}13.2%{transform:translateX(-9504px)}13.3%{transform:translateX(-9636px)}13.4%{transform:translateX(-9900px)}13.5%{transform:translateX(-10296px)}13.6%{transform:translateX(-10692px)}13.8%{transform:translateX(-11088px)}13.9%{transform:translateX(-11484px)}14%{transform:translateX(-11880px)}14.2%{transform:translateX(-12144px)}14.3%{transform:translateX(-12408px)}14.4%{transform:translateX(-12540px)}14.5%{transform:translateX(-12804px)}14.6%{transform:translateX(-13200px)}14.7%{transform:translateX(-13596px)}14.9%{transform:translateX(-13992px)}15%{transform:translateX(-14124px)}15.1%{transform:translateX(-14256px)}24%{transform:translateX(-14520px)}27.6%{transform:translateX(-14652px)}31.3%{transform:translateX(-14784px)}35%{transform:translateX(-14916px)}38.6%{transform:translateX(-15048px)}38.7%{transform:translateX(-15180px)}38.8%{transform:translateX(-15312px)}38.9%{transform:translateX(-15444px)}39%{transform:translateX(-15576px)}42.7%{transform:translateX(-15708px)}46.4%{transform:translateX(-15840px)}48.6%{transform:translateX(-16368px)}52.3%{transform:translateX(-16500px)}56%{transform:translateX(-16632px)}59.6%{transform:translateX(-16764px)}63.3%{transform:translateX(-16896px)}67%{transform:translateX(-17028px)}70.6%{transform:translateX(-17160px)}74.3%{transform:translateX(-17292px)}78%{transform:translateX(-17424px)}81.6%{transform:translateX(-17556px)}85.3%{transform:translateX(-17688px)}89%{transform:translateX(-17820px)}92.7%{transform:translateX(-17952px)}96.3%{transform:translateX(-18084px)}to{transform:translateX(-18216px)}}.a{fill:#2d2d2d}.f,.g,.h{fill:gray;white-space:pre}.g,.h{fill:#c9c9c9}.h{fill:#01e6ff}.i,.j,.k,.l,.m,.n{fill:#01818f;white-space:pre}.j,.k,.l,.m,.n{fill:#e927ff}.k,.l,.m,.n{fill:#ff2797}.l,.m,.n{fill:#fffc67}.m,.n{fill:#92ff60}.n{fill:#2ec1ff}</style><g font-family="Monaco,Consolas,Menlo,'Bitstream Vera Sans Mono','Powerline Symbols',monospace" font-size="1.67"><defs><symbol id="21"><text x="3.006" y="1.67" class="g">▉▊▋▌▍▎▏</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="1"><text y="1.67" class="f">$</text><text x="2.004" y="1.67" class="g">HEADR</text><text x="8.016" y="1.67" class="g">fooBar</text><text x="15.03" y="1.67" class="g">baz</text></symbol><symbol id="3"><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="4"><text x="3.006" y="1.67" class="g">▁</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="5"><text x="3.006" y="1.67" class="g">▁▂</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="6"><text x="3.006" y="1.67" class="g">▁▂▃</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="7"><text x="3.006" y="1.67" class="g">▁▂▃▄</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="8"><text x="3.006" y="1.67" class="g">▁▂▃▄▅</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="9"><text x="3.006" y="1.67" class="g">▁▂▃▄▅▆</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="10"><text x="3.006" y="1.67" class="g">▁▂▃▄▅▆▇</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="11"><text x="3.006" y="1.67" class="g">▂▃▄▅▆▇█</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="12"><text x="3.006" y="1.67" class="g">▃▄▅▆▇██</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="13"><text x="3.006" y="1.67" class="g">▄▅▆▇███</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="14"><text x="3.006" y="1.67" class="g">▅▆▇████</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="15"><text x="3.006" y="1.67" class="g">▆▇████▉</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="16"><text x="3.006" y="1.67" class="g">▇████▉▊</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="17"><text x="3.006" y="1.67" class="g">████▉▊▋</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="18"><text x="3.006" y="1.67" class="g">███▉▊▋▌</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="19"><text x="3.006" y="1.67" class="g">██▉▊▋▌▍</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="20"><text x="3.006" y="1.67" class="g">█▉▊▋▌▍▎</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="2"><text y="1.67" class="f">$</text><text x="2.004" y="1.67" class="f">HEADR</text><text x="8.016" y="1.67" class="f">fooBar</text><text x="15.03" y="1.67" class="f">baz</text></symbol><symbol id="22"><text x="3.006" y="1.67" class="g">▊▋▌▍▎▏</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="23"><text x="3.006" y="1.67" class="g">▋▌▍▎▏</text><text x="9.018" y="1.67" class="k">▏</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="24"><text x="3.006" y="1.67" class="g">▌▍▎▏</text><text x="8.016" y="1.67" class="j">▏</text><text x="9.018" y="1.67" class="k">▎</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="25"><text x="3.006" y="1.67" class="g">▍▎▏</text><text x="7.014" y="1.67" class="l">▏</text><text x="8.016" y="1.67" class="j">▎</text><text x="9.018" y="1.67" class="k">▍</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="26"><text x="3.006" y="1.67" class="g">▎▏</text><text x="6.012" y="1.67" class="m">▏</text><text x="7.014" y="1.67" class="l">▎</text><text x="8.016" y="1.67" class="j">▍</text><text x="9.018" y="1.67" class="k">▌</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="27"><text x="3.006" y="1.67" class="g">▏</text><text x="5.01" y="1.67" class="n">▏</text><text x="6.012" y="1.67" class="m">▎</text><text x="7.014" y="1.67" class="l">▍</text><text x="8.016" y="1.67" class="j">▌</text><text x="9.018" y="1.67" class="k">▋</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="28"><text x="4.008" y="1.67" class="h">▏</text><text x="5.01" y="1.67" class="n">▎</text><text x="6.012" y="1.67" class="m">▍</text><text x="7.014" y="1.67" class="l">▌</text><text x="8.016" y="1.67" class="j">▋</text><text x="9.018" y="1.67" class="k">▊</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="29"><text x="3.006" y="1.67" class="f">▏</text><text x="4.008" y="1.67" class="h">▎</text><text x="5.01" y="1.67" class="n">▍</text><text x="6.012" y="1.67" class="m">▌</text><text x="7.014" y="1.67" class="l">▋</text><text x="8.016" y="1.67" class="j">▊</text><text x="9.018" y="1.67" class="k">▉</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="30"><text x="3.006" y="1.67" class="f">▎</text><text x="4.008" y="1.67" class="h">▍</text><text x="5.01" y="1.67" class="n">▌</text><text x="6.012" y="1.67" class="m">▋</text><text x="7.014" y="1.67" class="l">▊</text><text x="8.016" y="1.67" class="j">▉</text><text x="9.018" y="1.67" class="k">█</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="31"><text x="3.006" y="1.67" class="f">▍</text><text x="4.008" y="1.67" class="h">▌</text><text x="5.01" y="1.67" class="n">▋</text><text x="6.012" y="1.67" class="m">▊</text><text x="7.014" y="1.67" class="l">▉</text><text x="8.016" y="1.67" class="j">█</text><text x="9.018" y="1.67" class="k">█</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="32"><text x="3.006" y="1.67" class="f">▌</text><text x="4.008" y="1.67" class="h">▋</text><text x="5.01" y="1.67" class="n">▊</text><text x="6.012" y="1.67" class="m">▉</text><text x="7.014" y="1.67" class="l">█</text><text x="8.016" y="1.67" class="j">█</text><text x="9.018" y="1.67" class="k">█</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="33"><text x="3.006" y="1.67" class="f">▋</text><text x="4.008" y="1.67" class="h">▊</text><text x="5.01" y="1.67" class="n">▉</text><text x="6.012" y="1.67" class="m">█</text><text x="7.014" y="1.67" class="l">█</text><text x="8.016" y="1.67" class="j">█</text><text x="9.018" y="1.67" class="k">█</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="34"><text x="3.006" y="1.67" class="f">▊</text><text x="4.008" y="1.67" class="h">▉</text><text x="5.01" y="1.67" class="n">█</text><text x="6.012" y="1.67" class="m">█</text><text x="7.014" y="1.67" class="l">█</text><text x="8.016" y="1.67" class="j">█</text><text x="9.018" y="1.67" class="k">█</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="35"><text x="3.006" y="1.67" class="f">▉</text><text x="4.008" y="1.67" class="h">█</text><text x="5.01" y="1.67" class="n">█</text><text x="6.012" y="1.67" class="m">█</text><text x="7.014" y="1.67" class="l">█</text><text x="8.016" y="1.67" class="j">█</text><text x="9.018" y="1.67" class="k">█</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="36"><text x="3.006" y="1.67" class="f">█</text><text x="4.008" y="1.67" class="h">█</text><text x="5.01" y="1.67" class="n">█</text><text x="6.012" y="1.67" class="m">█</text><text x="7.014" y="1.67" class="l">█</text><text x="8.016" y="1.67" class="j">█</text><text x="9.018" y="1.67" class="k">█</text><text x="11.022" y="1.67" class="h">FOO</text><text x="15.03" y="1.67" class="i">BAR</text><text x="19.038" y="1.67" class="j">BAZ</text></symbol><symbol id="37"><text x="1.002" y="1.67" class="g">tracr</text><text x="7.014" y="1.67" class="g">-foo</text><text x="12.024" y="1.67" class="g">--bar</text><text x="18.036" y="1.67" class="g">--</text><text x="21.042" y="1.67" class="g">---baz</text></symbol><symbol id="38"><text y="1.67" class="f">#</text><text x="2.004" y="1.67" class="f">tracr</text><text x="8.016" y="1.67" class="f">-foo</text><text x="13.026" y="1.67" class="f">--bar</text><text x="19.038" y="1.67" class="f">--</text><text x="22.044" y="1.67" class="f">---baz</text></symbol><symbol id="39"><text x="1.002" y="1.67" class="h">4</text><text x="3.006" y="1.67" class="h">`</text><text x="4.008" y="1.67" class="g">-foo</text><text x="8.016" y="1.67" class="h">`</text><text x="10.02" y="1.67" class="h">`</text><text x="11.022" y="1.67" class="g">--bar</text><text x="16.032" y="1.67" class="h">`</text><text x="18.036" y="1.67" class="h">`</text><text x="19.038" y="1.67" class="g">--</text><text x="21.042" y="1.67" class="h">`</text><text x="23.046" y="1.67" class="h">`</text><text x="24.048" y="1.67" class="g">---baz</text><text x="30.06" y="1.67" class="h">`</text><text x="67.134" y="1.67" style="white-space:pre" fill="#29abe2">↗</text><text x="69.138" y="1.67" class="g">file:///home/john/main#9</text></symbol><symbol id="a"><path fill="transparent" d="M0 0h132v26H0z"/></symbol><symbol id="b"><path fill="#c7c7c7" d="M0 0h1.102v2.171H0z"/></symbol></defs><path class="a" d="M0 0h132v54.275H0z"/><g style="animation-duration:13.711693s;animation-iteration-count:infinite;animation-name:r;animation-timing-function:steps(1,end)"><svg width="18348"><svg><use xlink:href="#a"/><use xlink:href="#b" x="-.004"/></svg><svg x="132"><use xlink:href="#a"/><use xlink:href="#b" x="-.004"/></svg><svg x="264"><use xlink:href="#a"/></svg><svg x="396"><use xlink:href="#a"/><use xlink:href="#b" x=".996"/><text y="1.67" class="f">$</text></svg><svg x="528"><use xlink:href="#a"/><use xlink:href="#b" x="12.996"/><text y="1.67" class="f">$</text><text x="2.004" y="1.67" class="g">HEADR</text><text x="8.016" y="1.67" class="g">fooBa</text></svg><svg x="660"><use xlink:href="#a"/><use xlink:href="#b" x="17.996"/><use xlink:href="#1"/></svg><svg x="792"><use xlink:href="#a"/><use xlink:href="#1"/></svg><svg x="924"><use xlink:href="#a"/><use xlink:href="#b" x="17.996"/><use xlink:href="#1"/></svg><svg x="1056"><use xlink:href="#a"/><use xlink:href="#2"/></svg><svg x="1188"><use xlink:href="#a"/><use xlink:href="#2"/></svg><svg x="1320"><use xlink:href="#a"/><use xlink:href="#2"/></svg><svg x="1452"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#3" y="4.342"/></svg><svg x="1584"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#3" y="4.342"/></svg><svg x="1716"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#3" y="4.342"/></svg><svg x="1848"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#4" y="4.342"/></svg><svg x="1980"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#4" y="4.342"/></svg><svg x="2112"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#4" y="4.342"/></svg><svg x="2244"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#5" y="4.342"/></svg><svg x="2376"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#5" y="4.342"/></svg><svg x="2508"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#5" y="4.342"/></svg><svg x="2640"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#6" y="4.342"/></svg><svg x="2772"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#6" y="4.342"/></svg><svg x="2904"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#6" y="4.342"/></svg><svg x="3036"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#7" y="4.342"/></svg><svg x="3168"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#7" y="4.342"/></svg><svg x="3300"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#7" y="4.342"/></svg><svg x="3432"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#8" y="4.342"/></svg><svg x="3564"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#8" y="4.342"/></svg><svg x="3696"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#8" y="4.342"/></svg><svg x="3828"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#9" y="4.342"/></svg><svg x="3960"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#9" y="4.342"/></svg><svg x="4092"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#9" y="4.342"/></svg><svg x="4224"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#10" y="4.342"/></svg><svg x="4356"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#10" y="4.342"/></svg><svg x="4488"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#10" y="4.342"/></svg><svg x="4620"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#11" y="4.342"/></svg><svg x="4752"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#11" y="4.342"/></svg><svg x="4884"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#11" y="4.342"/></svg><svg x="5016"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#12" y="4.342"/></svg><svg x="5148"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#12" y="4.342"/></svg><svg x="5280"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#12" y="4.342"/></svg><svg x="5412"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#13" y="4.342"/></svg><svg x="5544"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#13" y="4.342"/></svg><svg x="5676"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#13" y="4.342"/></svg><svg x="5808"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#14" y="4.342"/></svg><svg x="5940"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#14" y="4.342"/></svg><svg x="6072"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#14" y="4.342"/></svg><svg x="6204"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#15" y="4.342"/></svg><svg x="6336"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#15" y="4.342"/></svg><svg x="6468"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#15" y="4.342"/></svg><svg x="6600"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#16" y="4.342"/></svg><svg x="6732"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#16" y="4.342"/></svg><svg x="6864"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#16" y="4.342"/></svg><svg x="6996"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#17" y="4.342"/></svg><svg x="7128"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#17" y="4.342"/></svg><svg x="7260"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#17" y="4.342"/></svg><svg x="7392"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#18" y="4.342"/></svg><svg x="7524"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#18" y="4.342"/></svg><svg x="7656"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#18" y="4.342"/></svg><svg x="7788"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#19" y="4.342"/></svg><svg x="7920"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#19" y="4.342"/></svg><svg x="8052"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#19" y="4.342"/></svg><svg x="8184"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#20" y="4.342"/></svg><svg x="8316"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#20" y="4.342"/></svg><svg x="8448"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#20" y="4.342"/></svg><svg x="8580"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#21" y="4.342"/></svg><svg x="8712"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#21" y="4.342"/></svg><svg x="8844"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#21" y="4.342"/></svg><svg x="8976"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#22" y="4.342"/></svg><svg x="9108"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#22" y="4.342"/></svg><svg x="9240"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#22" y="4.342"/></svg><svg x="9372"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#23" y="4.342"/></svg><svg x="9504"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#23" y="4.342"/></svg><svg x="9636"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#23" y="4.342"/></svg><svg x="9768"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#24" y="4.342"/></svg><svg x="9900"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#24" y="4.342"/></svg><svg x="10032"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#24" y="4.342"/></svg><svg x="10164"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#25" y="4.342"/></svg><svg x="10296"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#25" y="4.342"/></svg><svg x="10428"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#25" y="4.342"/></svg><svg x="10560"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#26" y="4.342"/></svg><svg x="10692"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#26" y="4.342"/></svg><svg x="10824"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#26" y="4.342"/></svg><svg x="10956"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#27" y="4.342"/></svg><svg x="11088"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#27" y="4.342"/></svg><svg x="11220"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#27" y="4.342"/></svg><svg x="11352"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#28" y="4.342"/></svg><svg x="11484"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#28" y="4.342"/></svg><svg x="11616"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#28" y="4.342"/></svg><svg x="11748"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#29" y="4.342"/></svg><svg x="11880"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#29" y="4.342"/></svg><svg x="12012"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#29" y="4.342"/></svg><svg x="12144"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#30" y="4.342"/></svg><svg x="12276"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#30" y="4.342"/></svg><svg x="12408"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#31" y="4.342"/></svg><svg x="12540"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#31" y="4.342"/></svg><svg x="12672"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#32" y="4.342"/></svg><svg x="12804"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#32" y="4.342"/></svg><svg x="12936"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#32" y="4.342"/></svg><svg x="13068"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#33" y="4.342"/></svg><svg x="13200"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#33" y="4.342"/></svg><svg x="13332"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#33" y="4.342"/></svg><svg x="13464"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#34" y="4.342"/></svg><svg x="13596"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#34" y="4.342"/></svg><svg x="13728"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#34" y="4.342"/></svg><svg x="13860"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#35" y="4.342"/></svg><svg x="13992"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#35" y="4.342"/></svg><svg x="14124"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#35" y="4.342"/></svg><svg x="14256"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/></svg><svg x="14388"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/></svg><svg x="14520"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/></svg><svg x="14652"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="10.83"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/></svg><svg x="14784"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/></svg><svg x="14916"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="10.83"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/></svg><svg x="15048"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="10.83"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/></svg><svg x="15180"><use xlink:href="#a"/><use xlink:href="#b" x="12.996" y="10.83"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><text x="1.002" y="12.525" class="g">tracr</text><text x="7.014" y="12.525" class="g">-foo</text><text x="12.024" y="12.525" class="g">-</text></svg><svg x="15312"><use xlink:href="#a"/><use xlink:href="#b" x="25.996" y="10.83"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><text x="1.002" y="12.525" class="g">tracr</text><text x="7.014" y="12.525" class="g">-foo</text><text x="12.024" y="12.525" class="g">--bar</text><text x="18.036" y="12.525" class="g">--</text><text x="21.042" y="12.525" class="g">---ba</text></svg><svg x="15444"><use xlink:href="#a"/><use xlink:href="#b" x="26.996" y="10.83"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#37" y="10.855"/></svg><svg x="15576"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#37" y="10.855"/></svg><svg x="15708"><use xlink:href="#a"/><use xlink:href="#b" x="26.996" y="10.83"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#37" y="10.855"/></svg><svg x="15840"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="10.83"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/></svg><svg x="15972"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="13.001"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/></svg><svg x="16104"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="15.172"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="16236"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="17.343"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="16368"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="16500"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="17.343"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="16632"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="16764"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="17.343"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="16896"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="17028"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="17.343"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="17160"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="17292"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="17.343"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="17424"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="17556"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="17.343"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="17688"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="17820"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="17.343"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="17952"><use xlink:href="#a"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="18084"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="17.343"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg><svg x="18216"><use xlink:href="#a"/><use xlink:href="#b" x="-.004" y="17.343"/><use xlink:href="#2"/><use xlink:href="#36" y="4.342"/><use xlink:href="#38" y="10.855"/><use xlink:href="#39" y="13.026"/></svg></svg></g></g></svg></svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1240" height="1883.64">
+    <style>
+        .xxx {
+            x: 15px;
+            y: 15px;
+            width: 800;
+            mix-blend-mode: luminosity;
+            opacity: 0.5;
+        }
+        .content {
+            mix-blend-mode: luminosity;
+            font-family: 'JetBrains Mono', Monaco, Consolas, Menlo, 'Bitstream Vera Sans Mono', 'Lucida Console', 'Ubuntu Mono', 'Meslo for Powerline', 'Meslo LG M for Powerline', 'Powerline Symbols', Monospace, monospace
+        }
+        .content:hover {
+            mix-blend-mode: initial;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .a {
+                fill: #f0f0f0;
+            }
+        <!--        h1 { color: #ddd; }-->
+        }
+    </style>
+    <!-- font-family="'JetBrains Mono', Monaco, Consolas, Menlo, 'Bitstream Vera Sans Mono', 'Lucida Console', 'Ubuntu Mono', 'Meslo for Powerline', 'Meslo LG M for Powerline', 'Powerline Symbols', Monospace, monospace" font-size="1.67" -->
+    <!-- change xlink:href to href, see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href -->
+    <rect width="1240" height="1883.64" rx="5" ry="5" class="a"/>
+    <svg y="0%" x="0%">
+        <circle cx="20" cy="20" r="6" fill="#ff5f58"/>
+        <circle cx="40" cy="20" r="6" fill="#ffbd2e"/>
+        <circle cx="60" cy="20" r="6" fill="#18c132"/>
+    </svg>
+    <svg class="content" height="1823.64" viewBox="0 0 120 182.364" width="1200" x="15" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" y="50">
+        <style>@keyframes
+            r{0%{transform:translateX(0)}4.1%{transform:translateX(-120px)}4.3%{transform:translateX(-240px)}4.4%{transform:translateX(-360px)}16.1%{transform:translateX(-480px)}16.2%{transform:translateX(-600px)}16.4%{transform:translateX(-720px)}16.5%{transform:translateX(-960px)}16.7%{transform:translateX(-1320px)}16.9%{transform:translateX(-1440px)}17%{transform:translateX(-1680px)}17.1%{transform:translateX(-1800px)}17.2%{transform:translateX(-2040px)}17.4%{transform:translateX(-2400px)}17.6%{transform:translateX(-2760px)}17.8%{transform:translateX(-2880px)}17.9%{transform:translateX(-3120px)}18.1%{transform:translateX(-3480px)}18.3%{transform:translateX(-3840px)}18.5%{transform:translateX(-4200px)}18.7%{transform:translateX(-4320px)}18.8%{transform:translateX(-4560px)}18.9%{transform:translateX(-4680px)}19%{transform:translateX(-4920px)}19.2%{transform:translateX(-5280px)}19.4%{transform:translateX(-5640px)}19.6%{transform:translateX(-5760px)}19.7%{transform:translateX(-6000px)}19.8%{transform:translateX(-6120px)}19.9%{transform:translateX(-6360px)}20.1%{transform:translateX(-6720px)}20.3%{transform:translateX(-6960px)}20.4%{transform:translateX(-7080px)}20.5%{transform:translateX(-7200px)}20.6%{transform:translateX(-7440px)}20.8%{transform:translateX(-7800px)}21%{transform:translateX(-8160px)}21.2%{transform:translateX(-8520px)}21.4%{transform:translateX(-8880px)}21.6%{transform:translateX(-9000px)}21.7%{transform:translateX(-9240px)}21.8%{transform:translateX(-9360px)}21.9%{transform:translateX(-9600px)}22.1%{transform:translateX(-9960px)}22.3%{transform:translateX(-10200px)}22.4%{transform:translateX(-10320px)}22.5%{transform:translateX(-10440px)}22.6%{transform:translateX(-10680px)}22.8%{transform:translateX(-11040px)}23%{transform:translateX(-11400px)}23.2%{transform:translateX(-11760px)}23.4%{transform:translateX(-11880px)}23.5%{transform:translateX(-12120px)}23.7%{transform:translateX(-12480px)}23.9%{transform:translateX(-12720px)}38%{transform:translateX(-12960px)}61.1%{transform:translateX(-13080px)}61.3%{transform:translateX(-13200px)}61.4%{transform:translateX(-13320px)}61.6%{transform:translateX(-13440px)}73.3%{transform:translateX(-13560px)}76.8%{transform:translateX(-13680px)}76.9%{transform:translateX(-13920px)}to{transform:translateX(-14040px)}}.a{fill:#2d2d2d}.f,.g,.h{fill:gray;white-space:pre}.g,.h{fill:#01e6ff}.h{fill:#01818f}.i,.j,.k,.l,.m,.n{fill:#e927ff;white-space:pre}.j,.k,.l,.m,.n{fill:#c9c9c9}.k,.l,.m,.n{fill:#ff2797}.l,.m,.n{fill:#fffc67}.m,.n{fill:#92ff60}.n{fill:#2ec1ff}
+
+        </style>
+        <!-- TODO -->
+        <g font-family="'JetBrains Mono', Monaco, Consolas, Menlo, 'Bitstream Vera Sans Mono', 'Lucida Console', 'Ubuntu Mono', 'Meslo for Powerline', 'Meslo LG M for Powerline', 'Powerline Symbols', Monospace, monospace" font-size="1.67">
+            <defs>
+                <symbol id="20">
+                    <text x="3.006" y="1.67" class="j">▉▊▋▌▍▎▏</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="1">
+                    <text y="1.67" class="f">$</text>
+                    <text x="2.004" y="1.67" class="f">HEADR</text>
+                    <text x="8.016" y="1.67" class="f">fooBar</text>
+                    <text x="15.03" y="1.67" class="f">baz</text>
+                </symbol>
+                <symbol id="3">
+                    <text x="3.006" y="1.67" class="j">▁</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="4">
+                    <text x="3.006" y="1.67" class="j">▁▂</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="5">
+                    <text x="3.006" y="1.67" class="j">▁▂▃</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="6">
+                    <text x="3.006" y="1.67" class="j">▁▂▃▄</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="7">
+                    <text x="3.006" y="1.67" class="j">▁▂▃▄▅</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="8">
+                    <text x="3.006" y="1.67" class="j">▁▂▃▄▅▆</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="9">
+                    <text x="3.006" y="1.67" class="j">▁▂▃▄▅▆▇</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="10">
+                    <text x="3.006" y="1.67" class="j">▂▃▄▅▆▇█</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="11">
+                    <text x="3.006" y="1.67" class="j">▃▄▅▆▇██</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="12">
+                    <text x="3.006" y="1.67" class="j">▄▅▆▇███</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="13">
+                    <text x="3.006" y="1.67" class="j">▅▆▇████</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="14">
+                    <text x="3.006" y="1.67" class="j">▆▇████▉</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="15">
+                    <text x="3.006" y="1.67" class="j">▇████▉▊</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="16">
+                    <text x="3.006" y="1.67" class="j">████▉▊▋</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="17">
+                    <text x="3.006" y="1.67" class="j">███▉▊▋▌</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="18">
+                    <text x="3.006" y="1.67" class="j">██▉▊▋▌▍</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="19">
+                    <text x="3.006" y="1.67" class="j">█▉▊▋▌▍▎</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="2">
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="21">
+                    <text x="3.006" y="1.67" class="j">▊▋▌▍▎▏</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="22">
+                    <text x="3.006" y="1.67" class="j">▋▌▍▎▏</text>
+                    <text x="9.018" y="1.67" class="k">▏</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="23">
+                    <text x="3.006" y="1.67" class="j">▌▍▎▏</text>
+                    <text x="8.016" y="1.67" class="i">▏</text>
+                    <text x="9.018" y="1.67" class="k">▎</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="24">
+                    <text x="3.006" y="1.67" class="j">▍▎▏</text>
+                    <text x="7.014" y="1.67" class="l">▏</text>
+                    <text x="8.016" y="1.67" class="i">▎</text>
+                    <text x="9.018" y="1.67" class="k">▍</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="25">
+                    <text x="3.006" y="1.67" class="j">▎▏</text>
+                    <text x="6.012" y="1.67" class="m">▏</text>
+                    <text x="7.014" y="1.67" class="l">▎</text>
+                    <text x="8.016" y="1.67" class="i">▍</text>
+                    <text x="9.018" y="1.67" class="k">▌</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="26">
+                    <text x="3.006" y="1.67" class="j">▏</text>
+                    <text x="5.01" y="1.67" class="n">▏</text>
+                    <text x="6.012" y="1.67" class="m">▎</text>
+                    <text x="7.014" y="1.67" class="l">▍</text>
+                    <text x="8.016" y="1.67" class="i">▌</text>
+                    <text x="9.018" y="1.67" class="k">▋</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="27">
+                    <text x="4.008" y="1.67" class="g">▏</text>
+                    <text x="5.01" y="1.67" class="n">▎</text>
+                    <text x="6.012" y="1.67" class="m">▍</text>
+                    <text x="7.014" y="1.67" class="l">▌</text>
+                    <text x="8.016" y="1.67" class="i">▋</text>
+                    <text x="9.018" y="1.67" class="k">▊</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="28">
+                    <text x="3.006" y="1.67" class="f">▏</text>
+                    <text x="4.008" y="1.67" class="g">▎</text>
+                    <text x="5.01" y="1.67" class="n">▍</text>
+                    <text x="6.012" y="1.67" class="m">▌</text>
+                    <text x="7.014" y="1.67" class="l">▋</text>
+                    <text x="8.016" y="1.67" class="i">▊</text>
+                    <text x="9.018" y="1.67" class="k">▉</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="29">
+                    <text x="3.006" y="1.67" class="f">▎</text>
+                    <text x="4.008" y="1.67" class="g">▍</text>
+                    <text x="5.01" y="1.67" class="n">▌</text>
+                    <text x="6.012" y="1.67" class="m">▋</text>
+                    <text x="7.014" y="1.67" class="l">▊</text>
+                    <text x="8.016" y="1.67" class="i">▉</text>
+                    <text x="9.018" y="1.67" class="k">█</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="30">
+                    <text x="3.006" y="1.67" class="f">▍</text>
+                    <text x="4.008" y="1.67" class="g">▌</text>
+                    <text x="5.01" y="1.67" class="n">▋</text>
+                    <text x="6.012" y="1.67" class="m">▊</text>
+                    <text x="7.014" y="1.67" class="l">▉</text>
+                    <text x="8.016" y="1.67" class="i">█</text>
+                    <text x="9.018" y="1.67" class="k">█</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="31">
+                    <text x="3.006" y="1.67" class="f">▌</text>
+                    <text x="4.008" y="1.67" class="g">▋</text>
+                    <text x="5.01" y="1.67" class="n">▊</text>
+                    <text x="6.012" y="1.67" class="m">▉</text>
+                    <text x="7.014" y="1.67" class="l">█</text>
+                    <text x="8.016" y="1.67" class="i">█</text>
+                    <text x="9.018" y="1.67" class="k">█</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="32">
+                    <text x="3.006" y="1.67" class="f">▋</text>
+                    <text x="4.008" y="1.67" class="g">▊</text>
+                    <text x="5.01" y="1.67" class="n">▉</text>
+                    <text x="6.012" y="1.67" class="m">█</text>
+                    <text x="7.014" y="1.67" class="l">█</text>
+                    <text x="8.016" y="1.67" class="i">█</text>
+                    <text x="9.018" y="1.67" class="k">█</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="33">
+                    <text x="3.006" y="1.67" class="f">▊</text>
+                    <text x="4.008" y="1.67" class="g">▉</text>
+                    <text x="5.01" y="1.67" class="n">█</text>
+                    <text x="6.012" y="1.67" class="m">█</text>
+                    <text x="7.014" y="1.67" class="l">█</text>
+                    <text x="8.016" y="1.67" class="i">█</text>
+                    <text x="9.018" y="1.67" class="k">█</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="34">
+                    <text x="3.006" y="1.67" class="f">▉</text>
+                    <text x="4.008" y="1.67" class="g">█</text>
+                    <text x="5.01" y="1.67" class="n">█</text>
+                    <text x="6.012" y="1.67" class="m">█</text>
+                    <text x="7.014" y="1.67" class="l">█</text>
+                    <text x="8.016" y="1.67" class="i">█</text>
+                    <text x="9.018" y="1.67" class="k">█</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="35">
+                    <text x="3.006" y="1.67" class="f">█</text>
+                    <text x="4.008" y="1.67" class="g">█</text>
+                    <text x="5.01" y="1.67" class="n">█</text>
+                    <text x="6.012" y="1.67" class="m">█</text>
+                    <text x="7.014" y="1.67" class="l">█</text>
+                    <text x="8.016" y="1.67" class="i">█</text>
+                    <text x="9.018" y="1.67" class="k">█</text>
+                    <text x="11.022" y="1.67" class="g">FOO</text>
+                    <text x="15.03" y="1.67" class="h">BAR</text>
+                    <text x="19.038" y="1.67" class="i">BAZ</text>
+                </symbol>
+                <symbol id="36">
+                    <text y="1.67" class="f">#</text>
+                    <text x="2.004" y="1.67" class="f">tracr</text>
+                    <text x="8.016" y="1.67" class="f">-foo</text>
+                    <text x="13.026" y="1.67" class="f">--bar</text>
+                    <text x="19.038" y="1.67" class="f">--</text>
+                    <text x="22.044" y="1.67" class="f">---baz</text>
+                </symbol>
+                <symbol id="37">
+                    <text x="1.002" y="1.67" class="g">4</text>
+                    <text x="3.006" y="1.67" class="g">`</text>
+                    <text x="4.008" y="1.67" class="j">-foo</text>
+                    <text x="8.016" y="1.67" class="g">`</text>
+                    <text x="10.02" y="1.67" class="g">`</text>
+                    <text x="11.022" y="1.67" class="j">--bar</text>
+                    <text x="16.032" y="1.67" class="g">`</text>
+                    <text x="18.036" y="1.67" class="g">`</text>
+                    <text x="19.038" y="1.67" class="j">--</text>
+                    <text x="21.042" y="1.67" class="g">`</text>
+                    <text x="23.046" y="1.67" class="g">`</text>
+                    <text x="24.048" y="1.67" class="j">---baz</text>
+                    <text x="30.06" y="1.67" class="g">`</text>
+                    <text x="51.102" y="1.67" style="white-space:pre" fill="#29abe2">↗</text>
+                    <text x="53.106" y="1.67" class="j">file:///home/john/main#12</text>
+                </symbol>
+                <symbol id="a">
+                    <path fill="transparent" d="M0 0h120v84H0z"/>
+                </symbol>
+                <symbol id="b">
+                    <path fill="#c7c7c7" d="M0 0h1.102v2.171H0z"/>
+                </symbol>
+            </defs>
+            <path class="a" d="M0 0h120v182.364H0z"/>
+            <g style="animation-duration:8.662385s;animation-iteration-count:infinite;animation-name:r;animation-timing-function:steps(1,end)">
+                <svg width="14160">
+                    <svg>
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x="-.004"/>
+                    </svg>
+                    <svg x="120">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x=".996"/>
+                        <text y="1.67" class="f">$</text>
+                    </svg>
+                    <svg x="240">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x="14.996"/>
+                        <text y="1.67" class="f">$</text>
+                        <text x="2.004" y="1.67" class="j">HEADR</text>
+                        <text x="8.016" y="1.67" class="j">fooBar</text>
+                    </svg>
+                    <svg x="360">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x="17.996"/>
+                        <text y="1.67" class="f">$</text>
+                        <text x="2.004" y="1.67" class="j">HEADR</text>
+                        <text x="8.016" y="1.67" class="j">fooBar</text>
+                        <text x="15.03" y="1.67" class="j">baz</text>
+                    </svg>
+                    <svg x="480">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                    </svg>
+                    <svg x="600">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                    </svg>
+                    <svg x="720">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                    </svg>
+                    <svg x="840">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#2" y="4.342"/>
+                    </svg>
+                    <svg x="960">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#2" y="4.342"/>
+                    </svg>
+                    <svg x="1080">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#2" y="4.342"/>
+                    </svg>
+                    <svg x="1200">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#3" y="4.342"/>
+                    </svg>
+                    <svg x="1320">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#3" y="4.342"/>
+                    </svg>
+                    <svg x="1440">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#3" y="4.342"/>
+                    </svg>
+                    <svg x="1560">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#4" y="4.342"/>
+                    </svg>
+                    <svg x="1680">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#4" y="4.342"/>
+                    </svg>
+                    <svg x="1800">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#4" y="4.342"/>
+                    </svg>
+                    <svg x="1920">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#5" y="4.342"/>
+                    </svg>
+                    <svg x="2040">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#5" y="4.342"/>
+                    </svg>
+                    <svg x="2160">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#5" y="4.342"/>
+                    </svg>
+                    <svg x="2280">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#6" y="4.342"/>
+                    </svg>
+                    <svg x="2400">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#6" y="4.342"/>
+                    </svg>
+                    <svg x="2520">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#6" y="4.342"/>
+                    </svg>
+                    <svg x="2640">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#7" y="4.342"/>
+                    </svg>
+                    <svg x="2760">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#7" y="4.342"/>
+                    </svg>
+                    <svg x="2880">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#7" y="4.342"/>
+                    </svg>
+                    <svg x="3000">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#8" y="4.342"/>
+                    </svg>
+                    <svg x="3120">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#8" y="4.342"/>
+                    </svg>
+                    <svg x="3240">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#8" y="4.342"/>
+                    </svg>
+                    <svg x="3360">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#9" y="4.342"/>
+                    </svg>
+                    <svg x="3480">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#9" y="4.342"/>
+                    </svg>
+                    <svg x="3600">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#9" y="4.342"/>
+                    </svg>
+                    <svg x="3720">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#10" y="4.342"/>
+                    </svg>
+                    <svg x="3840">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#10" y="4.342"/>
+                    </svg>
+                    <svg x="3960">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#10" y="4.342"/>
+                    </svg>
+                    <svg x="4080">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#11" y="4.342"/>
+                    </svg>
+                    <svg x="4200">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#11" y="4.342"/>
+                    </svg>
+                    <svg x="4320">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#11" y="4.342"/>
+                    </svg>
+                    <svg x="4440">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#12" y="4.342"/>
+                    </svg>
+                    <svg x="4560">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#12" y="4.342"/>
+                    </svg>
+                    <svg x="4680">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#12" y="4.342"/>
+                    </svg>
+                    <svg x="4800">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#13" y="4.342"/>
+                    </svg>
+                    <svg x="4920">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#13" y="4.342"/>
+                    </svg>
+                    <svg x="5040">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#13" y="4.342"/>
+                    </svg>
+                    <svg x="5160">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#14" y="4.342"/>
+                    </svg>
+                    <svg x="5280">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#14" y="4.342"/>
+                    </svg>
+                    <svg x="5400">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#14" y="4.342"/>
+                    </svg>
+                    <svg x="5520">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#15" y="4.342"/>
+                    </svg>
+                    <svg x="5640">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#15" y="4.342"/>
+                    </svg>
+                    <svg x="5760">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#15" y="4.342"/>
+                    </svg>
+                    <svg x="5880">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#16" y="4.342"/>
+                    </svg>
+                    <svg x="6000">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#16" y="4.342"/>
+                    </svg>
+                    <svg x="6120">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#16" y="4.342"/>
+                    </svg>
+                    <svg x="6240">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#17" y="4.342"/>
+                    </svg>
+                    <svg x="6360">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#17" y="4.342"/>
+                    </svg>
+                    <svg x="6480">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#17" y="4.342"/>
+                    </svg>
+                    <svg x="6600">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#18" y="4.342"/>
+                    </svg>
+                    <svg x="6720">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#18" y="4.342"/>
+                    </svg>
+                    <svg x="6840">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#18" y="4.342"/>
+                    </svg>
+                    <svg x="6960">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#19" y="4.342"/>
+                    </svg>
+                    <svg x="7080">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#19" y="4.342"/>
+                    </svg>
+                    <svg x="7200">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#19" y="4.342"/>
+                    </svg>
+                    <svg x="7320">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#20" y="4.342"/>
+                    </svg>
+                    <svg x="7440">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#20" y="4.342"/>
+                    </svg>
+                    <svg x="7560">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#20" y="4.342"/>
+                    </svg>
+                    <svg x="7680">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#21" y="4.342"/>
+                    </svg>
+                    <svg x="7800">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#21" y="4.342"/>
+                    </svg>
+                    <svg x="7920">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#21" y="4.342"/>
+                    </svg>
+                    <svg x="8040">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#22" y="4.342"/>
+                    </svg>
+                    <svg x="8160">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#22" y="4.342"/>
+                    </svg>
+                    <svg x="8280">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#22" y="4.342"/>
+                    </svg>
+                    <svg x="8400">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#23" y="4.342"/>
+                    </svg>
+                    <svg x="8520">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#23" y="4.342"/>
+                    </svg>
+                    <svg x="8640">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#23" y="4.342"/>
+                    </svg>
+                    <svg x="8760">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#24" y="4.342"/>
+                    </svg>
+                    <svg x="8880">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#24" y="4.342"/>
+                    </svg>
+                    <svg x="9000">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#24" y="4.342"/>
+                    </svg>
+                    <svg x="9120">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#25" y="4.342"/>
+                    </svg>
+                    <svg x="9240">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#25" y="4.342"/>
+                    </svg>
+                    <svg x="9360">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#25" y="4.342"/>
+                    </svg>
+                    <svg x="9480">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#26" y="4.342"/>
+                    </svg>
+                    <svg x="9600">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#26" y="4.342"/>
+                    </svg>
+                    <svg x="9720">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#26" y="4.342"/>
+                    </svg>
+                    <svg x="9840">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#27" y="4.342"/>
+                    </svg>
+                    <svg x="9960">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#27" y="4.342"/>
+                    </svg>
+                    <svg x="10080">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#27" y="4.342"/>
+                    </svg>
+                    <svg x="10200">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#28" y="4.342"/>
+                    </svg>
+                    <svg x="10320">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#28" y="4.342"/>
+                    </svg>
+                    <svg x="10440">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#28" y="4.342"/>
+                    </svg>
+                    <svg x="10560">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#29" y="4.342"/>
+                    </svg>
+                    <svg x="10680">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#29" y="4.342"/>
+                    </svg>
+                    <svg x="10800">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#29" y="4.342"/>
+                    </svg>
+                    <svg x="10920">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#30" y="4.342"/>
+                    </svg>
+                    <svg x="11040">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#30" y="4.342"/>
+                    </svg>
+                    <svg x="11160">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#30" y="4.342"/>
+                    </svg>
+                    <svg x="11280">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#31" y="4.342"/>
+                    </svg>
+                    <svg x="11400">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#31" y="4.342"/>
+                    </svg>
+                    <svg x="11520">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#31" y="4.342"/>
+                    </svg>
+                    <svg x="11640">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#32" y="4.342"/>
+                    </svg>
+                    <svg x="11760">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#32" y="4.342"/>
+                    </svg>
+                    <svg x="11880">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#32" y="4.342"/>
+                    </svg>
+                    <svg x="12000">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#33" y="4.342"/>
+                    </svg>
+                    <svg x="12120">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#33" y="4.342"/>
+                    </svg>
+                    <svg x="12240">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#33" y="4.342"/>
+                    </svg>
+                    <svg x="12360">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#34" y="4.342"/>
+                    </svg>
+                    <svg x="12480">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#34" y="4.342"/>
+                    </svg>
+                    <svg x="12600">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#34" y="4.342"/>
+                    </svg>
+                    <svg x="12720">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#35" y="4.342"/>
+                    </svg>
+                    <svg x="12840">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#35" y="4.342"/>
+                    </svg>
+                    <svg x="12960">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#35" y="4.342"/>
+                    </svg>
+                    <svg x="13080">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x="-.004" y="10.83"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#35" y="4.342"/>
+                    </svg>
+                    <svg x="13200">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x="9.996" y="10.83"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#35" y="4.342"/>
+                        <text x="1.002" y="12.525" class="j">tracr</text>
+                        <text x="7.014" y="12.525" class="j">-fo</text>
+                    </svg>
+                    <svg x="13320">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x="22.996" y="10.83"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#35" y="4.342"/>
+                        <text x="1.002" y="12.525" class="j">tracr</text>
+                        <text x="7.014" y="12.525" class="j">-foo</text>
+                        <text x="12.024" y="12.525" class="j">--bar</text>
+                        <text x="18.036" y="12.525" class="j">--</text>
+                        <text x="21.042" y="12.525" class="j">--</text>
+                    </svg>
+                    <svg x="13440">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x="26.996" y="10.83"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#35" y="4.342"/>
+                        <text x="1.002" y="12.525" class="j">tracr</text>
+                        <text x="7.014" y="12.525" class="j">-foo</text>
+                        <text x="12.024" y="12.525" class="j">--bar</text>
+                        <text x="18.036" y="12.525" class="j">--</text>
+                        <text x="21.042" y="12.525" class="j">---baz</text>
+                    </svg>
+                    <svg x="13560">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x="-.004" y="10.83"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#35" y="4.342"/>
+                        <use xlink:href="#36" y="10.855"/>
+                    </svg>
+                    <svg x="13680">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x="-.004" y="13.001"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#35" y="4.342"/>
+                        <use xlink:href="#36" y="10.855"/>
+                    </svg>
+                    <svg x="13800">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x="-.004" y="15.172"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#35" y="4.342"/>
+                        <use xlink:href="#36" y="10.855"/>
+                        <use xlink:href="#37" y="13.026"/>
+                    </svg>
+                    <svg x="13920">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x="-.004" y="17.343"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#35" y="4.342"/>
+                        <use xlink:href="#36" y="10.855"/>
+                        <use xlink:href="#37" y="13.026"/>
+                    </svg>
+                    <svg x="14040">
+                        <use xlink:href="#a"/>
+                        <use xlink:href="#b" x="-.004" y="17.343"/>
+                        <use xlink:href="#1"/>
+                        <use xlink:href="#35" y="4.342"/>
+                        <use xlink:href="#36" y="10.855"/>
+                        <use xlink:href="#37" y="13.026"/>
+                    </svg>
+                </svg>
+            </g>
+        </g>
+    </svg>
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" aria-label="Kommons" role="img" viewBox="0 0 665 15" style="cursor: default; mix-blend-mode: luminosity;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 665 133"><g style="isolation:isolate"><g style="mix-blend-mode:multiply"><path d="M66.46,131l-22.37-41a4,4,0,0,0-6.63-.6L27.32,102A12.07,12.07,0,0,0,26,104.53v24.53c.42,2.21-1.37,3-2.59,3.94H4.89C1,133,0,130,0,129.06V28c-.12-2.22,1.67-4,4.88-4H23.42c1.22,0,3,1.79,2.59,4V59c.42,3.85,5.31,5.48,7.61,2.44L60.68,25.62A4,4,0,0,1,63.89,24H82.78A4,4,0,0,1,86,30.4L61,63.9a4,4,0,0,0-.33,4.28l31.43,59C93.55,129.84,93,133,89,133H70a4,4,0,0,1-3.18-1.57Z" style="fill:#2babe2"/><path d="M139.26,24h20.8a4,4,0,0,1,3.77,2.67l35.77,101a4,4,0,0,1-3.77,5.34H178.76a4,4,0,0,1-3.78-2.7l-6.08-17.6a4,4,0,0,0-3.79-2.7H134.56a4,4,0,0,0-3.78,2.68l-6.21,17.64a4,4,0,0,1-3.78,2.68H103.56a4,4,0,0,1-3.78-5.34l35.7-101A4,4,0,0,1,139.26,24Zm21.35,58.77-7.05-22a4,4,0,0,0-7.63,0l-7.13,22A4,4,0,0,0,142.61,88H156.8A4,4,0,0,0,160.61,82.77Z" style="fill:#2babe2"/><path d="M235,92v37a4,4,0,0,1-4,4H213a4,4,0,0,1-4-4V28a4,4,0,0,1,4-4h18a4,4,0,0,1,4,4V63a4,4,0,0,0,4,4h34a4,4,0,0,0,4-4V28a4,4,0,0,1,4-4h17a4,4,0,0,1,4,4V129a4,4,0,0,1-4,4H281a4,4,0,0,1-4-4V92a4,4,0,0,0-4-4H239A4,4,0,0,0,235,92Z" style="fill:#2babe2"/><path d="M344,28v80a4,4,0,0,0,4,4h37a4,4,0,0,1,4,4v13a4,4,0,0,1-4,4H322a4,4,0,0,1-4-4l.07-101a4,4,0,0,1,4-4H340A4,4,0,0,1,344,28Z" style="fill:#2babe2"/><path d="M402,24h69a4,4,0,0,1,4,4l-.09,13a4,4,0,0,1-4,4H427a4,4,0,0,0-4,4V64a4,4,0,0,0,4,4h36a4,4,0,0,1,4,4V85a4,4,0,0,1-4,4H428a4,4,0,0,0-4,4v15a4,4,0,0,0,4,4l44,.06a4,4,0,0,1,4,4V129a4,4,0,0,1-4,4H402a4,4,0,0,1-4-4V28A4,4,0,0,1,402,24Z" style="fill:#2babe2"/><path d="M547.46,130.55l-14.74-35.1A4,4,0,0,0,529,93H517a4,4,0,0,0-4,4v32a4,4,0,0,1-4,4H491a4,4,0,0,1-4-4V28a4,4,0,0,1,4-4h44.26c27.52,0,35.81,14.4,35.81,33.85,0,15.3-3.58,23.79-12.42,29.45a4,4,0,0,0-1.48,5l15.86,35a4,4,0,0,1-3.65,5.66H551.16A4,4,0,0,1,547.46,130.55Zm.32-72.28A15.08,15.08,0,0,0,532.37,43H517a4,4,0,0,0-4,4V70a4,4,0,0,0,4,4h14.6C541.33,74,547.78,66.9,547.78,58.27Z" style="fill:#2babe2"/><path d="M580,24h81a4,4,0,0,1,4,4V43a4,4,0,0,1-4,4H638a4,4,0,0,0-4,4v78a4,4,0,0,1-4,4H612a4,4,0,0,1-4-4V51a4,4,0,0,0-4-4H580a4,4,0,0,1-4-4V28A4,4,0,0,1,580,24Z" style="fill:#2babe2"/></g><g style="mix-blend-mode:multiply"><path d="M0,28.2A4.28,4.28,0,0,1,4.21,24h37.1C70.7,24,84.05,34.18,84.05,52.72c0,8.78-3.21,15.57-12.4,21.28A3,3,0,0,0,72,79.28c12.89,5.9,14.56,16.1,14.56,24.1C86.59,123.58,74,133,43.41,133H4.21A4.2,4.2,0,0,1,0,128.8ZM45.35,68c7.86,0,14.16-4.1,14.16-11.7,0-7.83-6.6-12.3-15.34-12.3h-14A4.2,4.2,0,0,0,26,48.2V63.8a4.2,4.2,0,0,0,4.2,4.2Zm-.41,46c11,0,16.66-5.74,16.66-13.15,0-8-6.54-12.85-15.74-12.85H30.21A4.2,4.2,0,0,0,26,92.2v17.6a4.2,4.2,0,0,0,4.2,4.2Z" style="fill:#c21f73"/><path d="M108,133a112.37,112.37,0,0,1-15.66-.8c-1.94-.31-3.36-1-3.34-3L89.15,114a4,4,0,0,1,4.64-3.89,35.47,35.47,0,0,0,5.56.5c10,0,12.66-5,12.66-16.74V28a4,4,0,0,1,4-4h18a4,4,0,0,1,4,4V100.6C138,123.14,125,133,108,133Z" style="fill:#c21f73"/><path d="M148,78.78C148,44.33,167,24,198,24c30.81,0,50.32,20.33,50.32,54.78C248.33,112.93,229.2,133,198,133,166.51,133,148,113.08,148,78.78Zm73.61.38c0-25.71-9.38-33.81-23.25-33.81S175,53.45,175,79.16c0,25.1,9.52,32.6,23.39,32.6S221.59,104.26,221.59,79.16Z" style="fill:#c21f73"/><path d="M320.47,130.56,305.72,95.44A4,4,0,0,0,302,93H290a4,4,0,0,0-4,4v32a4,4,0,0,1-4,4H264a4,4,0,0,1-4-4V28a4,4,0,0,1,4-4h44.28c27.52,0,35.81,14.4,35.81,33.85,0,15.31-3.59,23.8-12.44,29.47a4,4,0,0,0-1.47,5l15.89,35.07a4,4,0,0,1-3.63,5.63H324.14A4,4,0,0,1,320.47,130.56Zm.31-72.29A15.08,15.08,0,0,0,305.37,43H290a4,4,0,0,0-4,4V70a4,4,0,0,0,4,4h14.62C314.33,74,320.78,66.9,320.78,58.27Z" style="fill:#c21f73"/><path d="M456,28V129a4,4,0,0,1-4,4H436.25a4,4,0,0,1-3.25-1.69l-40.75-58A4,4,0,0,0,385,75.64V129a4,4,0,0,1-4,4H363a4,4,0,0,1-4-4V28a4,4,0,0,1,4-4h20.9a4,4,0,0,1,3.3,1.75l36.53,54A4,4,0,0,0,431,77.5V28a4,4,0,0,1,4-4h17A4,4,0,0,1,456,28Z" style="fill:#c21f73"/></g><g style="mix-blend-mode:multiply"><path d="M171.12,0H187a4,4,0,0,1,4,4l-.19,12a4,4,0,0,1-4,3.92H171a4,4,0,0,1-4-4l.14-12A4,4,0,0,1,171.12,0Z" style="fill:#c21f73"/><path d="M209.12,0H225a4,4,0,0,1,4,4l-.19,12a4,4,0,0,1-4,3.92H209a4,4,0,0,1-4-4l.14-12A4,4,0,0,1,209.12,0Z" style="fill:#c21f73"/></g></g></svg>    </svg>
+</svg>
