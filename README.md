@@ -3,23 +3,23 @@
 ## About
 **logr** is yet another Bash logger. This one's focus is clearly an aesthetic one. 
 
-![recorded terminal session demonstrating the logr function](docs/logr.svg "logr function")  
-***logr** function*
+[![recorded terminal session demonstrating the logr function](docs/logr.svg "logr function")  
+***logr** function*](../../raw/master/docs/logr.svg)
 
-![recorded terminal session demonstrating the prompt4 function](docs/prompt4.svg "prompt4 function")  
-***prompt4** function*
+[![recorded terminal session demonstrating the prompt4 function](docs/prompt4.svg "prompt4 function")  
+***prompt4** function*](../../raw/master/docs/prompt4.svg)
 
-![recorded terminal session demonstrating the failr function](docs/failr.svg "failr function")  
-***failr** function*
+[![recorded terminal session demonstrating the failr function](docs/failr.svg "failr function")  
+***failr** function*](../../raw/master/docs/failr.svg)
 
-![recorded terminal session demonstrating the banr utilities](docs/utilities/banr.svg "banr utilities")  
-***banr** utilities*
+[![recorded terminal session demonstrating the banr utilities](docs/utilities/banr.svg "banr utilities")  
+***banr** utilities*](../../raw/master/docs/utilities/banr.svg)
 
-![recorded terminal session demonstrating the tracr utilities](docs/utilities/tracr.svg "tracr utilities")  
-***tracr** utilities*
+[![recorded terminal session demonstrating the tracr utilities](docs/utilities/tracr.svg "tracr utilities")  
+***tracr** utilities*](../../raw/master/docs/utilities/tracr.svg)
 
-![recorded terminal session demonstrating the misc utilities](docs/utilities/util.svg "misc utilities")  
-***misc** utilities*
+[![recorded terminal session demonstrating the misc utilities](docs/utilities/util.svg "misc utilities")  
+***misc** utilities*](../../raw/master/docs/utilities/util.svg)
 
 ## Installation
 

@@ -202,8 +202,10 @@ set -- "${args[@]}"
 [ -d "${opts['build-dir']}" ] || mkdir -p "${opts['build-dir']}" || die "${opts['build-dir']} could not be created"
 [ -r "${opts['build-dir']}" ] || die "${opts['build-dir']} is not readable"
 
-[ -d "${opts['dest-dir']}" ] || mkdir -p "${opts['dest-dir']}" || die "${opts['dest-dir']} could not be created"
-[ -w "${opts['dest-dir']}" ] || die "${opts['dest-dir']} is not writable"
+[ ! "${opts['dest-dir']}" ] || {
+  [ -d "${opts['dest-dir']}" ] || mkdir -p "${opts['dest-dir']}" || die "${opts['dest-dir']} could not be created"
+  [ -w "${opts['dest-dir']}" ] || die "${opts['dest-dir']} is not writable"
+}
 
 infocmp -T "${opts['term']}" &>/dev/null || die 'Terminal `'"${opts['term']}"'` is unknown. Please provide one known to `terminfo` or use the default.'
 
@@ -212,12 +214,12 @@ infocmp -T "${opts['term']}" &>/dev/null || die 'Terminal `'"${opts['term']}"'` 
 
 # Prints a command line that calls this binary with `options` as its specified arguments.
 inv() {
-  printf '%q' "$0"
+  printf '%b' "$0"
   for opt in "${!opts[@]}"; do
-    printf ' --%q %q' "$opt" "${opts[$opt]}"
+    printf ' --%b=%b' "$opt" "${opts[$opt]}"
   done
   for flag in "${!flags[@]}"; do
-    [ ! "${flags[$flag]}" = true ] || printf ' --%q' "$flag"
+    [ ! "${flags[$flag]}" = true ] || printf ' --%b' "$flag"
   done
 }
 
