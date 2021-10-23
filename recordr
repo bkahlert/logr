@@ -96,7 +96,7 @@ declare -A opts=(
   ['columns']=132                                                             # optional number of columns to use for recording and conversion
   ['rows']=25                                                                 # optional number of rows to use for recording and conversion
   ['restart-delay']=5                                                         # optional number of seconds until the animation restart
-  ['term-profile']=''                                                         # optional path to the terminal profile to use for conversion
+  ['term-profile']=auto                                                       # optional path to the terminal profile to use for conversion
   ['parallel']=$(grep 2>/dev/null -c ^processor /proc/cpuinfo || printf %s 4) # optional maximum number of conversions that run at once; 0 will run as many conversions as possible
 )
 declare -A flags=(
@@ -209,8 +209,8 @@ set -- "${args[@]}"
 
 infocmp -T "${opts['term']}" &>/dev/null || die 'Terminal `'"${opts['term']}"'` is unknown. Please provide one known to `terminfo` or use the default.'
 
-[ "${opts['term-profile']}" ] || opts['term-profile']=$(find_term_profile "${opts['base-dir']}") || die "unexpected error while looking for a terminal profile"
-[ "${opts['term-profile']}" ] || opts['term-profile']=-
+[ ! "${opts['term-profile']}" = "auto" ] || opts['term-profile']=$(find_term_profile "${opts['base-dir']}") || die "unexpected error while looking for a terminal profile"
+[ -e "${opts['term-profile']}" ] || opts['term-profile']=''
 
 # Prints a command line that calls this binary with `options` as its specified arguments.
 inv() {
@@ -233,7 +233,7 @@ inv() {
   inv=$(inv)
   #shellcheck disable=SC2086
   (cd "${opts['base-dir']}" && find . -name '*.rec' -print0) | xargs -0 -I {} -n 1 -P "${opts['parallel']}" -r $inv {}
-  [ ! "${dest_dir-}" ] || rsync --archive --include="*.svg" "${opts['build-dir']%/}/" "$dest_dir"
+  [ ! "${dest_dir-}" ] || rsync -ar  --prune-empty-dirs --include "*/"  --include="*.svg" --exclude="*" "${opts['build-dir']%/}/" "$dest_dir"
   echo " $(tput setaf 2)✔$(tput sgr0) $(tput bold)BATCH COMPLETED$(tput sgr0)"
   exit 0
 }
@@ -250,7 +250,7 @@ inv() {
     printf '%s\n' "$1" && shift
   done) | xargs -0 -I {} -n 1 -P "${opts['parallel']}" -r $inv {}
   wait
-  [ ! "${dest_dir-}" ] || rsync --archive --include="*.svg" "${opts['build-dir']%/}/" "$dest_dir"
+  [ ! "${dest_dir-}" ] || rsync -ar  --prune-empty-dirs --include "*/"  --include="*.svg" --exclude="*" "${opts['build-dir']%/}/" "$dest_dir"
   echo " $(tput setaf 2)✔$(tput sgr0) $(tput bold)BATCH COMPLETED$(tput sgr0)"
   exit 0
 }
@@ -388,7 +388,20 @@ declare -a svg_term_args=()
 [ ! -e "$svg_file" ] || rm -- "$svg_file"
 [ ! "${opts['columns']-}" ] || svg_term_args+=("--width" "${opts['columns']}")
 [ ! "${opts['rows']-}" ] || svg_term_args+=("--height" "${opts['rows']}")
-[ "${opts['term-profile']--}" = '-' ] || svg_term_args+=("--term" "${supported_profiles["${opts['term-profile']##*.}"]}" "--profile" "${opts['term-profile']}")
+[ ! "${opts['term-profile']-}" ] || svg_term_args+=(
+  "--term" "${supported_profiles["${opts['term-profile']##*.}"]}"
+  "--profile" "$(cd "${opts['term-profile']%/*}" && pwd)/${opts['term-profile']##*/}"
+)
+
+echo
+printf '%s\n' svg-term \
+  --in "$cast_file" \
+  --out "$svg_file" \
+  --padding-x 20 \
+  --padding-y 20 \
+  ${svg_term_args[@]+"${svg_term_args[@]}"} \
+  --window
+#exit 0
 svg-term \
   --in "$cast_file" \
   --out "$svg_file" \
