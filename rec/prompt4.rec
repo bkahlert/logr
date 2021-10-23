@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source logr.sh
+
+yes() {
+  echo y | "$@"
+}
+
+no() {
+  echo y | "$@"
+}
+
+rec -1 yes prompt4 Yn
+rec -1 yes prompt4 Yn "Single line"
+rec -1 yes prompt4 Yn "%s\n" "Multi-" "line"
+rec -1 yes prompt4 Yn "%s\n" "Multi-" "line" -
+rec -1 no prompt4 Yn
+rec -1 no prompt4 Yn "Single line"
+rec -1 no prompt4 Yn "%s\n" "Multi-" "line"
+rec -1 no prompt4 Yn "%s\n" "Multi-" "line" -

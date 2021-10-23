@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+source logr.sh
+
+rec failr
+rec failr --code 2
+rec failr "error message"
+rec failr --warn "warning message"
+rec failr --name foo
+rec failr --name foo --usage "bar [baz]"
+rec failr --name foo -- bar baz
+rec failr --invalid
+
+# pretends to need an argument
+foo() {
+  [ "$1" = baz ] || failr "baz expected" --usage "baz" -- "$*"
+}
+rec foo bar

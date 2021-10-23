@@ -125,14 +125,14 @@ esc() {
           tty_connected=true                               # if set, signifies a connected terminal
           esc_alt=$(tput smcup || tput ti)                 # start alt display
           esc_alt_end=$(tput rmcup || tput te)             # end alt display
-          esc_scroll_down=$(tput indn 1 || tput SF 1)      # scroll down one line
+          esc_scroll_up=$(tput indn 1 || tput SF 1)        # entire display is moved up, new line(s) at bottom
           esc_hpa0=$(tput hpa 0 || tput ch 0)              # set horizontal abs pos 0
           esc_hpa1=$(tput hpa 1 || tput ch 1)              # set horizontal abs pos 1
           esc_hpa_margin=$(tput hpa ${#MARGIN})            # set horizontal abs end of margin
-          esc_cuu1=$(tput cuu 1 || tput cuu1 || tput up)   # up one line
-          esc_cud1=$(tput cud 1 || tput cud1 || tput 'do') # down one line
-          esc_cuf1=$(tput cuf 1 || tput cuf1 || tput nd)   # right one column
-          esc_cub1=$(tput cub 1 || tput cub1 || tput le)   # left one column
+          esc_cuu1=$(tput cuu 1 || tput cuu1 || tput up)   # move up one line; stop at edge of screen
+          esc_cud1=$(tput cud 1 || tput cud1 || tput 'do') # move down one line; stop at edge of screen
+          esc_cuf1=$(tput cuf 1 || tput cuf1 || tput nd)   # move right one pos; stop at edge of screen
+          esc_cub1=$(tput cub 1 || tput cub1 || tput le)   # move left one pos; stop at edge of screen
           esc_cursor_hide=$(tput civis || tput vi)         # hide cursor
           esc_cursor_show=$(tput cnorm || tput ve)         # show cursor
           esc_save=$(tput sc)                              # save cursor
@@ -882,7 +882,7 @@ prompt4() {
       local formatted_question
       util -v formatted_question print '%s%s %s %s' "${esc_bold-}" "${_yn_question%%$LF}" "[Y/n]" "${esc_stout_end-}"
       printf '%s' "$formatted_question"
-      esc cursor_show scroll_down cuu1
+      esc cursor_show scroll_up cuu1
 #      [ "${tty_connected-}" ] || printf '%s' "$MARGIN"
 #      [ ! "${tty_connected-}" ] || esc load cuu1
 
@@ -967,7 +967,7 @@ main() {
 
   esc --init
 
-  declare -A -g -r logr_icons=(
+  declare -A -g logr_icons=(
     ['new']='✱'
     ['item']='▪'
     ['link']='↗'
@@ -1020,7 +1020,7 @@ main() {
 
   set +e
 
-  [ "${ASCIINEMA_REC-}" ] || {
+  [ "${RECORDING-}" ] || {
     echo
     logr error '%s\n' "To use logr you need to source it at the top of your script."
     logr info '%s\n%s\n' 'If logr is on your $PATH type:' 'source logr.sh'
@@ -1028,6 +1028,8 @@ main() {
       'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/logr.sh"'
     logr info '%s\n%s\n' 'To source logr relative to your script add:' \
       'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE_PATH/logr.sh"'
+    logr info '%s\n%s\n' 'And for the more adventurous:' \
+      'source <(curl -LfsS https://git.io/logr.sh)'
 
     prompt4 Yn "Would you like to explore the provides functions beforehand?"
   }
@@ -1035,7 +1037,7 @@ main() {
   # bashsupport disable=BP5005
   # Starts a showcase group and prints the specified text as a demo headline.
   DEMO() {
-    [ ! "${ASCIINEMA_REC-}" ] || [ "${!#}" = 📸 ] || exit 0
+    [ ! "${RECORDING-}" ] || [ "${!#}" = 📸 ] || exit 0
     [ "${BASH_SUBSHELL-}" -gt 1 ] || set -- --opacity=high "$@"
     [ ! "${BASH_SUBSHELL-}" = 3 ] || set -- --dimmed --static "$@"
     banr "${@//📸/}" && sleep 0.5

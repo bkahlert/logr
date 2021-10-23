@@ -87,8 +87,7 @@ load_lib() {
     exit 1
   fi
   # shellcheck disable=SC1090
-  source "${file}"
-
+  source "$file"
   patch_lib "$short_name"
 }
 
@@ -100,37 +99,37 @@ patch_lib() {
 
   case $short_name in
     assert)
-    local bats_assert_line
-    bats_assert_line=$(declare -f assert_line) || true
-    if [ "${bats_assert_line-}" ]; then
-      eval "bats_${bats_assert_line}"
-      # bashsupport disable=BP5008
-      assert_line() {
-        local shell_option=nullglob
-        if shopt -q "$shell_option"; then
-          printf '%s\n' "❗ Bats' assert_line seems broken if shell option $shell_option is enabled." >&2
-          printf '%s\n' "❗ Workaround: enable $shell_option only locally or use assert_output." >&2
-          exit 1
-        fi
-        bats_assert_line "$@"
-      }
-    fi
-    ;;
-  file)
-    local bats_fn bats_decl
-    for bats_fn in $(set | grep -e "^assert_file_*"); do
-      [[ $bats_fn == assert_file_* ]] || continue
-      bats_decl=$(declare -f "$bats_fn") || true
-      if [ "${bats_decl-}" ]; then
-        eval "bats_$bats_decl"
-        eval "$bats_fn() {
+      local bats_assert_line
+      bats_assert_line=$(declare -f assert_line) || true
+      if [ "${bats_assert_line-}" ]; then
+        eval "bats_${bats_assert_line}"
+        # bashsupport disable=BP5008
+        assert_line() {
+          local shell_option=nullglob
+          if shopt -q "$shell_option"; then
+            printf '%s\n' "❗ Bats' assert_line seems broken if shell option $shell_option is enabled." >&2
+            printf '%s\n' "❗ Workaround: enable $shell_option only locally or use assert_output." >&2
+            exit 1
+          fi
+          bats_assert_line "$@"
+        }
+      fi
+      ;;
+    file)
+      local bats_fn bats_decl
+      for bats_fn in $(set | grep -e "^assert_file_*"); do
+        [[ $bats_fn == assert_file_* ]] || continue
+        bats_decl=$(declare -f "$bats_fn") || true
+        if [ "${bats_decl-}" ]; then
+          eval "bats_$bats_decl"
+          eval "$bats_fn() {
           BATSLIB_FILE_PATH_REM=\${BATSLIB_FILE_PATH_REM:-} \
           BATSLIB_FILE_PATH_ADD=\${BATSLIB_FILE_PATH_ADD:-} \
           bats_$bats_fn \"\$@\"
         }"
-      fi
-    done
-    ;;
+        fi
+      done
+      ;;
   esac
 }
 
@@ -201,8 +200,14 @@ assert_within() {
   local -i timeout=$((SECONDS + time))
   while true; do
     run "${cmdline[@]}"
-    [ ! "${status-}" -eq 0 ] || { assert_success; return 0; }
-    [ "$SECONDS" -le "$timeout" ] || { assert_success; break; }
+    [ ! "${status-}" -eq 0 ] || {
+      assert_success
+      return 0
+    }
+    [ "$SECONDS" -le "$timeout" ] || {
+      assert_success
+      break
+    }
     sleep 1
   done
   echo " $(tput setaf 1)✘$(tput sgr0) '${cmdline[*]}' did not succeed within ${time}s"
@@ -263,8 +268,8 @@ cp_fixture() {
 #   STDIN - content of the expect script
 interact() { # [!|=N] [--keep-empty-lines] [--output merged|separate|stderr|stdout] [--] <command to run...>
   local expect_script && expect_script="$(mktemp "${BATS_TEST_TMPDIR}/script.exp-XXXXXX")"
-  printf '%s\n' '#!/usr/bin/expect' > "$expect_script"
-  cat - >> "$expect_script"
+  printf '%s\n' '#!/usr/bin/expect' >"$expect_script"
+  cat - >>"$expect_script"
   chmod +x "$expect_script"
   run "$@" "$expect_script"
 }
@@ -293,7 +298,15 @@ test_min_bats_version() {
   local version
   version=$(bats --version) 2>/dev/null
   version=${version#Bats }
-  [[ ${version} == 1.4* ]]
+  (
+    # bashsupport disable=BP5006
+    LFS='.'
+    # shellcheck disable=SC2206
+    parts=($version)
+    [ "${parts[0]-0}" -le 2 ] || return 0
+    [ "${parts[0]-0}" -eq 1 ] || return 1
+    [ "${parts[1]-0}" -ge 4 ] || return 1
+  )
 }
 
 # Sanity checks

@@ -4,10 +4,67 @@ set -euo pipefail
 
 # query specified terminal: infocmp $1 | sed -e 's/,/\n/' -e 's/\t/ /'
 
-source logr.sh
+source <(curl -LfsS https://git.io/init.rc)
 banr --opacity=invalid
 
+dim_normal_bright(){
+  for color in BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE; do
+    local esc_bright_color="esc_bright_${color,,}"
+    local esc_color="esc_${color,,}"
+    if [ -v "${esc_bright_color-}" ]; then
+      esc_bright_color="${!esc_bright_color}"
+    else
+      esc_bright_color=""
+    fi
+    if [ -v "${esc_color-}" ]; then
+      esc_color="${!esc_color}"
+    else
+      esc_color=""
+    fi
+    printf "%8s %sNORMAL%sDIMMED%s %sBRIGHT%sDIMMED%s\n" "${color^^}" \
+      "${esc_color-}" "${esc_dim-}${esc_color-}" "${esc_reset-}" \
+      "${esc_bright_color-}" "${esc_dim-}${esc_bright_color-}" "${esc_reset-}"
+  done
+}
+
+# 16 colors
+for clbg in {40..47} {100..107} 49 ; do
+	#Foreground
+	for clfg in {30..37} {90..97} 39 ; do
+		#Formatting
+		for attr in 0 1 2 4 5 7 ; do
+			#Print the result
+			echo -en "\e[${attr};${clbg};${clfg}m ^[${attr};${clbg};${clfg}m \e[0m"
+		done
+		echo #Newline
+	done
+done
+
+# 256 colors
+for fgbg in 38 48 ; do # Foreground / Background
+    for color in {0..255} ; do # Colors
+        # Display the color
+        printf "\e[${fgbg};5;%sm  %3s  \e[0m" $color $color
+        # Display 6 colors per lines
+        if [ $((($color + 1) % 6)) == 4 ] ; then
+            echo # New line
+        fi
+    done
+    echo # New line
+done
+
 exit 0
+
+exit 0
+
+# Links
+# ~~[Helpful Ncurses Programs](https://www.askapache.com/linux/zen-terminal-escape-codes/#Helpful_Ncurses_Programs)~~
+# ~~[Standard Capabilities](https://www.askapache.com/linux/zen-terminal-escape-codes/#Standard_Capabilities)~~
+# [Bash tips: Colors and formatting (ANSI/VT100 Control sequences)](https://misc.flogisoft.com/bash/tip_colors_and_formatting)
+
+
+# Shows all capabilities and their sequences
+# infocmp -1Lq|grep -v "$TERM|#"|tr -d '  '
 
 # Prints the specified amount of times the specified text.
 # Arguments:
@@ -565,5 +622,26 @@ main() {
 }
 
 # TODO https://github.com/gnachman/iTerm2/tree/master/tests
+
+
+printf '\e[0m%s\e[0m\n' 'Clear all special attributes'
+printf '\e[1m%s\e[0m\n' 'Bold or increased intensity'
+printf '\e[22m%s\e[0m\n' 'Cancel bold or dim attribute only (VT220)'
+printf '\e[2m%s\e[0m\n' 'Dim or secondary color on GIGI  (superscript on XXXXXX)'
+printf '\e[3m%s\e[0m\n' 'Italic                          (subscript on XXXXXX)'
+printf '\e[4m%s\e[0m\n' 'Underscore, \\e[0;4m = Clear, then set underline only'
+printf '\e[24m%s\e[0m\n' 'Cancel underline attribute only (VT220)'
+printf '\e[5m%s\e[0m\n' 'Slow blink'
+printf '\e[25m%s\e[0m\n' 'Cancel fast or slow blink attribute only (VT220)'
+printf '\e[6m%s\e[0m\n' 'Fast blink                      (overscore on XXXXXX)'
+printf '\e[7m%s\e[0m\n' 'Negative image, \\e[0;1;7m = Bold + Inverse'
+printf '\e[27m%s\e[0m\n' 'Cancel negative image attribute only (VT220)'
+printf '\e[8m%s\e[0m\n' 'Concealed (do not display character echoed locally)'
+printf '\e[9m%s\e[0m\n' 'Reserved for future standardization'
+printf '\e[10m%s\e[0m\n' 'Select primary font (LA100)'
+printf '\e[11m%s\e[0m\n' 'Selete alternate font (LA100 has 11 thru 14)'
+printf '\e[19m%s\e[0m\n' 'unknown'
+printf '\e[20m%s\e[0m\n' 'FRAKTUR  26 characters include β, umlauts...'
+sleep 10
 
 main "$@"

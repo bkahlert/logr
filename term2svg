@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+DOCKER_BUILDKIT=1 \
+DOCKER_SCAN_SUGGEST=false \
+docker build \
+  --build-arg APP_HOME="/home/john" \
+  --build-arg TZ="$(date +"%Z")" \
+  --build-arg PUID="$(id -u)" \
+  --build-arg PGID="$(id -g)" \
+  --tag bkahlert/recordr \
+  . && \
+docker run -it --rm --name "recordr-$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom 2>/dev/null | head -c 3 || true)" \
+  -e NODE_OPTIONS="--max-old-space-size=16384" \
+  -e TERM="$TERM" \
+  -v "$PWD:/home/john" \
+  bkahlert/recordr

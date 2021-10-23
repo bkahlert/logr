@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+source logr.sh
+
+rec util inline 'foo'
+rec util inline '%s\n' 'foo' 'bar'
+rec util inline '%s\n' 'foo' 'bar' 'baz'
+
+# helper
+wrap() {
+  local delim="${esc_dim-}|${esc_reset-}"
+  printf '  %s%s%s\n' "$delim" "$("$@")" "$delim"
+}
+rec -1 wrap util center ""
+rec -1 wrap util center "✘"
+rec -1 wrap util center -w 2 '👐'
+rec -1 wrap util center "12"
+rec -1 wrap util center "123"
+rec -1 wrap util center "1234"
+
+rec -1 wrap util icon _unknown_
+rec -1 wrap util icon success
+rec -1 wrap util icon --center success
+
+# condensed output of existing icons
+print_icons() {
+  declare -a icons=()
+  tabs 12,+4,+8,+4,+8,+4,+8,+4 2>/dev/null
+  # shellcheck disable=SC2154
+  for icon in "${!logr_icons[@]}"; do
+    icons+=("${esc_dim-}$icon${esc_reset-}" "$(util icon "$icon")")
+  done
+  printf "  %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" "${icons[@]}"
+}
+rec print_icons
+
+rec util print 'text'
+rec util print --icon _unknownrec 'text'
+rec util print --icon success 'text'
+rec -1 eval 'util print "old text" && sleep 1 && util reprint "new text"'
+rec -1 eval 'util print --icon _unknown_ "old text" && sleep 1 && util reprint --icon success "new text"'
+rec -1 eval 'util print --icon success "old text" && sleep 1 && util reprint --icon success "new text"'

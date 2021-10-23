@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source logr.sh
+
+rec logr new "text"
+rec logr item "text"
+rec logr list "text-1" "text-2" "text-3"
+rec logr link "https://github.com/bkahlert/logr"
+rec logr link "https://example.com" "link-text"
+rec logr file --line 300 --column 10 "logr.sh"
+rec logr file --line 300 --column 10 "logr.sh" "link-text"
+rec logr success "text"
+rec logr info "text"
+rec logr warn "text"
+rec logr error "text"
+rec logr fail "text"
+rec logr task "text"
+rec logr running "text"
+rec logr task "text" -- sleep 2
+
+rec logr task -- bash -c '
+echo foo && sleep 0.7
+echo bar >&2 && sleep 0.7
+echo baz >&2 && sleep 0.7
+exit 2'
+
+# vanilla recursion
+foo() {
+  logr info "foo args: $*"
+  [ "$1" -eq 0 ] || foo $(($1 - 1)) "$2"
+  sleep 0.5
+  [ ! "$1" = "$2" ] || exit 1
+}
+rec logr task -- foo 3 -
+rec logr task -- foo 3 2
+
+# logr task recursion
+bar() {
+  logr info "bar args: $*"
+  [ "$1" -eq 0 ] || logr task -- bar $(($1 - 1)) "$2"
+  sleep 0.5
+  [ ! "$1" = "$2" ] || exit 1
+}
+rec logr task -- bar 3 -
+rec logr task -- bar 3 2
+
+# provoking line overflow
+supercalifragilisticexpialidocious() {
+  local long="${FUNCNAME[0]}"
+  sleep 0.5
+  logr task -- logr task -- echo "$long $long $long $long $long"
+  sleep 0.5
+  logr task -- logr task -- echo "$long $long $long $long $long"
+  sleep 0.5
+}
+rec logr task "running supercalifragilisticexpialidocious without breaking output" -- supercalifragilisticexpialidocious

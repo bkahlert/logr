@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+source logr.sh
+
+rec tracr
+rec tracr foo
+rec tracr foo bar
+rec tracr -foo --bar -- ---baz

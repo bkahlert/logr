@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+source logr.sh
+
+rec banr --static
+rec banr --static foo
+rec banr --static fooBar
+rec banr --static fooBar baz
+rec banr --static='c=■:c=▪:c=■:c=▪:c=■:c=▪:c=■'
+rec banr --static --bright fooBar baz
+rec banr --static --dimmed fooBar baz
+rec banr --static --opacity=low
+rec banr --static --opacity=medium
+rec banr --static --opacity=high
+
+rec banr
+rec banr --skip-intro
+rec banr --skip-outro
+rec banr --skip-intro --skip-outro
+rec banr --opacity=low --skip-intro
+rec banr --opacity=low --skip-outro
+rec banr --opacity=low --skip-intro --skip-outro
+rec banr --opacity=medium
+rec banr --opacity=high
