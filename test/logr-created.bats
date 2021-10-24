@@ -9,26 +9,26 @@ setup() {
 }
 
 @test "should print" {
-  run logr new foo
+  run logr created foo
   assert_output " ✱ foo"
 }
 
 @test "should print icon only" {
-  run logr new
+  run logr created
   assert_output " ✱ "
 }
 
 @test "should printf" {
-  run logr new 'foo %*s' 5 bar
+  run logr created 'foo %*s' 5 bar
   assert_output " ✱ foo   bar"
 }
 
 @test "should printf --inline" {
-  run logr --inline new 'foo %*s' 5 bar
+  run logr --inline created 'foo %*s' 5 bar
   assert_output "✱ foo   bar"
 }
 
 @test "should printf -i" {
-  run logr -i new 'foo %*s' 5 bar
+  run logr -i created 'foo %*s' 5 bar
   assert_output "✱ foo   bar"
 }

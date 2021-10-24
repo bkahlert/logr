@@ -15,7 +15,7 @@ $MARGIN
    Usage: logr [-i | --inline] COMMAND [ARGS...]
 
    Commands:
-     new         Log a new item
+     created     Log a created item
      added       Log an added item
      item        Log an item
      list        Log a list of items
@@ -24,9 +24,9 @@ $MARGIN
 
      success     Log a success message
      info        Log an information
-     warn        Log a warning
+     warning     Log a warning
      error       Log an error
-     fail        Log an error and terminate"
+     failure     Log an error and terminate"
 }
 
 @test "should run specified command" {
@@ -42,7 +42,7 @@ $MARGIN
 }
 
 
-@test "should warn if executed" {
+@test "should warning if executed" {
   run bash "$BATS_CWD/logr.sh"
   assert_line --partial "✘ To use logr you need to source it at the top of your script."
 }

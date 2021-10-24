@@ -35,6 +35,6 @@ setup() {
 
 # shellcheck disable=SC2154
 @test "should return 1" {
-  run logr fail foo
+  run logr error foo
   assert_equal "$status" "1"
 }

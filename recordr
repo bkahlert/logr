@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# recordr — terminal session recorder to SVG converter
+# Recordr — automated terminal session recorder and to SVG converter
 # https://github.com/bkahlert/recordr
 #
 # MIT License

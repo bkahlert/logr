@@ -9,7 +9,7 @@ setup() {
 }
 
 @test "should print icon and text" {
-  run util print --icon new 'text'
+  run util print --icon created 'text'
   assert_output " ✱ text"
 }
 
@@ -19,7 +19,7 @@ setup() {
 }
 
 @test "should print icon only" {
-  run util print --icon new
+  run util print --icon created
   assert_output " ✱ "
 }
 

@@ -15,12 +15,12 @@ setup() {
 }
 
 @test "should print icon" {
-  run util icon new
+  run util icon created
   assert_output "✱"
 }
 
 @test "should print iCoN" {
-  run util icon NeW
+  run util icon CreateD
   assert_output "✱"
 }
 
@@ -30,9 +30,9 @@ setup() {
 }
 
 @test "should print icon centered if specified" {
-  run util icon -c new
+  run util icon -c created
   assert_output " ✱ "
 
-  run util icon --center new
+  run util icon --center created
   assert_output " ✱ "
 }

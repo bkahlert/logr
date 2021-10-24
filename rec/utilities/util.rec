@@ -27,7 +27,7 @@ print_icons() {
   declare -a icons=()
   tabs 12,+4,+8,+4,+8,+4,+8 2>/dev/null
   # shellcheck disable=SC2154
-  for icon in "${!logr_icons[@]}"; do
+  for icon in "${!ICONS[@]}"; do
     icons+=("${esc_dim-}$icon${esc_reset-}" "$(util icon "$icon")")
   done
   printf "  %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" "${icons[@]}"

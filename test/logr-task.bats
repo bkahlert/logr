@@ -17,22 +17,22 @@ setup() {
 
 @test "should print" {
   run logr task "foo"
-  assert_output " ☐ foo"
+  assert_output " ⚙ foo"
 }
 
 @test "should printf" {
   run logr task 'foo %*s' 5 bar
-  assert_output " ☐ foo   bar"
+  assert_output " ⚙ foo   bar"
 }
 
 @test "should printf --inline" {
   run logr --inline task 'foo %*s' 5 bar
-  assert_output "☐ foo   bar"
+  assert_output "⚙ foo   bar"
 }
 
 @test "should printf -i" {
   run logr -i task 'foo %*s' 5 bar
-  assert_output "☐ foo   bar"
+  assert_output "⚙ foo   bar"
 }
 
 
@@ -40,7 +40,7 @@ setup() {
   run logr task 'message
 ...
 '
-  assert_output " ☐ message; ..."
+  assert_output " ⚙ message; ..."
 }
 
 @test "should execute specified task" {

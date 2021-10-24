@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# logr — yet another bash logger
+# Logr — logger written for the Bourne Again SHell — Bash, with a certain focus on aesthetics
 # https://github.com/bkahlert/logr
 #
 # MIT License
@@ -38,25 +38,27 @@ export BANR_CHAR=▔
 export MARGIN='   '
 export LF=$'\n'
 
+export ANSI_REMOVAL_SUBSTITUTION='s/\e[\[(][(0-9;]*[a-zA-Z]//g;'
+
 (return 2>/dev/null) || set -- "$@" "-!-"
 
 # Indicates an occurred problem and exits.
 # Globals:
 #   FUNCNAME
 # Arguments:
-#   warn  - optional flag; if set only returns instead of exits
-#   name  - optional name of the failed unit (determined using FUNCNAME by default)
-#   usage - optional usage information; output is automatically preceded with the name
-#   --    - optional; used declare remaining arguments as positional arguments
-#   *     - arguments the original unit was called with
+#   warning  - optional flag; if set only returns instead of exits
+#   name     - optional name of the failed unit (determined using FUNCNAME by default)
+#   usage    - optional usage information; output is automatically preceded with the name
+#   --       - optional; used declare remaining arguments as positional arguments
+#   *        - arguments the original unit was called with
 failr() {
   local code=$? failr_usage="[-n|--name NAME] [-u|--usage USAGE] [FORMAT [ARGS...]] [--] [INVOCATION...]" && [ ! ${code-} = 0 ] || code=1
-  local warn name=${FUNCNAME[1]:-?} format=() usage print_call idx
+  local warning name=${FUNCNAME[1]:-?} format=() usage print_call idx
 
   while (($#)); do
     case $1 in
-      -w | --warn)
-        warn=true && shift
+      -w | --warning)
+        warning=true && shift
         ;;
       -n | --name)
         [ "${2-}" ] || failr "value of name missing" --usage "$failr_usage" -- "$@"
@@ -97,8 +99,8 @@ failr() {
 
   # shellcheck disable=SC2059
   local formatted && [ "${#format[@]}" -eq 0 ] || printf -v formatted "${format[@]}"
-  local color="${esc_red-}" && [ ! "${warn-}" = true ] || color="${esc_yellow-}"
-  local icon="${logr_icons['error']}" && [ ! "${warn-}" = true ] || icon="${logr_icons['warn']}"
+  local color="${esc_red-}" && [ ! "${warning-}" = true ] || color="${esc_yellow-}"
+  local icon="${ICONS['error']}" && [ ! "${warning-}" = true ] || icon="${ICONS['warning']}"
 
   printf -v formatted '\n%s %s %s failed%s%s\n' "$color" "$icon" "$invocation" \
     "${format+: "${esc_bold-}${format[*]}${esc_stout_end-}"}" "${esc_reset-}"
@@ -108,7 +110,7 @@ failr() {
 
   printf '%s\n' "$formatted" >&2
 
-  [ "${warn-}" = true ] || exit "${code:-1}"
+  [ "${warning-}" = true ] || exit "${code:-1}"
   return "${code:-1}"
 }
 
@@ -272,13 +274,11 @@ util() {
       done
       set -- "${args[@]}"
       [ $# -eq 1 ] || failr "icon missing" --usage "$usage" -- "$@"
-      local _icon_icon _icon_template
-      _icon_icon=${logr_icons[${1,,}]-'?'}
-      _icon_template=${logr_templates[${1,,}]-'%s'}
-      # shellcheck disable=SC2059
-      printf -v _icon_icon "$_icon_template" "$_icon_icon"
-      [ ! ${_icon_center-} ] || util -v _icon_icon center --width 1 "$_icon_icon"
-      util_text=$_icon_icon
+      local _icon_name=${1,,}
+      _icon_name=${ICON_ALIASES[$_icon_name]-$_icon_name}
+      local _icon=${ICONS[$_icon_name]-'?'}
+      [ ! ${_icon_center-} ] || util -v _icon center --width 1 "$_icon"
+      util_text=$_icon
       ;;
 
     inline)
@@ -679,7 +679,7 @@ logr() {
       printf '\n   %s\n\n   Usage: logr %s%s' "$(banr --static "logr" "$LOGR_VERSION")" "$usage" '
 
    Commands:
-     new         Log a new item
+     created     Log a created item
      added       Log an added item
      item        Log an item
      list        Log a list of items
@@ -688,9 +688,9 @@ logr() {
 
      success     Log a success message
      info        Log an information
-     warn        Log a warning
+     warning     Log a warning
      error       Log an error
-     fail        Log an error and terminate
+     failure     Log an error and terminate
 '
       exit "$SUCCESS"
       ;;
@@ -712,19 +712,19 @@ logr() {
       done
       ;;
 
-    new | added | item | success | info | warn)
+    created | added | item | success | info | warning)
       local _rs
       util -v _rs print --icon "$1" "${@:2}"
       [ ! "${inline-}" ] || _rs="${_rs# }"
       echo "$_rs"
       ;;
-    error | fail)
+    error | failure)
       local _rs
       util -v _rs print --icon "$1" "${@:2}"
       [ ! "${inline-}" ] || _rs="${_rs# }"
       echo "$_rs" >&2
       [ ! "$1" = "error" ] || return "$ERROR"
-      [ ! "$1" = "fail" ] || exit "$ERROR"
+      [ ! "$1" = "failure" ] || exit "$ERROR"
       ;;
     list)
       shift
@@ -797,12 +797,6 @@ logr() {
         logr ${inline+"--inline"} link "$url" ${text+"$text"}
       fi
       ;;
-    running)
-      local _rs
-      util -v _rs print --icon "$1" "${@:2}"
-      [ ! "${inline-}" ] || _rs="${_rs# }"
-      echo "$_rs"
-      ;;
     task)
       usage="${usage%COMMAND*}$1 [FORMAT [ARGS...]] [-- COMMAND [ARGS...]]"
       shift
@@ -836,7 +830,7 @@ logr() {
         return "$SUCCESS"
       fi
 
-      local logr_tasks && util -v logr_tasks fit_concat nesting "$logr_parent_tasks" "$logr_task"
+      local logr_tasks && util -v logr_tasks fit_concat nested "$logr_parent_tasks" "$logr_task"
 
       local task_file && task_file=${TMPDIR:-/tmp}/logr.$$.task
       local log_file && log_file=${TMPDIR:-/tmp}/logr.$$.log
@@ -870,7 +864,7 @@ logr() {
         if [ ! "$task_exit_status" -eq 0 ]; then
           util reprint --icon error "$(cat "$task_file")"
           sed \
-            -e 's/[\[(][(0-9;]*[a-zA-Z]//g;' \
+            -e "$ANSI_REMOVAL_SUBSTITUTION" \
             -e 's/^/'"$MARGIN${esc_red-}"'/;' \
             -e 's/$/'"${esc_reset-}"'/;' \
             "$log_file"
@@ -883,7 +877,11 @@ logr() {
       fi
       ;;
     *)
-      failr "unknown command" --usage "$usage" -- "$@"
+      local original="${ICON_ALIASES[$1]-}"
+      [ "${original}" ] || failr "unknown command" --usage "$usage" -- "$@"
+
+      shift
+      logr ${inline+"--inline"} "$original" "$@"
       ;;
   esac
 }
@@ -998,40 +996,48 @@ main() {
 
   esc --init
 
-  declare -A -g logr_icons=(
-    ['new']='✱'
-    ['added']='✚'
-    ['item']='▪'
-    ['link']='↗'
-    ['file']='↗'
-    ['task']='☐'
-    ['nesting']='❱'
-    ['running']='⚙' # no terminal
-    #'running'-> spinner
-    ['success']='✔'
-    ['info']='ℹ'
-    ['warn']='!'
-    ['error']='✘'
-    ['fail']='ϟ'
+  local r=${esc_reset-}
+  # bashsupport disable=BP5006
+  declare -A -g -r ICONS=(
+    ['created']="${esc_yellow-}✱$r"
+    ['added']="${esc_green-}✚$r"
+    ['item']="${esc_bright_black-}▪$r"
+    ['link']="${esc_blue-}↗$r"
+    ['file']="${esc_blue-}↗$r"
+    ['task']="${esc_yellow-}⚙$r"
+    ['nested']="${esc_yellow-}❱$r"
+    ['success']="${esc_green-}✔$r"
+    ['info']="${esc_white-}ℹ$r"
+    ['warning']="${esc_bold-}${esc_yellow-}!$r"
+    ['error']="${esc_red-}✘$r"
+    ['failure']="${esc_bold-}${esc_red-}ϟ$r"
   )
 
   declare -g logr_parent_tasks=''
 
-  local r=${esc_reset-}
-  declare -A -g -r logr_templates=(
-    ['new']="${esc_yellow-}%s$r"
-    ['added']="${esc_green-}%s$r"
-    ['item']="${esc_bright_black-}%s$r"
-    ['link']="${esc_blue-}%s$r"
-    ['file']="${esc_blue-}%s$r"
-    ['task']="${esc_blue-}%s$r"
-    ['nesting']="${esc_yellow-}%s$r"
-    ['running']="${esc_yellow-}%s$r"
-    ['success']="${esc_green-}%s$r"
-    ['info']="${esc_white-}%s$r"
-    ['warn']="${esc_bold-}${esc_yellow-}%s$r"
-    ['error']="${esc_red-}%s$r"
-    ['fail']="${esc_bold-}${esc_red-}%s$r"
+  # bashsupport disable=BP5006
+  declare -A -g -r -x ICON_ALIASES=(
+    ['creation']="created"
+    ['create']="created"
+    ['new']="created"
+    ['addition']="added"
+    ['add']="added"
+    ['hyperlink']="link"
+    ['job']="task"
+    ['work']="task"
+    ['nesting']="nested"
+    ['nest']="nested"
+    ['successful']="success"
+    ['succeed']="success"
+    ['succeeded']="success"
+    ['inform']="info"
+    ['informed']="info"
+    ['warn']="warning"
+    ['warned']="warning"
+    ['erroneous']="error"
+    ['failed']="failure"
+    ['fail']="failure"
+    ['fatal']="failure"
   )
 
   # Checks if the given shell option is available and activates it. Fails otherwise.

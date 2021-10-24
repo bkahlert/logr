@@ -9,26 +9,26 @@ setup() {
 }
 
 @test "should print" {
-  run logr warn foo
+  run logr warning foo
   assert_output " ! foo"
 }
 
 @test "should print icon only" {
-  run logr warn
+  run logr warning
   assert_output " ! "
 }
 
 @test "should print array" {
-  run logr warn 'foo %*s' 5 bar
+  run logr warning 'foo %*s' 5 bar
   assert_output " ! foo   bar"
 }
 
 @test "should print array --inline" {
-  run logr --inline warn 'foo %*s' 5 bar
+  run logr --inline warning 'foo %*s' 5 bar
   assert_output "! foo   bar"
 }
 
 @test "should print array -i" {
-  run logr -i warn 'foo %*s' 5 bar
+  run logr -i warning 'foo %*s' 5 bar
   assert_output "! foo   bar"
 }

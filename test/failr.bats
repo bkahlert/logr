@@ -28,10 +28,10 @@ setup() {
   assert_output --regexp " ✘ .*"
 }
 
-@test "should print warn icon if specified" {
+@test "should print warning icon if specified" {
   run failr -w
   assert_output --regexp " ! .*"
-  run failr --warn
+  run failr --warning
   assert_output --regexp " ! .*"
 }
 
