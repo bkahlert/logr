@@ -697,10 +697,10 @@ logr() {
     _init)
       shift
       set -E
-      local no=$ERROR_NEGATIVE_USER_RESPONSE
-      trap 'code=$?; [ ! $code = '"$no"' ] || return '"$no"'; logr _cleanup; failr --name "${0##*/}" --code "$code" ${FUNCNAME[0]-main} returned ${code}' ERR
-      trap 'code=$?; logr _cleanup; failr --name "${0##*/}" --code "$code" Terminated' TERM
-      trap 'code=$?; logr _cleanup; (failr --name "${0##*/}" --code "$code" Interrupted) || true; trap - INT && kill -s INT "$$"' INT
+      local abort=$ERROR_NEGATIVE_USER_RESPONSE shared='code=$?; if [  "${code-}" -eq 0 ]; then trap - ERR TERM INT; logr _cleanup; exit 0; fi'
+      trap "$shared"'; [ ! $code = '"$abort"' ] || return '"$abort"'; logr _cleanup; failr --name "${0##*/}" --code "$code" ${FUNCNAME[0]-main} returned ${code}' ERR
+      trap "$shared"'; failr --name "${0##*/}" --code "$code" Terminated' TERM
+      trap "$shared"'; (failr --name "${0##*/}" --code "$code" Interrupted) || true; trap - INT && kill -s INT "$$"' INT
       esc cursor_hide
       ;;
     _cleanup)
