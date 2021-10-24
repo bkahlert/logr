@@ -234,7 +234,7 @@ bats() {
     elif [ "$(docker image ls --quiet "$tag")" ]; then
       BATS_IMAGE_ID="$tag"
       export BATS_IMAGE_ID
-      echo " $(tput setaf 11)⚠$(tput sgr0) failed to build Bats Docker image; re-using previous build: $BATS_IMAGE_ID"
+      echo " $(tput setaf 11)!$(tput sgr0) failed to build Bats Docker image; re-using previous build: $BATS_IMAGE_ID"
     else
       die "Failed to build Bats Docker image and no previous build to re-use"
     fi

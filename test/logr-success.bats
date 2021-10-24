@@ -22,3 +22,13 @@ setup() {
   run logr success 'foo %*s' 5 bar
   assert_output " ✔ foo   bar"
 }
+
+@test "should printf --inline" {
+  run logr --inline success 'foo %*s' 5 bar
+  assert_output "✔ foo   bar"
+}
+
+@test "should printf -i" {
+  run logr -i success 'foo %*s' 5 bar
+  assert_output "✔ foo   bar"
+}

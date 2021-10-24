@@ -25,7 +25,7 @@ rec -1 wrap util icon --center success
 # condensed output of existing icons
 print_icons() {
   declare -a icons=()
-  tabs 12,+4,+8,+4,+8,+4,+8,+4 2>/dev/null
+  tabs 12,+4,+8,+4,+8,+4,+8 2>/dev/null
   # shellcheck disable=SC2154
   for icon in "${!logr_icons[@]}"; do
     icons+=("${esc_dim-}$icon${esc_reset-}" "$(util icon "$icon")")

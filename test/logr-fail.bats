@@ -23,6 +23,16 @@ setup() {
   assert_output " ϟ foo   bar"
 }
 
+@test "should printf --inline" {
+  run logr --inline fail 'foo %*s' 5 bar
+  assert_output "ϟ foo   bar"
+}
+
+@test "should printf -i" {
+  run logr -i fail 'foo %*s' 5 bar
+  assert_output "ϟ foo   bar"
+}
+
 # shellcheck disable=SC2154
 @test "should exit with code 1" {
   run logr fail foo

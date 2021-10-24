@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
-
 source logr.sh
 
+headr "logr"
+
 rec logr new "text"
+rec logr added "text"
 rec logr item "text"
 rec logr list "text-1" "text-2" "text-3"
 rec logr link "https://github.com/bkahlert/logr"

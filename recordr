@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# recordr — terminal session recordings to SVG converter
+# recordr — terminal session recorder to SVG converter
 # https://github.com/bkahlert/recordr
 #
 # MIT License
@@ -80,7 +80,7 @@ find_term_profile() {
     profiles+=("$REPLY")
   done < <(find "$path" -type f \( $query \) -print0)
 
-  [ ! "${#profiles[@]}" -gt 1 ] || printf ' %s %s\n' "$(tput bold && tput setaf 3)⚠$(tput sgr0) Found multiple terminal profiles:" "${profiles[*]/#/$'\n   ▪ '}" >&2
+  [ ! "${#profiles[@]}" -gt 1 ] || printf ' %s %s\n' "$(tput bold && tput setaf 3)!$(tput sgr0) Found multiple terminal profiles:" "${profiles[*]/#/$'\n   ▪ '}" >&2
   [ "${#profiles[@]}" -eq 0 ] || {
     printf ' %s terminal profile: %s\n' "$(tput setaf 2)✔$(tput sgr0)" "${profiles[0]}" >&2
     printf '%s\n' "${profiles[0]}"
@@ -88,7 +88,7 @@ find_term_profile() {
 }
 
 declare -A opts=(
-  ['base-dir']=./                                                             # optional path to prefix specified rec files with
+  ['rec-dir']=rec/                                                            # optional path to prefix specified rec files with
   ['build-dir']=build/rec/                                                    # optional path to store (intermediate) build artifacts in
   ['dest-dir']=docs/                                                          # optional path to copy the created SVG files to
   ['term']=xterm-256color                                                     # optional value to use for the TERM environmental variable
@@ -107,12 +107,12 @@ declare -a args=()
 while (($#)); do
   case $1 in
     # options
-    --base-dir=*)
-      opts['base-dir']=${1#*=} && shift
+    --rec-dir=*)
+      opts['rec-dir']=${1#*=} && shift
       ;;
-    --base-dir)
+    --rec-dir)
       [ "${2-}" ] || die "$1 is missing a value"
-      opts['base-dir']=$2 && shift 2
+      opts['rec-dir']=$2 && shift 2
       ;;
     --build-dir=*)
       opts['build-dir']=${1#*=} && shift
@@ -199,6 +199,10 @@ while (($#)); do
 done
 set -- "${args[@]}"
 
+[ -e "${opts['rec-dir']}" ] || die "'${opts['rec-dir']}' does not exist"
+[ -d "${opts['rec-dir']}" ] || die "'${opts['rec-dir']}' is no directory"
+[ -r "${opts['rec-dir']}" ] || die "'${opts['rec-dir']}' is not readable"
+
 [ -d "${opts['build-dir']}" ] || mkdir -p "${opts['build-dir']}" || die "${opts['build-dir']} could not be created"
 [ -r "${opts['build-dir']}" ] || die "${opts['build-dir']} is not readable"
 
@@ -209,7 +213,7 @@ set -- "${args[@]}"
 
 infocmp -T "${opts['term']}" &>/dev/null || die 'Terminal `'"${opts['term']}"'` is unknown. Please provide one known to `terminfo` or use the default.'
 
-[ ! "${opts['term-profile']}" = "auto" ] || opts['term-profile']=$(find_term_profile "${opts['base-dir']}") || die "unexpected error while looking for a terminal profile"
+[ ! "${opts['term-profile']}" = "auto" ] || opts['term-profile']=$(find_term_profile "${opts['rec-dir']}") || die "unexpected error while looking for a terminal profile"
 [ -e "${opts['term-profile']}" ] || opts['term-profile']=''
 
 # Prints a command line that calls this binary with `options` as its specified arguments.
@@ -226,14 +230,13 @@ inv() {
 # no args -> invoke recordr with all rec files in `rec` directory
 [ $# -eq 0 ] && {
   declare dest_dir=${opts['dest-dir']}
-  opts['base-dir']="rec" opts['dest-dir']="" flags['hide-recording']=true
-  [ -d "${opts['base-dir']}" ] || die "'${opts['base-dir']}' does not exist. Alternatively you can pass a list of rec files."
+  opts['dest-dir']="" flags['hide-recording']=true
   echo "$(tput setaf 1)●$(tput setaf 2)◕$(tput sgr0) $(tput bold)BATCH RECORD AND CONVERT$(tput sgr0)"
-  echo "$(tput setaf 7) ℹ$(tput sgr0) base directory: ${opts['base-dir']}"
+  echo "$(tput setaf 7) ℹ$(tput sgr0) recordings directory: ${opts['rec-dir']}"
   inv=$(inv)
   #shellcheck disable=SC2086
-  (cd "${opts['base-dir']}" && find . -name '*.rec' -print0) | xargs -0 -I {} -n 1 -P "${opts['parallel']}" -r $inv {}
-  [ ! "${dest_dir-}" ] || rsync -ar  --prune-empty-dirs --include "*/"  --include="*.svg" --exclude="*" "${opts['build-dir']%/}/" "$dest_dir"
+  (cd "${opts['rec-dir']}" && find . -name '*.rec' -print0) | xargs -0 -I {} -n 1 -P "${opts['parallel']}" -r $inv {}
+  [ ! "${dest_dir-}" ] || rsync -ar --prune-empty-dirs --include "*/"  --include="*.svg" --exclude="*" "${opts['build-dir']%/}/" "$dest_dir"
   echo " $(tput setaf 2)✔$(tput sgr0) $(tput bold)BATCH COMPLETED$(tput sgr0)"
   exit 0
 }
@@ -256,20 +259,20 @@ inv() {
 }
 
 # one arg left = relative path to rec file
-declare rec_file=${1#./}                                # e.g. foo/bar.rec
-declare real_rec_file=${opts['base-dir']%/}/${rec_file} # e.g. base/foo/bar.rec
+declare rec_file=${1#./}                                         # e.g. foo
+declare real_rec_file=${opts['rec-dir']%/}/${rec_file%.rec}.rec  # e.g. rec/foo.rec
 [ -e "$real_rec_file" ] || die "$real_rec_file does not exist"
 [ -r "$real_rec_file" ] || die "$real_rec_file is not readable"
 
-declare build_file=${opts['build-dir']%/}/${rec_file#/} # e.g. build/rec/foo/bar.rec
-declare recordable_file=${build_file%.rec}.sh           # e.g. build/rec/foo/bar.sh
-declare cast_file=${build_file%.rec}.cast               # e.g. build/rec/foo/bar.rec
-declare svg_file=${build_file%.rec}.svg                 # e.g. build/rec/foo/bar.svg
+declare build_file=${opts['build-dir']%/}/${rec_file#/}          # e.g. build/rec/foo.rec
+declare recordable_file=${build_file%.rec}.sh                    # e.g. build/rec/foo.sh
+declare cast_file=${build_file%.rec}.cast                        # e.g. build/rec/foo.rec
+declare svg_file=${build_file%.rec}.svg                          # e.g. build/rec/foo.svg
 mkdir -p "${build_file%/*}"
 
 [ ! "${opts['dest-dir']-}" ] || {
-  declare dest_file=${opts['dest-dir']%/}/${rec_file#/} # e.g. docs/foo/bar.rec
-  declare dest_svg_file=${dest_file%.rec}.svg           # e.g. docs/foo/bar.svg
+  declare dest_file=${opts['dest-dir']%/}/${rec_file#/}          # e.g. docs/foo.rec
+  declare dest_svg_file=${dest_file%.rec}.svg                    # e.g. docs/foo.svg
   mkdir -p "${dest_svg_file%/*}"
 }
 
@@ -346,7 +349,7 @@ rec() {
   printf $esc_esc_hide
   local result=0 col esc_hpa_col tmp
   tmp=\$(mktemp)
-  ("\${hidden_args[@]}" "\$@" | tee "\$tmp") || result=\$? || true
+  ("\${hidden_args[@]}" "\$@" 2>&1 | tee "\$tmp") || result=\$? || true
 
   # add eventually missing new line
   [ "\$(tail -c 1 "\$tmp" | tr -Cd '\n' | tr '\n' 'n')" ] || {
@@ -393,15 +396,6 @@ declare -a svg_term_args=()
   "--profile" "$(cd "${opts['term-profile']%/*}" && pwd)/${opts['term-profile']##*/}"
 )
 
-echo
-printf '%s\n' svg-term \
-  --in "$cast_file" \
-  --out "$svg_file" \
-  --padding-x 20 \
-  --padding-y 20 \
-  ${svg_term_args[@]+"${svg_term_args[@]}"} \
-  --window
-#exit 0
 svg-term \
   --in "$cast_file" \
   --out "$svg_file" \

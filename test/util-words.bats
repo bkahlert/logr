@@ -25,6 +25,19 @@ setup() {
   assert_output "CAMEL CAMELCASE"
 }
 
+@test "should format first1" {
+  run util words "first1"
+  assert_output "FIRST 1"
+}
+@test "should format first 1 third" {
+  run util words "first 1 third"
+  assert_output "FIRST 1 THIRD"
+}
+@test "should format first second 23 fourth" {
+  run util words "first second 23 THIRD"
+  assert_output "FIRST SECOND 23 THIRD"
+}
+
 @test "should format nothing" {
   run util words
   assert_output ""

@@ -14,6 +14,7 @@ ARG PGID=1000
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install \
     dumb-init \
+    expect \
     nodejs \
     npm \
     rsync \

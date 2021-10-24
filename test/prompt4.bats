@@ -12,19 +12,21 @@ source $BATS_CWD/logr.sh
 SCRIPT
   chmod +x script.sh
 
-  declare -g usage='
-   prompt4 SNAPSHOT
+  MARGIN='   '
+  declare -g usage="
+$MARGIN
+   ▔▔▔▔▔▔▔ PROMPT 4 SNAPSHOT
 
    Usage: prompt4 TYPE [ARGS...]
 
    Type:
-     Yn    "Do you want to continue?"'
+     Y/n    \"Do you want to continue?\""
 }
 
 @test "should prompt specified type" {
-  printf '%s\n' "prompt4 Yn" >> script.sh
+  printf '%s\n' "prompt4 Y/n" >> script.sh
 
-  interact <<EXPECT
+  expect <<EXPECT
 set timeout 5
 spawn ./script.sh
 expect "continue?"

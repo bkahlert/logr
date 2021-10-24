@@ -11,7 +11,7 @@ setup() {
 @test "should print usage" {
   run logr file
   assert_line --partial "failed: path missing"
-  assert_line --partial "Usage: logr file [-l|--line LINE [-c|--column COLUMN]] PATH [TEXT]"
+  assert_line --partial "Usage: logr [-i | --inline] file [-l|--line LINE [-c|--column COLUMN]] PATH [TEXT]"
 }
 
 @test "should print file link" {
@@ -22,6 +22,16 @@ setup() {
 @test "should print file link with custom text" {
   run logr file /foo/bar baz
   assert_output " ↗ [file:///foo/bar](baz)"
+}
+
+@test "should print file link --inline" {
+  run logr --inline file /foo/bar baz
+  assert_output "↗ [file:///foo/bar](baz)"
+}
+
+@test "should print file link -i" {
+  run logr -i file /foo/bar baz
+  assert_output "↗ [file:///foo/bar](baz)"
 }
 
 @test "should encode line if specified" {

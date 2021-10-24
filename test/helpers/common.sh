@@ -22,10 +22,12 @@ trace() {
   if [ $# -eq 0 ] && [ "${output-}" ]; then
     set -- "${output:-}"
   fi
+  local argc="$#" _trace_args=""
+  printf -v _trace_args " '%q'" "$@"
   if { true >&3; } 2<>/dev/null; then
-    echo '#' "$*" >&3
+    echo '# ' "$argc$_trace_args" >&3
   else
-    echo "$*"
+    echo "$argc$_trace_args"
   fi
 }
 
@@ -258,15 +260,15 @@ cp_fixture() {
   cp "$(fixture "${1:?}")" "${2:?}"
 }
 
-# Interactive counterpart to Bats' run function that uses `expect`.
-# The piped script must not include a shebang.
+# Expect-based counterpart to Bats' run function.
+# The piped script must not include a shebang as it will be added automatically.
 # Globals:
 #   Same as run, i.e. `output`, `lines` and `status`
 # Arguments:
 #   * - run arguments
 # Inputs:
 #   STDIN - content of the expect script
-interact() { # [!|=N] [--keep-empty-lines] [--output merged|separate|stderr|stdout] [--] <command to run...>
+expect() { # [!|=N] [--keep-empty-lines] [--output merged|separate|stderr|stdout] [--] <command to run...>
   local expect_script && expect_script="$(mktemp "${BATS_TEST_TMPDIR}/script.exp-XXXXXX")"
   printf '%s\n' '#!/usr/bin/expect' >"$expect_script"
   cat - >>"$expect_script"
@@ -298,21 +300,21 @@ test_min_bats_version() {
   local version
   version=$(bats --version) 2>/dev/null
   version=${version#Bats }
+  echo "$version"
   (
-    # bashsupport disable=BP5006
-    LFS='.'
-    # shellcheck disable=SC2206
-    parts=($version)
-    [ "${parts[0]-0}" -le 2 ] || return 0
-    [ "${parts[0]-0}" -eq 1 ] || return 1
-    [ "${parts[1]-0}" -ge 4 ] || return 1
+    IFS='.' read -r -a parts <<< "$version"
+    [ "${parts[0]-0}" -lt 2 ] || return 0 # if >= 2.x.x 👍
+    [ "${parts[0]-0}" -eq 1 ] || return 1 # if <= 0.x.x 👎
+    [ "${parts[1]-0}" -ge 4 ] || return 1 # if >= 1.4.x 👍
+    # else < 1.4.x 👎
   )
 }
 
 # Sanity checks
 main() {
 
-  ! test_min_bats_version || return 0
+  local version
+  ! version=$(test_min_bats_version) || return 0
 
   if test_bashsupport_pro; then
     # shellcheck disable=SC2016
@@ -343,7 +345,7 @@ exit
   else
     # shellcheck disable=SC2016
     printf '%s' '
-❗ You are running these tests with an outdated version of Bats.
+❗ You are running these tests with an outdated version of Bats ('"$version"').
 
 Please update or use the Bats wrapper `batsw`.
 ' >&2

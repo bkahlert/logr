@@ -14,11 +14,11 @@ teardown() {
 }
 
 @test "should fit concat texts" {
-  run util fit_concat nest "abc" "123"
+  run util fit_concat nesting "abc" "123"
   assert_output "abc ❱ 123"
 }
 
 @test "should truncate on insufficient space" {
-  run util fit_concat nest "abc-def-ghi-jkl" "123"
+  run util fit_concat nesting "abc-def-ghi-jkl" "123"
   assert_output "abc-def ... l ❱ 123"
 }

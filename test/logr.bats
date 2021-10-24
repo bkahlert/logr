@@ -7,13 +7,16 @@ setup() {
 
   load "$BATS_CWD/logr.sh"
 
-  declare -g usage='
-   logr SNAPSHOT
+  MARGIN='   '
+  declare -g usage="
+$MARGIN
+   ▔▔▔▔▔▔▔ LOGR SNAPSHOT
 
-   Usage: logr COMMAND [ARGS...]
+   Usage: logr [-i | --inline] COMMAND [ARGS...]
 
    Commands:
      new         Log a new item
+     added       Log an added item
      item        Log an item
      list        Log a list of items
      link        Log a link
@@ -23,7 +26,7 @@ setup() {
      info        Log an information
      warn        Log a warning
      error       Log an error
-     fail        Log an error and terminate'
+     fail        Log an error and terminate"
 }
 
 @test "should run specified command" {
@@ -35,7 +38,7 @@ setup() {
   run logr --illegal
   assert_failure
   assert_line --partial "failed: unknown command"
-  assert_line --partial "Usage: logr COMMAND [ARGS...]"
+  assert_line --partial "Usage: logr [-i | --inline] COMMAND [ARGS...]"
 }
 
 
@@ -44,12 +47,13 @@ setup() {
   assert_line --partial "✘ To use logr you need to source it at the top of your script."
 }
 
-@test "should offer feature overview" {
+@test "should print usage information if executed" {
   run bash "$BATS_CWD/logr.sh"
-  assert_success
-  assert_line --partial " Would you like to explore the provides functions beforehand? [Y/n]"
-  assert_line --partial "$ logr success text"
-  assert_line --partial "✔ text"
+  assert_failure 2
+  assert_line --partial 'source logr.sh'
+  assert_line --partial 'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/logr.sh"'
+  assert_line --partial 'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE_PATH/logr.sh"'
+  assert_line --partial 'source <(curl -LfsS https://git.io/logr.sh)'
 }
 
 @test "should print help if executed with -h flag" {

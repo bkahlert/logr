@@ -27,24 +27,31 @@
 
 set -euo pipefail
 
+export SUCCESS=0
+export ERROR=1
+export ERROR_NO_SOURCING=2
+export ERROR_NEGATIVE_USER_RESPONSE=10
+
+export TMPDIR=${TMPDIR:-/tmp}
+export LOGR_VERSION=SNAPSHOT
+export BANR_CHAR=▔
+export MARGIN='   '
+export LF=$'\n'
+
 (return 2>/dev/null) || set -- "$@" "-!-"
 
 # Indicates an occurred problem and exits.
 # Globals:
 #   FUNCNAME
 # Arguments:
-#   w - optional flag; if set only returns instead of exits
-#   n - optional name of the failed unit (determined using FUNCNAME by default)
-#   u - optional usage information; output is automatically preceded with the name
-#   - - optional; used declare remaining arguments as positional arguments
-#   * - arguments the original unit was called with
+#   warn  - optional flag; if set only returns instead of exits
+#   name  - optional name of the failed unit (determined using FUNCNAME by default)
+#   usage - optional usage information; output is automatically preceded with the name
+#   --    - optional; used declare remaining arguments as positional arguments
+#   *     - arguments the original unit was called with
 failr() {
   local code=$? failr_usage="[-n|--name NAME] [-u|--usage USAGE] [FORMAT [ARGS...]] [--] [INVOCATION...]" && [ ! ${code-} = 0 ] || code=1
   local warn name=${FUNCNAME[1]:-?} format=() usage print_call idx
-  local -a stacktrace=()
-  for idx in "${!BASH_LINENO[@]}"; do
-    [ "${BASH_LINENO[idx]}" = 0 ] || stacktrace+=("${FUNCNAME[idx + 1]:-?}(${BASH_SOURCE[idx + 1]:-?}:${BASH_LINENO[idx]:-?})")
-  done
 
   while (($#)); do
     case $1 in
@@ -71,6 +78,11 @@ failr() {
         format+=("$1") && shift
         ;;
     esac
+  done
+
+  local -a stacktrace=()
+  for idx in "${!BASH_LINENO[@]}"; do
+    [ "${BASH_LINENO[idx]}" = 0 ] || stacktrace+=("${FUNCNAME[idx + 1]:-?}(${BASH_SOURCE[idx + 1]:-?}:${BASH_LINENO[idx]:-?})")
   done
 
   local invocation=$name
@@ -263,9 +275,10 @@ util() {
       local _icon_icon _icon_template
       _icon_icon=${logr_icons[${1,,}]-'?'}
       _icon_template=${logr_templates[${1,,}]-'%s'}
-      [ ! ${_icon_center-} ] || util center -v _icon_icon "$_icon_icon"
       # shellcheck disable=SC2059
-      printf -v util_text "$_icon_template" "$_icon_icon"
+      printf -v _icon_icon "$_icon_template" "$_icon_icon"
+      [ ! ${_icon_center-} ] || util -v _icon_icon center --width 1 "$_icon_icon"
+      util_text=$_icon_icon
       ;;
 
     inline)
@@ -301,6 +314,7 @@ util() {
       fi
       ;;
 
+    # concatenates the specified texts with the specified icon
     fit_concat)
       usage="${usage%UTIL*}$1 ICON TEXT1 TEXT2"
       shift
@@ -442,7 +456,7 @@ util() {
 
         # split first word camelCase; first word -> bright cyan; rest -> cyan
         # shellcheck disable=SC2001
-        local -a _words0 && read -r -a _words0 <<<"$(echo "${_words[$i]}" | sed -e 's/\([A-Z]\)/ \1/g')"
+        local -a _words0 && read -r -a _words0 <<<"$(echo "${_words[$i]}" | sed -E -e 's,([A-Z]), \1,g' -e 's,([a-z])([0-9]+),\1 \2,g')"
         if [ ${#_words0[@]} -gt 0 ]; then
           _colored+=("${prefix_colors[0]}${_words0[0]^^}${esc_reset-}")
           if [ ${#_words0[@]} -gt 1 ]; then
@@ -471,7 +485,7 @@ util() {
 # Arguments:
 #   * - args passed to the spinner function.
 spinner() {
-  [ "${tty_connected-}" ] || return 0
+  [ "${tty_connected-}" ] || return "$SUCCESS"
   local usage="start | is_active | stop"
   [ $# -gt 0 ] || failr "command missing" --usage "$usage" -- "$@"
   case $1 in
@@ -645,13 +659,28 @@ headr() {
 #   1 - error
 #   * - signal
 logr() {
-  local usage="COMMAND [ARGS...]"
+  local args=() usage="[-i | --inline] COMMAND [ARGS...]" inline
+  while (($#)); do
+    case $1 in
+      -i | --inline)
+        inline=true && shift
+        ;;
+      --)
+        args+=("$@") && break
+        ;;
+      *)
+        args+=("$1") && shift
+        ;;
+    esac
+  done
+  set -- "${args[@]}"
   case ${1:-'_help'} in
     _help)
-      printf '\n   logr %s\n\n   Usage: logr %s%s' "$LOGR_VERSION" "$usage" '
+      printf '\n   %s\n\n   Usage: logr %s%s' "$(banr --static "logr" "$LOGR_VERSION")" "$usage" '
 
    Commands:
      new         Log a new item
+     added       Log an added item
      item        Log an item
      list        Log a list of items
      link        Log a link
@@ -663,13 +692,15 @@ logr() {
      error       Log an error
      fail        Log an error and terminate
 '
-      exit 0
+      exit "$SUCCESS"
       ;;
     _init)
       shift
-      trap 'logr _cleanup || true; printf "\n"; logr error "${0##*/} aborted"; trap - INT; kill -s INT "$$"' INT
-      trap 'logr _abort $?' TERM
-      trap 'logr _cleanup' EXIT
+      set -E
+      local no=$ERROR_NEGATIVE_USER_RESPONSE
+      trap 'code=$?; [ ! $code = '"$no"' ] || return '"$no"'; logr _cleanup; failr --name "${0##*/}" --code "$code" ${FUNCNAME[0]-main} returned ${code}' ERR
+      trap 'code=$?; logr _cleanup; failr --name "${0##*/}" --code "$code" Terminated' TERM
+      trap 'code=$?; logr _cleanup; (failr --name "${0##*/}" --code "$code" Interrupted) || true; trap - INT && kill -s INT "$$"' INT
       esc cursor_hide
       ;;
     _cleanup)
@@ -680,41 +711,50 @@ logr() {
         kill "$job_pid" &>/dev/null || true
       done
       ;;
-    _abort)
-      shift
-      local code=${1:-1}
-      logr _cleanup
-      failr --name "${0##*/}" --code "$code" "Aborted" || true
-      ;;
 
-    new | item | success | info | warn)
-      util print --icon "$1" "${@:2}"
+    new | added | item | success | info | warn)
+      local _rs
+      util -v _rs print --icon "$1" "${@:2}"
+      [ ! "${inline-}" ] || _rs="${_rs# }"
+      echo "$_rs"
       ;;
     error | fail)
-      util print --icon "$1" "${@:2}" >&2
-      [ ! "$1" = "error" ] || return 1
-      [ ! "$1" = "fail" ] || exit 1
+      local _rs
+      util -v _rs print --icon "$1" "${@:2}"
+      [ ! "${inline-}" ] || _rs="${_rs# }"
+      echo "$_rs" >&2
+      [ ! "$1" = "error" ] || return "$ERROR"
+      [ ! "$1" = "fail" ] || exit "$ERROR"
       ;;
     list)
       shift
-      local item
-      for item in "$@"; do logr item "$item"; done
+      local items=() item
+      for item in "$@"; do items+=("$(logr item "$item")"); done
+      if [ "${inline-}" ]; then
+        item=${items[*]}
+        echo "${item:1}"
+      else
+        item=${items[*]/#/$'\n'}
+        echo "${item:1}"
+      fi
       ;;
     link)
       usage="${usage%COMMAND*}$1 URL [TEXT]"
       shift
       [ $# -ge "1" ] || failr "url missing" --usage "$usage" -- "$@"
-      local url="$1" text=${2-}
+      local url="$1" text=${2-} _link_link
       # shellcheck disable=SC1003
       if [ "${tty_connected-}" ]; then
-        util print --icon link '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "${text:-$url}"
+        util -v _link_link print --icon link '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "${text:-$url}"
       else
         if [ "${text-}" ]; then
-          util print --icon link '[%s](%s)' "$url" "$text"
+          util -v _link_link print --icon link '[%s](%s)' "$url" "$text"
         else
-          util print --icon link '%s' "$url"
+          util -v _link_link print --icon link '%s' "$url"
         fi
       fi
+      [ ! "${inline-}" ] || _link_link="${_link_link# }"
+      echo "$_link_link"
       ;;
     file)
       usage="${usage%COMMAND*}$1 [-l|--line LINE [-c|--column COLUMN]] PATH [TEXT]"
@@ -752,13 +792,16 @@ logr() {
       fi
       local url="file://$path"
       if [ "${tty_connected-}" ]; then
-        logr link "$url" "${text:-$url}"
+        logr ${inline+"--inline"} link "$url" "${text:-$url}"
       else
-        logr link "$url" ${text+"$text"}
+        logr ${inline+"--inline"} link "$url" ${text+"$text"}
       fi
       ;;
     running)
-      util print --icon "$1" "${@:2}"
+      local _rs
+      util -v _rs print --icon "$1" "${@:2}"
+      [ ! "${inline-}" ] || _rs="${_rs# }"
+      echo "$_rs"
       ;;
     task)
       usage="${usage%COMMAND*}$1 [FORMAT [ARGS...]] [-- COMMAND [ARGS...]]"
@@ -786,11 +829,14 @@ logr() {
       fi
 
       if [ "${#cmdline[@]}" -eq 0 ]; then
-        util print --icon task "$logr_task"
-        return 0
+        local _rs
+        util -v _rs print --icon task "$logr_task"
+        [ ! "${inline-}" ] || _rs="${_rs# }"
+        echo "$_rs"
+        return "$SUCCESS"
       fi
 
-      local logr_tasks && util -v logr_tasks fit_concat nest "$logr_parent_tasks" "$logr_task"
+      local logr_tasks && util -v logr_tasks fit_concat nesting "$logr_parent_tasks" "$logr_task"
 
       local task_file && task_file=${TMPDIR:-/tmp}/logr.$$.task
       local log_file && log_file=${TMPDIR:-/tmp}/logr.$$.log
@@ -849,22 +895,23 @@ logr() {
 # Returns:
 #   0 - success
 #   1 - error
+#   10 - no
 #   * - signal
 prompt4() {
   local usage="TYPE [ARGS...]"
   case ${1:-'_help'} in
     _help | -h | --help)
-      printf '\n   prompt4 %s\n\n   Usage: prompt4 %s%s' "$LOGR_VERSION" "$usage" '
+      printf '\n   %s\n\n   Usage: prompt4 %s%s' "$(banr --static "prompt4" "$LOGR_VERSION")" "$usage" '
 
    Type:
-     Yn    "Do you want to continue?"
+     Y/n    "Do you want to continue?"
 '
-      exit 0
+      exit "$SUCCESS"
       ;;
-    Yn)
+    Y/n)
       shift
       local -a args=()
-      local _arg _yn_question="Do you want to continue?" _yn_answer
+      local _arg _yn_question="Do you want to continue?"
       for _arg in "$@"; do
         if [ "${_arg-}" = - ]; then
           args+=("$_yn_question")
@@ -881,38 +928,30 @@ prompt4() {
 
       local formatted_question
       util -v formatted_question print '%s%s %s %s' "${esc_bold-}" "${_yn_question%%$LF}" "[Y/n]" "${esc_stout_end-}"
-      printf '%s' "$formatted_question"
-      esc cursor_show scroll_up cuu1
-#      [ "${tty_connected-}" ] || printf '%s' "$MARGIN"
-#      [ ! "${tty_connected-}" ] || esc load cuu1
+      [ ! "${tty_connected-}" ] || {
+        printf '\n%s' "$esc_cuu1"
+      }
 
-      if [ -t 0 ]; then
-        local _yn_tty_settings
-        _yn_tty_settings=$(stty -g)
-        # shellcheck disable=SC2064
-        trap "stty '$_yn_tty_settings'" EXIT
-        trap "_yn_answer=n" INT TERM
-        stty raw isig || true
-        _yn_answer=$(head -c 1) || true
-        stty "${_yn_tty_settings}" || true
-        trap - INT TERM EXIT
-      else
-        _yn_answer=$(head -c 1) || true
-      fi
+      prompt4 _read_answer "$formatted_question" || true
 
       local _prompt4_format="${esc_cursor_hide-}${esc_dim-}%s${esc_reset-}${esc_hpa0-}"
-      # shellcheck disable=SC2059,SC2128
-      case $_yn_answer in
-        n* | **)
-          util print "$_prompt4_format" no --icon error
-          exit 1
-          ;;
-        *)
-          util print "$_prompt4_format" yes --icon success
-          printf '\n'
-          sleep .4
-          ;;
-      esac
+
+      if [ "${REPLY-}" = no ]; then
+        util print "$_prompt4_format" no --icon error
+        exit "$ERROR_NEGATIVE_USER_RESPONSE"
+      fi
+
+      util print "$_prompt4_format" yes --icon success
+      printf '\n'
+      sleep .4
+      ;;
+    _read_answer)
+      shift
+      trap 'REPLY=no; trap - INT TERM; return '"$ERROR" INT TERM
+      read -n 1 -r -s -p "${1?prompt missing}"
+      if [ "$REPLY" = $'\E' ] || [ "$REPLY" = 'n' ]; then
+        REPLY=no
+      fi
       ;;
     *)
       failr "unknown type" --usage "$usage" -- "$@"
@@ -955,30 +994,23 @@ tracr() {
 # Initializes environment
 main() {
 
-  TMPDIR=${TMPDIR:-/tmp}
   TMPDIR=${TMPDIR%/}
-
-  # bashsupport disable=BP5006
-  declare -g -r \
-    LOGR_VERSION=SNAPSHOT \
-    BANR_CHAR='▔' \
-    MARGIN='   ' \
-    LF=$'\n'
 
   esc --init
 
   declare -A -g logr_icons=(
     ['new']='✱'
+    ['added']='✚'
     ['item']='▪'
     ['link']='↗'
     ['file']='↗'
     ['task']='☐'
-    ['nest']='❱'
+    ['nesting']='❱'
     ['running']='⚙' # no terminal
     #'running'-> spinner
     ['success']='✔'
     ['info']='ℹ'
-    ['warn']='⚠'
+    ['warn']='!'
     ['error']='✘'
     ['fail']='ϟ'
   )
@@ -988,14 +1020,16 @@ main() {
   local r=${esc_reset-}
   declare -A -g -r logr_templates=(
     ['new']="${esc_yellow-}%s$r"
+    ['added']="${esc_green-}%s$r"
+    ['item']="${esc_bright_black-}%s$r"
     ['link']="${esc_blue-}%s$r"
     ['file']="${esc_blue-}%s$r"
     ['task']="${esc_blue-}%s$r"
-    ['nest']="${esc_yellow-}%s$r"
+    ['nesting']="${esc_yellow-}%s$r"
     ['running']="${esc_yellow-}%s$r"
     ['success']="${esc_green-}%s$r"
     ['info']="${esc_white-}%s$r"
-    ['warn']="${esc_bright_yellow-}%s$r"
+    ['warn']="${esc_bold-}${esc_yellow-}%s$r"
     ['error']="${esc_red-}%s$r"
     ['fail']="${esc_bold-}${esc_red-}%s$r"
   )
@@ -1016,251 +1050,21 @@ main() {
   [ ! "${1-}" = -h ] || logr _help
   [ ! "${1-}" = --help ] || logr _help
   [ "${BATS_VERSION-}" ] || logr _init
-  [[ " $* " == *" -!- "* ]] || return 0
 
-  set +e
+  [ ! "${RECORDING-}" ] || return "$SUCCESS"
+  [[ " $* " == *" -!- "* ]] || return "$SUCCESS"
 
-  [ "${RECORDING-}" ] || {
-    echo
-    logr error '%s\n' "To use logr you need to source it at the top of your script."
-    logr info '%s\n%s\n' 'If logr is on your $PATH type:' 'source logr.sh'
-    logr info '%s\n%s\n' 'To source logr from the same directory as your script add:' \
-      'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/logr.sh"'
-    logr info '%s\n%s\n' 'To source logr relative to your script add:' \
-      'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE_PATH/logr.sh"'
-    logr info '%s\n%s\n' 'And for the more adventurous:' \
-      'source <(curl -LfsS https://git.io/logr.sh)'
-
-    prompt4 Yn "Would you like to explore the provides functions beforehand?"
-  }
-
-  # bashsupport disable=BP5005
-  # Starts a showcase group and prints the specified text as a demo headline.
-  DEMO() {
-    [ ! "${RECORDING-}" ] || [ "${!#}" = 📸 ] || exit 0
-    [ "${BASH_SUBSHELL-}" -gt 1 ] || set -- --opacity=high "$@"
-    [ ! "${BASH_SUBSHELL-}" = 3 ] || set -- --dimmed --static "$@"
-    banr "${@//📸/}" && sleep 0.5
-  }
-  # Executes a single showcase.
-  _() {
-    printf ' $ ' && esc cursor_show
-    local i j s && s=$(printf '%q ' "$@")
-    [ ! "${1-}" = "eval" ] || s=${2-} # type only payload on eval command
-    for ((i = 0, j = 0; i < ${#s}; i = i + j, j = 10 + (RANDOM % 5))); do
-      printf '%s' "${s:i:j}" && sleep .01
-    done
-    esc cursor_hide reset && sleep .5
-    if [ "${1-}" = "banr" ]; then
-      ("$1" --indent=10 "${@:1}")
-    else
-      printf '%s\n' "${esc_reset-} " && ("$@")
-      printf '\n'
-    fi
-  }
-  # bashsupport disable=BP5005
-  # Ends a showcase group and prints all arguments.
-  END() {
-    sleep 2
-  }
-
-  (
-    DEMO logr bash logger 📸
-    _ logr new "text"
-    _ logr item "text"
-    _ logr list "text-1" "text-2" "text-3"
-    _ logr link "https://github.com/bkahlert/logr"
-    _ logr link "https://example.com" "link-text"
-    _ logr file --line 300 --column 10 "logr.sh"
-    _ logr file --line 300 --column 10 "logr.sh" "link-text"
-    _ logr success "text"
-    _ logr info "text"
-    _ logr warn "text"
-    _ logr error "text"
-    _ logr fail "text"
-
-    _ logr task "text"
-    _ logr running "text"
-    _ logr task "text" -- sleep 0.5
-    _ logr task -- bash -c '
-echo foo && sleep 0.5
-echo bar >&2 && sleep 0.5
-echo baz >&2 && sleep 0.5
-exit 2'
-
-    # vanilla recursion
-    foo() {
-      logr info "foo args: $*"
-      [ "$1" -eq 0 ] || foo $(($1 - 1)) "$2"
-      sleep 0.5
-      [ ! "$1" = "$2" ] || exit 1
-    }
-    _ logr task -- foo 3 -
-    _ logr task -- foo 3 2
-
-    # logr task recursion
-    bar() {
-      logr info "bar args: $*"
-      [ "$1" -eq 0 ] || logr task -- bar $(($1 - 1)) "$2"
-      sleep 0.5
-      [ ! "$1" = "$2" ] || exit 1
-    }
-    _ logr task -- bar 3 -
-    _ logr task -- bar 3 2
-
-    # provoking line overflow
-    supercalifragilisticexpialidocious() {
-      local long="${FUNCNAME[0]}"
-      sleep 0.5
-      logr task -- logr task -- echo "$long $long $long $long $long"
-      sleep 0.5
-      logr task -- logr task -- echo "$long $long $long $long $long"
-      sleep 0.5
-    }
-    _ logr task "running supercalifragilisticexpialidocious without breaking output" -- supercalifragilisticexpialidocious
-    END
-  )
-
-  (
-    DEMO prompt4 simple user feedback 📸
-    _ eval 'echo y | prompt4 Yn'
-    _ eval 'echo y | prompt4 Yn "Single line"'
-    _ eval 'echo y | prompt4 Yn "%s\n" "Multi-" "line"'
-    _ eval 'echo y | prompt4 Yn "%s\n" "Multi-" "line" -'
-    _ eval 'echo n | prompt4 Yn'
-    _ eval 'echo n | prompt4 Yn "Single line"'
-    _ eval 'echo n | prompt4 Yn "%s\n" "Multi-" "line"'
-    _ eval 'echo n | prompt4 Yn "%s\n" "Multi-" "line" -'
-    END
-  )
-
-  (
-    DEMO failr error message util 📸
-    _ failr --warn
-    _ failr --
-
-    # pretends to need argument
-    foo() {
-      [ "$1" = baz ] || failr "baz expected" --usage "baz" -- "$*"
-    }
-    _ foo bar
-    END
-  )
-
-  (
-    DEMO utilities 📸
-
-    (
-      DEMO esc 📸
-      for color in BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE; do
-        local esc_bright_color="esc_bright_${color,,}"
-        local esc_color="esc_${color,,}"
-        if [ -v "${esc_bright_color-}" ]; then
-          esc_bright_color="${!esc_bright_color}"
-        else
-          esc_bright_color=""
-        fi
-        if [ -v "${esc_color-}" ]; then
-          esc_color="${!esc_color}"
-        else
-          esc_color=""
-        fi
-        printf "%8s %sNORMAL%sDIMMED%s %sBRIGHT%sDIMMED%s\n" "${color^^}" \
-          "${esc_color-}" "${esc_dim-}${esc_color-}" "${esc_reset-}" \
-          "${esc_bright_color-}" "${esc_dim-}${esc_bright_color-}" "${esc_reset-}"
-      done
-      END
-    )
-
-    (
-      DEMO banr 📸
-      _ banr --static
-      _ banr --static foo
-      _ banr --static fooBar
-      _ banr --static fooBar baz
-      _ banr --static='c=■:c=▪:c=■:c=▪:c=■:c=▪:c=■'
-      _ banr --static --bright fooBar baz
-      _ banr --static --dimmed fooBar baz
-      _ banr --static --opacity=low
-      _ banr --static --opacity=medium
-      _ banr --static --opacity=high
-
-      _ banr
-      _ banr --skip-intro
-      _ banr --skip-outro
-      _ banr --skip-intro --skip-outro
-      _ banr --opacity=medium
-      _ banr --opacity=medium --skip-intro
-      _ banr --opacity=medium --skip-outro
-      _ banr --opacity=medium --skip-intro --skip-outro
-      END
-    )
-
-    (
-      DEMO util 📸
-
-      (
-        DEMO util inline 📸
-        _ util inline ' foo'
-        _ util inline ' %s\n' 'foo' 'bar'
-        _ util inline ' %s\n' 'foo' 'bar' 'baz'
-        END
-      )
-
-      (
-        DEMO util center 📸
-        # helper
-        wrap() {
-          local delim="${esc_dim-}|${esc_reset-}"
-          printf ' %s%s%s\n' "$delim" "$("$@")" "$delim"
-        }
-        _ wrap util center ""
-        _ wrap util center "✘"
-        _ wrap util center -w 2 '👐'
-        _ wrap util center "12"
-        _ wrap util center "123"
-        _ wrap util center "1234"
-        END
-      )
-
-      (
-        DEMO util icon 📸
-        _ eval 'printf "%s" "$MARGIN" && util icon _unknown_'
-        _ eval 'printf "%s" "$MARGIN" && util icon success'
-        _ eval 'printf "%s" "$MARGIN" && util icon --center success'
-
-        local icons=()
-        tabs 12,+4,+8,+4,+8,+4,+8,+4 2>/dev/null
-        for icon in "${!logr_icons[@]}"; do
-          icons+=("${esc_dim-}$icon${esc_reset-}" "$(util icon "$icon")")
-        done
-        printf "$MARGIN%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" "${icons[@]}"
-        END
-      )
-
-      (
-        DEMO util print reprint 📸
-        _ util print 'text'
-        _ util print --icon _unknown_ 'text'
-        _ util print --icon success 'text'
-        _ eval 'util print "old text" && sleep 0.3 && util reprint "new text"'
-        _ eval 'util print --icon _unknown_ "old text" && sleep 0.3 && util reprint --icon success "new text"'
-        _ eval 'util print --icon success "old text" && sleep 0.3 && util reprint --icon success "new text"'
-        END
-      )
-    )
-
-    (
-      DEMO tracr 📸
-      _ tracr
-      _ tracr foo
-      _ tracr foo bar
-      _ tracr -foo --bar -- ---baz
-      END
-    )
-  )
-
-  exit 0
+  echo
+  logr error "%s\n" "To use logr you need to source it at the top of your script." || true
+  logr info "%s\n%s\n" "If logr is on your ${esc_bold-}\$PATH${esc_reset-} add:" \
+    "${esc_yellow-}"'source logr.sh'"${esc_reset-}"
+  logr info "%s\n%s\n" "To source logr from the ${esc_bold-}same directory as your script${esc_reset-} add:" \
+    "${esc_yellow-}"'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/logr.sh"'"${esc_reset-}"
+  logr info "%s\n%s\n" "To source logr ${esc_bold-}relative to your script${esc_reset-} add:" \
+    "${esc_yellow-}"'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE_PATH/logr.sh"'"${esc_reset-}"
+  logr info "%s\n%s\n" "And for the more adventurous:" \
+    "${esc_yellow-}"'source <(curl -LfsS https://git.io/logr.sh)'"${esc_reset-}"
+  exit "$ERROR_NO_SOURCING"
 }
 
 main "$@"

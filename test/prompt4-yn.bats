@@ -8,49 +8,69 @@ setup() {
 
 # shellcheck disable=SC2059
 logr_script() {
-  local script && script="$(mktemp "${BATS_TEST_TMPDIR}/script.bash-XXXXXX")"
+  local script && script="$(mktemp "${TMPDIR%/}/script.bash-XXXXXX")"
   cat <<SCRIPT >"$script"
 #!/usr/bin/env bash
-source $BATS_CWD/logr.sh
+source logr.sh
 $*
-echo CONFIRMED
 SCRIPT
   chmod +x "$script"
   echo "$script"
 }
 
+# Invokes an expect script that used the first argument
+# to answer the prompt created by running the remaining arguments.
 run_prompt() {
   local input=${1?input missing} script quoted
   shift
   quoted=$(printf "'%s' " "$@")
-  script=$(logr_script "prompt4" "$quoted")
-  interact <<EXPECT
-set timeout 5
-spawn "$script"
-expect "Y/n "
+  script=$(logr_script "$quoted")
+  local e='echo'
+  expect <<EXPECT
+set timeout 2
+log_user 1
+spawn -no$e "$script"
+expect "*\[Y/n\]*"
 send "$input"
-expect "(\r\n)+"
-interact
+expect {
+ "yes"  { exit 0 }
+ "no" { exit 10 }
+ eof
+}
+foreach { pid spawn_id os_error_flag value } [wait] break
+
+if {"${os_error_flag-}" == 0} {
+  puts "exit status: ${value-}"
+  exit "${value-}"
+} else {
+  puts "errno: ${value-}"
+  exit "${value-}"
+}
+if [ "$input" = "y" ]; then
+  expect "(\r\n)+"
+else
+  eof
+fi
 EXPECT
 }
 
 @test "should prompt default question" {
 
-  run_prompt ' ' Yn
+  run_prompt ' ' prompt4 Y/n
 
   assert_line --partial "Do you want to continue?"
 }
 
 @test "should prompt specified question" {
 
-  run_prompt ' ' Yn "Ok?"
+  run_prompt ' ' prompt4 Y/n "Ok?"
 
   assert_line --partial "Ok?"
 }
 
 @test "should prompt replace - with default question" {
 
-  run_prompt ' ' Yn '%s\n' "This is a message." -
+  run_prompt ' ' prompt4 Y/n '%s\n' "This is a message." -
 
   assert_line --partial "This is a message."
   assert_line --partial "Do you want to continue?"
@@ -58,40 +78,40 @@ EXPECT
 
 @test "should confirm on y" {
 
-  run_prompt y Yn
+  run_prompt y prompt4 Y/n
 
   assert_line --partial "✔"
-  assert_line --partial "CONFIRMED"
+  assert_success
 }
 
 @test "should confirm on SPACE" {
 
-  run_prompt '\x20' Yn
+  run_prompt '\x20' prompt4 Y/n
 
   assert_line --partial "✔"
-  assert_line --partial "CONFIRMED"
+  assert_success
 }
 
 @test "should abort on n" {
 
-  run_prompt n Yn
+  run_prompt n prompt4 Y/n
 
   assert_line --partial "✘"
-  refute_line --partial "CONFIRMED"
+  assert_failure 10
 }
 
 @test "should abort on ESC" {
 
-  run_prompt '\033' Yn
+  run_prompt '\033' prompt4 Y/n
 
   assert_line --partial "✘"
-  refute_line --partial "CONFIRMED"
+  assert_failure 10
 }
 
 @test "should abort on ^C" {
 
-  run_prompt '\003' Yn
+  run_prompt '\003' prompt4 Y/n
 
   assert_failure
-  assert_line --partial "not open"
+  assert_failure 10
 }

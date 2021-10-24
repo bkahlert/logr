@@ -12,7 +12,7 @@ setup() {
 @test "should print usage" {
   run logr task
   assert_line --partial "failed: format or command missing"
-  assert_line --partial "Usage: logr task [FORMAT [ARGS...]] [-- COMMAND [ARGS...]]"
+  assert_line --partial "Usage: logr [-i | --inline] task [FORMAT [ARGS...]] [-- COMMAND [ARGS...]]"
 }
 
 @test "should print" {
@@ -23,6 +23,16 @@ setup() {
 @test "should printf" {
   run logr task 'foo %*s' 5 bar
   assert_output " ☐ foo   bar"
+}
+
+@test "should printf --inline" {
+  run logr --inline task 'foo %*s' 5 bar
+  assert_output "☐ foo   bar"
+}
+
+@test "should printf -i" {
+  run logr -i task 'foo %*s' 5 bar
+  assert_output "☐ foo   bar"
 }
 
 
@@ -40,7 +50,7 @@ setup() {
   assert_file_not_empty "$testfile"
 }
 
-@test "should not fail on error" {
+@test "should fail on error" {
   run logr logr task -- exit 2
   assert_failure
 }
