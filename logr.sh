@@ -38,7 +38,13 @@ export BANR_CHAR=▔
 export MARGIN='   '
 export LF=$'\n'
 
-export ANSI_REMOVAL_SUBSTITUTION='s/\e[\[(][(0-9;]*[a-zA-Z]//g;'
+declare esc_osc="\e]"     # operating system command
+declare esc_st="\e\\\\"   # string terminator
+export ANSI_REMOVAL_SUBSTITUTION="s/\(\
+${esc_osc}8;\([^;]\)*;[^"$'\e'"]*${esc_st}\
+\|\
+\e[\[(][(0-9;]*[a-zA-Z]\
+\)//g;"
 
 (return 2>/dev/null) || set -- "$@" "-!-"
 
@@ -230,6 +236,18 @@ util() {
   local util_text
   # bashsupport disable=BP2001
   case $1 in
+    remove_ansi)
+      args=() usage="${usage%UTIL*}$1 FORMAT [ARGS...]"
+      shift
+      [ $# -gt 0 ] || failr "format missing" --usage "$usage" -- "$@"
+      # shellcheck disable=SC2059
+      printf -v util_text "$@"
+      util_text=$(printf '%b' "$util_text" | sed -e "$ANSI_REMOVAL_SUBSTITUTION")
+      #      printf -v util_text "$@"
+      #      printf -v util_text '%b' "$util_text"
+      #      util_text=${util_text//$'\033'[\[(][(0-9;]*[a-zA-Z]/X}
+      ;;
+
     center)
       args=() usage="${usage%UTIL*}$1 [-w|--width WIDTH] TEXT"
       shift
@@ -745,7 +763,9 @@ logr() {
       local url="$1" text=${2-} _link_link
       # shellcheck disable=SC1003
       if [ "${tty_connected-}" ]; then
-        util -v _link_link print --icon link '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "${text:-$url}"
+        local params='' # colon separated list of key-value pairs
+        local start="${esc_osc}8;${params};%s${esc_st}" end="${esc_osc}8;;${esc_st}"
+        util -v _link_link print --icon link "${start}%s${end}" "$url" "${text:-$url}"
       else
         if [ "${text-}" ]; then
           util -v _link_link print --icon link '[%s](%s)' "$url" "$text"

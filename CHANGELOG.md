@@ -24,6 +24,7 @@
 - SVG terminal sessions recordings
   [![recorded terminal session demonstrating the logr library](https://github.com/bkahlert/logr/raw/5c3eb8eab973efe19b0d4d8c02d1500ccff7e21b/docs/logr.svg "logr library")](https://github.com/bkahlert/logr/raw/5c3eb8eab973efe19b0d4d8c02d1500ccff7e21b/docs/logr.svg)
 - Support for synonyms (e.g. `logr task` == `logr job` == `logr work`)
+- Utility remove_ansi to remove any type of ANSI escapes
 
 ## [0.4.0] - 2021-10-15
 

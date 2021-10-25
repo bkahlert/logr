@@ -53,9 +53,7 @@ for fgbg in 38 48 ; do # Foreground / Background
     echo # New line
 done
 
-exit 0
 
-exit 0
 
 # Links
 # ~~[Helpful Ncurses Programs](https://www.askapache.com/linux/zen-terminal-escape-codes/#Helpful_Ncurses_Programs)~~

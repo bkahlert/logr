@@ -326,7 +326,7 @@ main() {
 
   # Checks for tests starting with capital X.
   # If such exist, focus on them and ignore the others.
-  local highlighted_tests_args=('--filter' '^X')
+  local highlighted_tests_args=('--filter' '^[Xx]')
   local highlighted_tests=0
   if ! highlighted_tests=$(TERM=dumb "${BATS_CMD}" --count "${highlighted_tests_args[@]}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"); then
     echo "Failed to find highlighted tests"
