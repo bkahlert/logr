@@ -38,8 +38,8 @@ export BANR_CHAR=▔
 export MARGIN='   '
 export LF=$'\n'
 
-declare esc_osc="\e]"     # operating system command
-declare esc_st="\e\\\\"   # string terminator
+declare -g esc_osc="\e]"     # operating system command
+declare -g esc_st="\e\\\\"   # string terminator
 export ANSI_REMOVAL_SUBSTITUTION="s/\(\
 ${esc_osc}8;\([^;]\)*;[^"$'\e'"]*${esc_st}\
 \|\
