@@ -52,15 +52,16 @@ ${esc_osc}8;\([^;]\)*;[^"$'\e'"]*${esc_st}\
 # Globals:
 #   FUNCNAME
 # Arguments:
-#   warning  - optional flag; if set only returns instead of exits
-#   name     - optional name of the failed unit (determined using FUNCNAME by default)
-#   usage    - optional usage information; output is automatically preceded with the name
-#   --       - optional; used declare remaining arguments as positional arguments
-#   *        - arguments the original unit was called with
+#   warning    - optional flag; if set only returns instead of exits
+#   name       - optional name of the failed unit (determined using FUNCNAME by default)
+#   usage      - optional usage information; output is automatically preceded with the name
+#   stacktrace - prints the stacktrace if specified
+#   --         - optional; used declare remaining arguments as positional arguments
+#   *          - arguments the original unit was called with
 failr() {
   local code=$? failr_usage="[-n|--name NAME] [-u|--usage USAGE] [FORMAT [ARGS...]] [--] [INVOCATION...]" && [ ! ${code-} = 0 ] || code=1
-  local warning name=${FUNCNAME[1]:-?} format=() usage print_call idx
-
+  local warning name=${FUNCNAME[1]:-?} format=() usage stacktrace=() print_call idx
+  [ ! "${name-}" = main ] || name=${BASH_SOURCE[$((${#BASH_SOURCE[@]}-1))]##*/}
   while (($#)); do
     case $1 in
       -w | --warning)
@@ -78,6 +79,12 @@ failr() {
         [ "${2-}" ] || failr "value of code missing" --usage "$failr_usage" -- "$@"
         code=$2 && shift 2
         ;;
+      -x | --stacktrace)
+        shift
+        for idx in "${!BASH_LINENO[@]}"; do
+          [ "${BASH_LINENO[idx]}" = 0 ] || stacktrace+=("${FUNCNAME[idx + 1]:-?}(${BASH_SOURCE[idx + 1]:-?}:${BASH_LINENO[idx]:-?})")
+        done
+        ;;
       --)
         print_call=true && shift
         break
@@ -86,11 +93,6 @@ failr() {
         format+=("$1") && shift
         ;;
     esac
-  done
-
-  local -a stacktrace=()
-  for idx in "${!BASH_LINENO[@]}"; do
-    [ "${BASH_LINENO[idx]}" = 0 ] || stacktrace+=("${FUNCNAME[idx + 1]:-?}(${BASH_SOURCE[idx + 1]:-?}:${BASH_LINENO[idx]:-?})")
   done
 
   local invocation=$name
@@ -104,7 +106,7 @@ failr() {
   fi
 
   # shellcheck disable=SC2059
-  local formatted && [ "${#format[@]}" -eq 0 ] || printf -v formatted "${format[@]}"
+  local formatted && [ "${#format[@]}" -eq 0 ] || printf -v formatted -- "${format[@]}"
   local color="${esc_red-}" && [ ! "${warning-}" = true ] || color="${esc_yellow-}"
   local icon="${ICONS['error']}" && [ ! "${warning-}" = true ] || icon="${ICONS['warning']}"
 
@@ -195,7 +197,7 @@ esc() {
         } 3>&2 2>/dev/null || true
         ;;
       -v)
-        [ "${2-}" ] || failr "value of var missing" --usage "$usage" -- "$@"
+        [ "${2-}" ] || failr "value of var missing" --usage "$usage" --stacktrace -- "$@"
         _esc_var=$2 && shift 2
         ;;
       *)
@@ -221,7 +223,7 @@ util() {
   while (($#)); do
     case $1 in
       -v)
-        [ "${2-}" ] || failr "value of var missing" --usage "$usage" -- "$@"
+        [ "${2-}" ] || failr "value of var missing" --usage "$usage" --stacktrace -- "$@"
         _util_var=$2 && shift 2
         ;;
       *)
@@ -230,7 +232,7 @@ util() {
     esac
   done
   set -- "${args[@]}"
-  [ $# = 0 ] && failr "command missing" --usage "$usage" -- "$@"
+  [ $# = 0 ] && failr "command missing" --usage "$usage" --stacktrace -- "$@"
 
   # utilities
   local util_text
@@ -239,7 +241,7 @@ util() {
     remove_ansi)
       args=() usage="${usage%UTIL*}$1 FORMAT [ARGS...]"
       shift
-      [ $# -gt 0 ] || failr "format missing" --usage "$usage" -- "$@"
+      [ $# -gt 0 ] || failr "format missing" --usage "$usage" --stacktrace -- "$@"
       # shellcheck disable=SC2059
       printf -v util_text "$@"
       util_text=$(printf '%b' "$util_text" | sed -e "$ANSI_REMOVAL_SUBSTITUTION")
@@ -255,7 +257,7 @@ util() {
       while (($#)); do
         case $1 in
           -w | --width)
-            [ "${2-}" ] || failr "value of width missing" --usage "$usage" -- "$@"
+            [ "${2-}" ] || failr "value of width missing" --usage "$usage" --stacktrace -- "$@"
             util_center_width=$2 && shift 2
             ;;
           *)
@@ -265,7 +267,7 @@ util() {
       done
 
       set -- "${args[@]}"
-      [ $# -eq 1 ] || failr "text missing" --usage "$usage" -- "$@"
+      [ $# -eq 1 ] || failr "text missing" --usage "$usage" --stacktrace -- "$@"
 
       local -i available_width=${#MARGIN} text_width="${util_center_width:-${#1}}"
       local -i lpad=$(((available_width - text_width) / 2))
@@ -291,7 +293,7 @@ util() {
         esac
       done
       set -- "${args[@]}"
-      [ $# -eq 1 ] || failr "icon missing" --usage "$usage" -- "$@"
+      [ $# -eq 1 ] || failr "icon missing" --usage "$usage" --stacktrace -- "$@"
       local _icon_name=${1,,}
       _icon_name=${ICON_ALIASES[$_icon_name]-$_icon_name}
       local _icon=${ICONS[$_icon_name]-'?'}
@@ -303,7 +305,7 @@ util() {
       usage="${usage%UTIL*}$1 FORMAT [ARGS...]"
       shift
 
-      [ $# -ge 1 ] || failr "format missing" --usage "$usage" -- "$@"
+      [ $# -ge 1 ] || failr "format missing" --usage "$usage" --stacktrace -- "$@"
 
       # shellcheck disable=SC2059
       local text && printf -v text "${@}"
@@ -336,7 +338,7 @@ util() {
     fit_concat)
       usage="${usage%UTIL*}$1 ICON TEXT1 TEXT2"
       shift
-      [ $# -eq 3 ] || failr --usage "$usage" -- "$@"
+      [ $# -eq 3 ] || failr --usage "$usage" --stacktrace -- "$@"
 
       local _fit_concat_icon && util -v _fit_concat_icon icon --center "$1" && shift
       local _fit_concat_text
@@ -397,7 +399,7 @@ util() {
       while (($#)); do
         case $1 in
           --config)
-            [ "${2-}" ] || failr "value for config missing" --usage "$usage" -- "$@"
+            [ "${2-}" ] || failr "value for config missing" --usage "$usage" --stacktrace -- "$@"
             config=$2 && shift 2
             ;;
           *)
@@ -488,7 +490,7 @@ util() {
       ;;
 
     *)
-      failr "unknown command" --usage "$usage" -- "$@"
+      failr "unknown command" --usage "$usage" --stacktrace -- "$@"
       ;;
   esac
 
@@ -505,29 +507,29 @@ util() {
 spinner() {
   [ "${tty_connected-}" ] || return "$SUCCESS"
   local usage="start | is_active | stop"
-  [ $# -gt 0 ] || failr "command missing" --usage "$usage" -- "$@"
+  [ $# -gt 0 ] || failr "command missing" --usage "$usage" --stacktrace -- "$@"
   case $1 in
     start)
       shift
-      [ $# = 0 ] || failr "unexpected argument" --usage "$usage" -- "$@"
+      [ $# = 0 ] || failr "unexpected argument" --usage "$usage" --stacktrace -- "$@"
       spinner stop
       spinner _spin &
       ;;
     is_active)
       shift
-      [ $# = 0 ] || failr "unexpected argument" --usage "$usage" -- "$@"
+      [ $# = 0 ] || failr "unexpected argument" --usage "$usage" --stacktrace -- "$@"
       jobs -p 'spinner _spin' >/dev/null 2>/dev/null
       ;;
     stop)
       shift
-      [ $# = 0 ] || failr "unexpected argument" --usage "$usage" -- "$@"
+      [ $# = 0 ] || failr "unexpected argument" --usage "$usage" --stacktrace -- "$@"
       if spinner is_active; then
         jobs -p 'spinner _spin' | xargs -r kill
       fi
       ;;
     _spin)
       shift
-      [ $# = 0 ] || failr "unexpected argument" --usage "$usage" -- "$@"
+      [ $# = 0 ] || failr "unexpected argument" --usage "$usage" --stacktrace -- "$@"
       local -a frames=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
       local _i
       for _i in "${!frames[@]}"; do
@@ -541,7 +543,7 @@ spinner() {
       done
       ;;
     *)
-      failr "unknown command" --usage "$usage" -- "$@"
+      failr "unknown command" --usage "$usage" --stacktrace -- "$@"
       ;;
   esac
 }
@@ -714,8 +716,7 @@ logr() {
       ;;
     _init)
       shift
-      set -E
-      local abort=$ERROR_NEGATIVE_USER_RESPONSE shared='code=$?; if [  "${code-}" -eq 0 ]; then trap - ERR TERM INT; logr _cleanup; exit 0; fi'
+      local abort=$ERROR_NEGATIVE_USER_RESPONSE shared='code=$?; logr _cleanup; if [  "${code-}" -eq 0 ]; then trap - ERR TERM INT; exit 0; fi'
       trap "$shared"'; [ ! $code = '"$abort"' ] || return '"$abort"'; logr _cleanup; failr --name "${0##*/}" --code "$code" ${FUNCNAME[0]-main} returned ${code}' ERR
       trap "$shared"'; failr --name "${0##*/}" --code "$code" Terminated' TERM
       trap "$shared"'; (failr --name "${0##*/}" --code "$code" Interrupted) || true; trap - INT && kill -s INT "$$"' INT
@@ -1064,21 +1065,21 @@ main() {
   # Arguments:
   #   1 - shell option name
   require_shopt() {
-    test $# -eq 1 || failr --usage "option" -- "$@"
-    ! shopt -q "$1" || failr "unsupported shell option" -- "$@"
-    shopt -s "$1" || failr "failed to activate shell option" -- "$@"
+    test $# -eq 1 || failr --usage "option" --stacktrace -- "$@"
+    ! shopt -q "$1" || failr "unsupported shell option" --stacktrace -- "$@"
+    shopt -s "$1" || failr "failed to activate shell option" --stacktrace -- "$@"
   }
 
   require_shopt globstar            # ** matches all files and any number of dirs and sub dirs
   require_shopt checkjobs           # check for running jobs before exiting
   stty -echoctl 2>/dev/null || true # don't echo control characters in hat notation (e.g. `^C`)
 
-  [ ! "${1-}" = -h ] || logr _help
-  [ ! "${1-}" = --help ] || logr _help
-  [ "${BATS_VERSION-}" ] || logr _init
+  [ "${TESTING-}" ] || logr _init
 
   [ ! "${RECORDING-}" ] || return "$SUCCESS"
   [[ " $* " == *" -!- "* ]] || return "$SUCCESS"
+  [[ ! " $* " == *" -h "* ]] || logr _help
+  [[ ! " $* " == *" --help "* ]] || logr _help
 
   echo
   logr error "%s\n" "To use logr you need to source it at the top of your script." || true

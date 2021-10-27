@@ -269,7 +269,7 @@ cp_fixture() {
 # Inputs:
 #   STDIN - content of the expect script
 expect() { # [!|=N] [--keep-empty-lines] [--output merged|separate|stderr|stdout] [--] <command to run...>
-  local expect_script && expect_script="$(mktemp "${BATS_TEST_TMPDIR}/script.exp-XXXXXX")"
+  local expect_script && expect_script="$(mktemp "${BATS_TEST_TMPDIR}/script-XXXXXX")"
   printf '%s\n' '#!/usr/bin/expect' >"$expect_script"
   cat - >>"$expect_script"
   chmod +x "$expect_script"

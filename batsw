@@ -249,7 +249,7 @@ bats() {
   )
 
   echo "$(tput setaf 7) ℹ$(tput sgr0) bats command line: bats" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
-  docker run --rm --name "bats-$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom 2>/dev/null | head -c 3 || true)" \
+  docker run --rm --name "bats-$(head /dev/urandom | LC_ALL=C tr -dc A-Za-z0-9 | head -c 3)" \
     -e TERM="${TERM-}" \
     -e TMPDIR="${PWD:?}/${BATS_TMPDIR%${PWD}}" \
     -v /var/run/docker.sock:/var/run/docker.sock \
@@ -278,7 +278,7 @@ main() {
   export TERM
   local -r BATS_CMD=bats
 
-  local -a BATS_ARGS=()
+  local -a BATS_ARGS=("--env" "TESTING=1")
   while (($#)); do
     case "$1" in
     --inject)

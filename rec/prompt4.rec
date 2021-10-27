@@ -4,7 +4,7 @@ source logr.sh
 
 # Creates and executes an expect script that is passed via STDIN.
 expect() {
-  local expect_script && expect_script="$(mktemp "${TMPDIR%/}/script.exp-XXXXXX")"
+  local expect_script && expect_script="$(mktemp "${TMPDIR%/}/script-XXXXXX")"
   echo '#!/usr/bin/expect' >"$expect_script"
   cat - >>"$expect_script"
   chmod +x "$expect_script"

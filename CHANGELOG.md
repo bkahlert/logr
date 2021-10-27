@@ -26,6 +26,10 @@
 - Support for synonyms (e.g. `logr task` == `logr job` == `logr work`)
 - Utility remove_ansi to remove any type of ANSI escapes
 
+### Changed
+- `failr` only prints stacktrace if invoked with `-x` or `--stacktrace`
+
+
 ## [0.4.0] - 2021-10-15
 
 ### Added

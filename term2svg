@@ -11,7 +11,7 @@ docker build \
   --build-arg PGID="$(id -g)" \
   --tag bkahlert/recordr \
   . && \
-docker run -it --rm --name "recordr-$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom 2>/dev/null | head -c 3 || true)" \
+docker run -it --rm --name "recordr-$(head /dev/urandom | LC_ALL=C tr -dc A-Za-z0-9 | head -c 3)" \
   -e NODE_OPTIONS="--max-old-space-size=16384" \
   -e TERM="$TERM" \
   -v "$PWD:/home/john" \

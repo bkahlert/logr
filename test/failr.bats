@@ -48,6 +48,12 @@ setup() {
   assert_output --partial "failed: error message"
 }
 
+@test "should print enclosing function by default" {
+  foo() { failr; }
+  run foo
+  assert_output --partial "foo failed"
+}
+
 @test "should print specified name" {
   run failr -n name
   assert_output --partial "name failed"

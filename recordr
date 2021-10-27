@@ -66,7 +66,7 @@ declare -A supported_profiles=(
 #   STDERR - warning if multiple terminal profiles were found
 find_term_profile() {
   local path=${1:-./}
-  echo "$(tput setaf 7) ℹ$(tput sgr0) terminal profile search directory: $path" >&2
+  echo " $(tput setaf 7)ℹ$(tput sgr0) terminal profile search directory: $path" >&2
 
   local query='' ext
   for ext in "${!supported_profiles[@]}"; do
