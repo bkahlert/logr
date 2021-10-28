@@ -111,7 +111,7 @@ failr() {
   local icon="${ICONS['error']}" && [ ! "${warning-}" = true ] || icon="${ICONS['warning']}"
 
   printf -v formatted '\n%s %s %s failed%s%s\n' "$color" "$icon" "$invocation" \
-    "${format+: "${esc_bold-}${format[*]}${esc_stout_end-}"}" "${esc_reset-}"
+    "${formatted+: "${esc_bold-}${formatted}${esc_stout_end-}"}" "${esc_reset-}"
 
   [ ${#stacktrace[@]} -eq 0 ] || formatted+="$(printf '     at %s\n' "${stacktrace[@]}")$LF"
   [ ! "${usage-}" ] || formatted+="   Usage: $name ${usage//$LF/$LF   }$LF"
@@ -718,6 +718,8 @@ logr() {
       shift
       local abort=$ERROR_NEGATIVE_USER_RESPONSE shared='code=$?; logr _cleanup; if [  "${code-}" -eq 0 ]; then trap - ERR TERM INT; exit 0; fi'
       trap "$shared"'; [ ! $code = '"$abort"' ] || return '"$abort"'; logr _cleanup; failr --name "${0##*/}" --code "$code" ${FUNCNAME[0]-main} returned ${code}' ERR
+      # shellcheck disable=SC2064
+      trap "$shared" EXIT
       trap "$shared"'; failr --name "${0##*/}" --code "$code" Terminated' TERM
       trap "$shared"'; (failr --name "${0##*/}" --code "$code" Interrupted) || true; trap - INT && kill -s INT "$$"' INT
       esc cursor_hide

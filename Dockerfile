@@ -23,6 +23,7 @@ RUN apt-get update \
     --gid "$PGID" \
     "$APP_GROUP" \
  && useradd \
+    --comment "app user" \
     --uid $PUID \
     --gid "$APP_GROUP" \
     --home "$APP_HOME" \

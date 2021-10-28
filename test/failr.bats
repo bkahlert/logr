@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 setup() {
-  load 'helpers/common.sh'
+  load helpers/common.sh
   load_lib support
   load_lib assert
 
@@ -43,9 +43,11 @@ setup() {
 @test "should print specified message" {
   run failr "error message"
   assert_output --partial "failed: error message"
+}
 
-  run failr error message
-  assert_output --partial "failed: error message"
+@test "should format specified message" {
+  run failr "%s--%s" error message
+  assert_output --partial "failed: error--message"
 }
 
 @test "should print enclosing function by default" {
