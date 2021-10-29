@@ -716,8 +716,8 @@ logr() {
       ;;
     _init)
       shift
-      local abort=$ERROR_NEGATIVE_USER_RESPONSE shared='code=$?; logr _cleanup; if [  "${code-}" -eq 0 ]; then trap - ERR TERM INT; exit 0; fi'
-      trap "$shared"'; [ ! $code = '"$abort"' ] || return '"$abort"'; logr _cleanup; failr --name "${0##*/}" --code "$code" ${FUNCNAME[0]-main} returned ${code}' ERR
+      local abort=$ERROR_NEGATIVE_USER_RESPONSE shared='code=$?; echo "slkslksklslk"; logr _cleanup; if [  "${code-}" -eq 0 ]; then trap - ERR TERM INT; exit 0; fi'
+      trap "$shared"'; [ ! $code = '"$abort"' ] || return '"$abort"'; logr _cleanup; failr --name "${0##*/}" --code "$code" "${FUNCNAME[0]:-main}("${BASH_SOURCE[0]:-?}":"${LINENO:-?}"): $BASH_COMMAND"' ERR
       # shellcheck disable=SC2064
       trap "$shared" EXIT
       trap "$shared"'; failr --name "${0##*/}" --code "$code" Terminated' TERM

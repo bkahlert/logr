@@ -192,6 +192,32 @@ assert_file_owner_group() {
   assert_output --regexp "${regexp}"
 }
 
+# Fail and display path of the file (or directory) if it does contain a string.
+# This function is the missing logical complement of `assert_file_contains'.
+#
+# Globals:
+#   BATSLIB_FILE_PATH_REM
+#   BATSLIB_FILE_PATH_ADD
+# Arguments:
+#   $1 - path
+#   $2 - regex
+# Returns:
+#   0 - file not contains regex
+#   1 - otherwise
+# Outputs:
+#   STDERR - details, on failure
+assert_file_not_contains() {
+  local -r file="$1"
+  local -r regex="$2"
+  if ! grep -v -q "$regex" "$file"; then
+    local -r rem="$BATSLIB_FILE_PATH_REM"
+    local -r add="$BATSLIB_FILE_PATH_ADD"
+    batslib_print_kv_single 4 'path' "${file/$rem/$add}" \
+      | batslib_decorate 'file contains regex' \
+      | fail
+  fi
+}
+
 # Calls the specified command once a seconds for at most the
 # specified amount of time and returns 0 if the command succeeds within time.
 assert_within() {
@@ -260,6 +286,34 @@ cp_fixture() {
   cp "$(fixture "${1:?}")" "${2:?}"
 }
 
+# Creates a temporary file containing the specified lines and prints it path.
+# If the first arguments is `+x` the file will be made executable.
+# Arguments:
+#   +x - optional flag set the executable flag on the returned file
+#   -  - reads the lines from STDIN
+#   *  - lines to add to the file
+# Output:
+#   STDOUT - path of the created file
+mkfile() {
+  local file
+  file="$(mktemp "$BATS_TEST_TMPDIR/XXXXXX")"
+  touch "$file"
+  [ ! "${1-}" = '+x' ] || {
+    chmod +x "$file" && shift
+  }
+  while(($#)); do
+    case $1 in
+    -)
+      cat - >>"$file" && shift
+      ;;
+    *)
+      printf '%s\n' "$1" >>"$file" && shift
+      ;;
+    esac
+  done
+  printf '%s\n' "$file"
+}
+
 # Expect-based counterpart to Bats' run function.
 # The piped script must not include a shebang as it will be added automatically.
 # Globals:
@@ -269,11 +323,7 @@ cp_fixture() {
 # Inputs:
 #   STDIN - content of the expect script
 expect() { # [!|=N] [--keep-empty-lines] [--output merged|separate|stderr|stdout] [--] <command to run...>
-  local expect_script && expect_script="$(mktemp "${BATS_TEST_TMPDIR}/script-XXXXXX")"
-  printf '%s\n' '#!/usr/bin/expect' >"$expect_script"
-  cat - >>"$expect_script"
-  chmod +x "$expect_script"
-  run "$@" "$expect_script"
+  run "$@" "$(mkfile +x '#!/usr/bin/expect' -)"
 }
 
 # Tests if this test run was invoked via BashSupport Pro.
@@ -300,7 +350,6 @@ test_min_bats_version() {
   local version
   version=$(bats --version) 2>/dev/null
   version=${version#Bats }
-  echo "$version"
   (
     IFS='.' read -r -a parts <<< "$version"
     [ "${parts[0]-0}" -lt 2 ] || return 0 # if >= 2.x.x 👍
