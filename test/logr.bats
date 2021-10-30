@@ -7,7 +7,6 @@ setup() {
 
   load "$BATS_CWD/logr.sh"
 
-  MARGIN='   '
   declare -g usage="
 $MARGIN
    ▔▔▔▔▔▔▔ LOGR SNAPSHOT

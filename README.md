@@ -63,9 +63,8 @@ chmod +x ./batsw
 ./batsw test
 ```
 
-`batsw` is a wrapper for the Bash testing framework [Bats](https://github.com/bats-core/bats-core).   
-It builds a Docker image on-the-fly containing Bats incl. several libraries and runs all tests
-contained in the specified directory.
+[Bats Wrapper](https://github.com/bkahlert/bats-wrapper) is a self-contained wrapper to run tests based on the 
+Bash testing framework [Bats](https://github.com/bats-core/bats-core).
 
 > 💡 To accelerate testing, the Bats Wrapper checks if any test is prefixed with a capital X and if so, only runs those tests.
 
