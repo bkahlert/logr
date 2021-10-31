@@ -28,6 +28,7 @@
 
 ### Changed
 - `failr` only prints stacktrace if invoked with `-x` or `--stacktrace`
+- `errexit` disabled
 
 
 ## [0.4.0] - 2021-10-15

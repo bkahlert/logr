@@ -25,7 +25,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -euo pipefail
+set -o nounset
+set -o pipefail
+set -o posix
+set -o errtrace
 
 declare -r -g EX_OK=0
 declare -r -g EX_GENERAL=1
@@ -38,8 +41,8 @@ declare -r -g BANR_CHAR=▔
 declare -r -g MARGIN='   '
 declare -r -g LF=$'\n'
 
-declare -r -g ESC_OSC="\e]"     # operating system command
-declare -r -g ESC_ST="\e\\\\"   # string terminator
+declare -r -g ESC_OSC="\e]"   # operating system command
+declare -r -g ESC_ST="\e\\\\" # string terminator
 declare -r -g ESC_PATTERN="s/\(\
 ${ESC_OSC}8;\([^;]\)*;[^"$'\e'"]*${ESC_ST}\
 \|\
@@ -61,7 +64,7 @@ ${ESC_OSC}8;\([^;]\)*;[^"$'\e'"]*${ESC_ST}\
 failr() {
   local code=$? failr_usage="[-n|--name NAME] [-u|--usage USAGE] [FORMAT [ARGS...]] [--] [INVOCATION...]" && [ ! ${code-} = 0 ] || code=1
   local warning name=${FUNCNAME[1]:-?} format=() usage stacktrace=() print_call idx
-  [ ! "${name-}" = main ] || name=${BASH_SOURCE[$((${#BASH_SOURCE[@]}-1))]##*/}
+  [ ! "${name-}" = main ] || name=${BASH_SOURCE[$((${#BASH_SOURCE[@]} - 1))]##*/}
   while (($#)); do
     case $1 in
       -w | --warning)
@@ -105,10 +108,15 @@ failr() {
     fi
   fi
 
-  # shellcheck disable=SC2059
-  local formatted && [ "${#format[@]}" -eq 0 ] || printf -v formatted -- "${format[@]}"
-  local color="${esc_red-}" && [ ! "${warning-}" = true ] || color="${esc_yellow-}"
-  local icon="${ICONS['error']}" && [ ! "${warning-}" = true ] || icon="${ICONS['warning']}"
+  local formatted color="${esc_red-}" icon="${ICONS['error']}"
+  if [ ! "${#format[@]}" -eq 0 ]; then
+    # shellcheck disable=SC2059
+    printf -v formatted -- "${format[@]}"
+  fi
+  if [ "${warning-}" = true ]; then
+    color="${esc_yellow-}"
+    icon="${ICONS['warning']}"
+  fi
 
   printf -v formatted '\n%s %s %s failed%s%s\n' "$color" "$icon" "$invocation" \
     "${formatted+: "${esc_bold-}${formatted}${esc_stout_end-}"}" "${esc_reset-}"
@@ -118,8 +126,11 @@ failr() {
 
   printf '%s\n' "$formatted" >&2
 
-  [ "${warning-}" = true ] || exit "${code:-1}"
-  return "${code:-1}"
+  if [ "${warning-}" = true ]; then
+    return "${code:-1}"
+  else
+    exit "${code:-1}"
+  fi
 }
 
 # bashsupport disable=BP2001
@@ -340,7 +351,10 @@ util() {
       shift
       [ $# -eq 3 ] || failr --usage "$usage" --stacktrace -- "$@"
 
-      local _fit_concat_icon && util -v _fit_concat_icon icon --center "$1" && shift
+      local _fit_concat_icon
+      util -v _fit_concat_icon icon --center "$1"
+      shift
+
       local _fit_concat_text
       if [ "$1" ] && [ "$2" ]; then
         _fit_concat_text="$1$_fit_concat_icon$2"
@@ -375,11 +389,13 @@ util() {
           -i | --icon)
             [ "${2-}" ] || usage
             icon_last=true
-            util -v print_icon icon --center "$2" && shift 2
+            util -v print_icon icon --center "$2"
+            shift 2
             ;;
           *)
             icon_last=false
-            args+=("$1") && shift
+            args+=("$1")
+            shift
             ;;
         esac
       done
@@ -506,7 +522,7 @@ util() {
 #   * - args passed to the spinner function.
 spinner() {
   [ "${tty_connected-}" ] || return "$EX_OK"
-  local usage="start | is_active | stop"
+  local usage="start | stop"
   [ $# -gt 0 ] || failr "command missing" --usage "$usage" --stacktrace -- "$@"
   case $1 in
     start)
@@ -515,15 +531,10 @@ spinner() {
       spinner stop
       spinner _spin &
       ;;
-    is_active)
-      shift
-      [ $# = 0 ] || failr "unexpected argument" --usage "$usage" --stacktrace -- "$@"
-      jobs -p 'spinner _spin' >/dev/null 2>/dev/null
-      ;;
     stop)
       shift
       [ $# = 0 ] || failr "unexpected argument" --usage "$usage" --stacktrace -- "$@"
-      if spinner is_active; then
+      if jobs -p 'spinner _spin' >/dev/null 2>/dev/null; then
         jobs -p 'spinner _spin' | xargs -r kill
       fi
       ;;
@@ -620,7 +631,7 @@ banr() {
   set -- "${args[@]}"
   printf '\n'
 
-  [[ ! ${indent} =~ [0-9]+ ]] || printf -v indent '%*.s' "$indent" ''
+  [ "$indent" -eq "$indent" ] 2>/dev/null && printf -v indent '%*.s' "$indent" ''
 
   local raw_prefix && tty_connected='' util -v raw_prefix prefix && raw_prefix=${raw_prefix//[^$BANR_CHAR]/}
 
@@ -716,12 +727,28 @@ logr() {
       ;;
     _init)
       shift
-      local abort=$EX_NEG_USR_RESP shared='code=$?; logr _cleanup; if [  "${code-}" -eq 0 ]; then trap - ERR TERM INT; exit 0; fi'
-      trap "$shared"'; [ ! $code = '"$abort"' ] || return '"$abort"'; logr _cleanup; failr --name "${0##*/}" --code "$code" "${FUNCNAME[0]:-main}(${BASH_SOURCE[0]:-?}:${LINENO:-?}): $BASH_COMMAND"' ERR
-      # shellcheck disable=SC2064
-      trap "$shared" EXIT
-      trap "$shared"'; failr --name "${0##*/}" --code "$code" Terminated' TERM
-      trap "$shared"'; (failr --name "${0##*/}" --code "$code" Interrupted) || true; trap - INT && kill -s INT "$$"' INT
+      _err() {
+        logr _cleanup
+        local meta && printf -v meta '%s%%s%s' "${esc_dim-}" "${esc_reset-}"
+        [ "$1" -eq "$EX_NEG_USR_RESP" ] && exit $EX_NEG_USR_RESP
+        logr fatal "%s $meta %d\n  $meta %s" "$2" 'returned' "$1" 'at' "$3"
+      }
+      _term() {
+        logr _cleanup
+        local meta && printf -v meta '%s%%s%s' "${esc_dim-}" "${esc_reset-}"
+        logr warn "%s $meta %d\n  $meta %s" "$2" 'returned' "$1" 'at' "$3"
+#        failr --name "${0##*/}" --code "$1" Terminated
+      }
+      _int() {
+        logr _cleanup
+        local meta && printf -v meta '%s%%s%s' "${esc_dim-}" "${esc_reset-}"
+        logr new "%s $meta %d\n  $meta %s" "$2" 'returned' "$1" 'at' "$3"
+#        (failr --name "${0##*/}" --code "$1" Interrupted) || true
+        trap - INT && kill -s INT "$$"
+      }
+      trap '_err $? "${BASH_COMMAND:-?}" "${FUNCNAME[0]:-main}(${BASH_SOURCE[0]:-?}:${LINENO:-?})"' ERR
+      trap '_term $? "${BASH_COMMAND:-?}" "${FUNCNAME[0]:-main}(${BASH_SOURCE[0]:-?}:${LINENO:-?})"' HUP QUIT TERM
+      trap '_int $? "${BASH_COMMAND:-?}" "${FUNCNAME[0]:-main}(${BASH_SOURCE[0]:-?}:${LINENO:-?})"' INT
       esc cursor_hide
       ;;
     _cleanup)
@@ -744,8 +771,7 @@ logr() {
       util -v _rs print --icon "$1" "${@:2}"
       [ ! "${inline-}" ] || _rs="${_rs# }"
       echo "$_rs" >&2
-      [ ! "$1" = "error" ] || return "$EX_GENERAL"
-      [ ! "$1" = "failure" ] || exit "$EX_GENERAL"
+      exit "$EX_GENERAL"
       ;;
     list)
       shift
@@ -1064,24 +1090,23 @@ main() {
   # Arguments:
   #   1 - shell option name
   require_shopt() {
-    test $# -eq 1 || failr --usage "option" --stacktrace -- "$@"
-    ! shopt -q "$1" || failr "unsupported shell option" --stacktrace -- "$@"
-    shopt -s "$1" || failr "failed to activate shell option" --stacktrace -- "$@"
+    [[ $# -eq 1 ]] || failr --usage "option" --stacktrace -- "$@"
+    [[ ":${BASHOPTS}:" != *":$1:"* ]] || return 0
+    shopt -s "$1" || failr "unsupported shell option" --stacktrace -- "$@"
   }
-
-  require_shopt globstar            # ** matches all files and any number of dirs and sub dirs
   require_shopt checkjobs           # check for running jobs before exiting
+  require_shopt globstar            # ** matches all files and any number of dirs and sub dirs
   stty -echoctl 2>/dev/null || true # don't echo control characters in hat notation (e.g. `^C`)
 
   [ "${TESTING-}" ] || logr _init
 
   [ ! "${RECORDING-}" ] || return "$EX_OK"
   [[ " $* " == *" -!- "* ]] || return "$EX_OK"
-  [[ ! " $* " == *" -h "* ]] || logr _help
-  [[ ! " $* " == *" --help "* ]] || logr _help
+  [[ " $* " != *" -h "* ]] || logr _help
+  [[ " $* " != *" --help "* ]] || logr _help
 
   echo
-  logr error "%s\n" "To use logr you need to source it at the top of your script." || true
+  (logr error "%s\n" "To use logr you need to source it at the top of your script.") || true
   logr info "%s\n%s\n" "If logr is on your ${esc_bold-}\$PATH${esc_reset-} add:" \
     "${esc_yellow-}"'source logr.sh'"${esc_reset-}"
   logr info "%s\n%s\n" "To source logr from the ${esc_bold-}same directory as your script${esc_reset-} add:" \
