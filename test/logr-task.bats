@@ -25,6 +25,13 @@ setup() {
   assert_output " ⚙ foo   bar"
 }
 
+@test "should printf to STDOUT" {
+  run --separate-stderr logr task 'foo %*s' 5 bar
+  assert_output " ⚙ foo   bar"
+  # shellcheck disable=SC2154
+  assert_equal "$stderr" ''
+}
+
 @test "should printf --inline" {
   run logr --inline task 'foo %*s' 5 bar
   assert_output "⚙ foo   bar"
@@ -65,6 +72,19 @@ exit 2
   refute_line --partial 'foo'
   assert_line --partial 'bar'
   assert_line --partial 'baz'
+}
+
+@test "should print errors to STDERR" {
+  run --separate-stderr logr task -- bash -c '
+echo foo && sleep .1
+echo bar >&2 && sleep .1
+echo baz >&2 && sleep .1
+exit 2
+'
+  # shellcheck disable=SC2154
+  assert_equal "$output" ''
+  # shellcheck disable=SC2154
+  assert_equal "$stderr" $'bash -c ; ...; exit 2\n ✘ bash -c ; ...; exit 2\n   bar\n   baz'
 }
 
 @test "should filter escape sequences" {

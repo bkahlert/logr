@@ -23,11 +23,11 @@ trace() {
     set -- "${output:-}"
   fi
   local argc="$#" _trace_args=""
-  printf -v _trace_args " '%q'" "$@"
+  printf -v _trace_args " %q" "$@"
   if { true >&3; } 2<>/dev/null; then
-    echo '# ' "$argc$_trace_args" >&3
+    echo '# ' "$(tput setaf 14)$argc$_trace_args$(tput sgr0)" >&3
   else
-    echo "$argc$_trace_args"
+    echo "$(tput setaf 14)$argc$_trace_args$(tput sgr0)"
   fi
 }
 

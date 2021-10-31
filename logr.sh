@@ -727,23 +727,26 @@ logr() {
       ;;
     _init)
       shift
+      # ERR handler
       _err() {
         logr _cleanup
         local meta && printf -v meta '%s%%s%s' "${esc_dim-}" "${esc_reset-}"
         [ "$1" -eq "$EX_NEG_USR_RESP" ] && exit $EX_NEG_USR_RESP
         logr fatal "%s $meta %d\n  $meta %s" "$2" 'returned' "$1" 'at' "$3"
       }
+      # HUP QUIT TERM handler
       _term() {
         logr _cleanup
         local meta && printf -v meta '%s%%s%s' "${esc_dim-}" "${esc_reset-}"
-        logr warn "%s $meta %d\n  $meta %s" "$2" 'returned' "$1" 'at' "$3"
-#        failr --name "${0##*/}" --code "$1" Terminated
+        logr warn "%s $meta %d\n  $meta %s" "$2" 'returned (HUP QUIT TERM)' "$1" 'at' "$3"
+        failr --name "${0##*/}" --code "$1" Terminated
       }
+      # INT handler
       _int() {
         logr _cleanup
         local meta && printf -v meta '%s%%s%s' "${esc_dim-}" "${esc_reset-}"
-        logr new "%s $meta %d\n  $meta %s" "$2" 'returned' "$1" 'at' "$3"
-#        (failr --name "${0##*/}" --code "$1" Interrupted) || true
+        logr new "%s $meta %d\n  $meta %s" "$2" 'returned (INT)' "$1" 'at' "$3"
+        (failr --name "${0##*/}" --code "$1" Interrupted) || true
         trap - INT && kill -s INT "$$"
       }
       trap '_err $? "${BASH_COMMAND:-?}" "${FUNCNAME[0]:-main}(${BASH_SOURCE[0]:-?}:${LINENO:-?})"' ERR
@@ -888,7 +891,7 @@ logr() {
       if [ ! "$logr_parent_tasks" ]; then
         [ ! -f "$task_file" ] || rm -- "$task_file"
         [ ! -f "$log_file" ] || rm -- "$log_file"
-        util print "$logr_tasks"
+        util print "$logr_tasks" >&2
         spinner start
         # run command line; redirect stdout+stderr to log_file; provide FD3 and FD4 as means to still print
         (logr_parent_tasks=$logr_tasks "${cmdline[@]}" 3>&1 1>"$log_file" 4>&2 2>"$log_file") || task_exit_status=$?
@@ -909,8 +912,8 @@ logr() {
         # --- only initial task here
         spinner stop
 
-        # error
         if [ ! "$task_exit_status" -eq 0 ]; then
+          # error
           util reprint --icon error "$(cat "$task_file")"
           sed \
             -e "$ESC_PATTERN" \
@@ -918,12 +921,12 @@ logr() {
             -e 's/$/'"${esc_reset-}"'/;' \
             "$log_file"
           exit $task_exit_status
+        else
+          # success
+          # erase what has been printed on same line by printing task_line again
+          util reprint --icon success "$logr_tasks"
         fi
-
-        # success
-        # erase what has been printed on same line by printing task_line again
-        util reprint --icon success "$logr_tasks"
-      fi
+      fi >&2
       ;;
     *)
       local original="${ICON_ALIASES[$1]-}"
@@ -1015,27 +1018,22 @@ prompt4() {
 #   2 - https://en.wikipedia.org/wiki/Debugging#Print_debugging
 tracr() {
   local arg_columns=40 && [ ! "${COLUMNS-}" ] || arg_columns=$((COLUMNS / 2))
-  local cyan && esc -v cyan bright_cyan
-  local reset && esc -v reset reset
-  local debug && debug="$cyan%s$reset"
-  local quote && printf -v quote "$debug%%s$debug" '`' '`'
-  local quote_escape && printf -v quote_escape "$debug%%q$debug" '`' '`'
   local out_args='' out_args_len=0 out_argc=0 out_location='?'
 
   # shellcheck disable=SC2059
   [ $# -eq 0 ] || {
-    printf -v out_args "$quote_escape " "$@"
-    printf -v out_args_len '`%q` ' "$@" && out_args_len="${#out_args_len}"
+    printf -v out_args '%q ' "$@"
+    printf -v out_args_len '%q ' "$@" && out_args_len="${#out_args_len}"
   }
 
   # shellcheck disable=SC2059
-  printf -v out_argc "$debug" "$#"
+  printf -v out_argc '%q' "$#"
   local out_argc_pad=' ' && [ $# -le 9 ] || out_argc_pad=''
 
   [ ! "${BASH_SOURCE[1]-}" ] || out_location=$(logr file ${BASH_LINENO[0]+--line "${BASH_LINENO[0]}"} "${BASH_SOURCE[1]}")
   local missing=$((arg_columns - out_args_len - 4))
   [ "$missing" -gt 0 ] || missing=1
-  printf '%s%s %s%*s %s\n' "$out_argc_pad" "$out_argc" "$out_args" "$missing" '' "$out_location"
+  printf '%s%s%s %s%*s %s%s\n' "${esc_bright_cyan-}" "$out_argc_pad" "$out_argc" "$out_args" "$missing" '' "$out_location" "${esc_reset-}" >&2
 }
 
 # Initializes environment
