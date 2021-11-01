@@ -9,9 +9,6 @@
 [![recorded terminal session demonstrating the prompt4 function](docs/prompt4.svg "prompt4 function")  
 ***prompt4** function*](../../raw/master/docs/prompt4.svg)
 
-[![recorded terminal session demonstrating the failr function](docs/failr.svg "failr function")  
-***failr** function*](../../raw/master/docs/failr.svg)
-
 [![recorded terminal session demonstrating the banr utilities](docs/utilities/banr.svg "banr utilities")  
 ***banr** utilities*](../../raw/master/docs/utilities/banr.svg)
 

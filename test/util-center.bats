@@ -10,7 +10,7 @@ setup() {
 
 @test "should print usage" {
   run util center
-  assert_line --partial "failed: text missing"
+  assert_line --partial "text missing"
   assert_line --partial "Usage: util [-v VAR] center [-w|--width WIDTH] TEXT"
 }
 

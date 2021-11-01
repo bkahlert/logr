@@ -16,7 +16,8 @@ rec logr success "text"
 rec logr info "text"
 rec logr warning "text"
 rec logr error "text"
-rec logr failure "text"
+rec logr failure "--bar expected" --name foo --usage "--bar [baz]" -- --baz
+
 rec logr task "text"
 rec logr task "text" -- sleep 2
 

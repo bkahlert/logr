@@ -10,7 +10,7 @@ setup() {
 
 @test "should print usage" {
   run logr file
-  assert_line --partial "failed: path missing"
+  assert_line --partial "path missing"
   assert_line --partial "Usage: logr [-i | --inline] file [-l|--line LINE [-c|--column COLUMN]] PATH [TEXT]"
 }
 

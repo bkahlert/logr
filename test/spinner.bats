@@ -19,7 +19,7 @@ teardown() {
 
 @test "should print usage" {
   run spinner
-  assert_line --partial "failed: command missing"
+  assert_line --partial "command missing"
   assert_line --partial "Usage: spinner start | stop"
 }
 

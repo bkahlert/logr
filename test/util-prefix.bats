@@ -60,11 +60,11 @@ setup() {
 
 @test "should print usage on missing config value" {
   run util prefix --config
-  assert_line --partial "failed: value for config missing"
+  assert_line --partial "value for config missing"
   assert_line --partial "Usage: util [-v VAR] prefix [--config CONFIG] [FORMAT [ARGS...]]"
 }
 
 @test "should print usage on invalid config" {
   run util prefix --config 'invalid'
-  assert_line --partial "failed: unknown prop 'invalid'; expected colon (:) separated list of space ( ) separated key=value pairs"
+  assert_line --partial "unknown prop 'invalid'; expected colon (:) separated list of space ( ) separated key=value pairs"
 }

@@ -10,7 +10,7 @@ setup() {
 
 @test "should print usage" {
   run util inline
-  assert_line --partial "failed: format missing"
+  assert_line --partial "format missing"
   assert_line --partial "Usage: util [-v VAR] inline FORMAT [ARGS...]"
 }
 

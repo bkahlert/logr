@@ -10,7 +10,7 @@ setup() {
 
 @test "should print usage" {
   run logr link
-  assert_line --partial "failed: url missing"
+  assert_line --partial "url missing"
   assert_line --partial "Usage: logr [-i | --inline] link URL [TEXT]"
 }
 

@@ -5,7 +5,7 @@
 *none*
 
 ### Changed
-*none*
+- `failr` is replaced by `logr error`; arguments are unchanged
 
 ### Deprecated
 *none*

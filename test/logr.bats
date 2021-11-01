@@ -35,20 +35,20 @@ $MARGIN
 
 @test "should fail on invalid arguments" {
   run logr --illegal
-  assert_failure
-  assert_line --partial "failed: unknown command"
+  assert_failure 64
+  assert_line --partial "--illegal: unknown command"
   assert_line --partial "Usage: logr [-i | --inline] COMMAND [ARGS...]"
 }
 
 
 @test "should warning if executed" {
   run bash "$BATS_CWD/logr.sh"
-  assert_line --partial "✘ To use logr you need to source it at the top of your script."
+  assert_line --partial "Usage: logr.sh must be sourced at the top of your script in order to be used."
 }
 
 @test "should print usage information if executed" {
   run bash "$BATS_CWD/logr.sh"
-  assert_failure 2
+  assert_failure 64
   assert_line --partial 'source logr.sh'
   assert_line --partial 'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/logr.sh"'
   assert_line --partial 'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE_PATH/logr.sh"'

@@ -9,13 +9,17 @@ setup() {
 }
 
 @test "should produce same output" {
+  local expected
+  # shellcheck disable=SC2154
   for alias in "${!ICON_ALIASES[@]}"; do
     original=${ICON_ALIASES[$alias]}
 
     [ ! "$original" = nested ] || continue
 
+    run logr "$original" "$original"
+    expected=$output
     run logr "$alias" "$original"
-    assert_output "$(logr "$original" "$original" 2>&1 || true)"
+    assert_output "$expected"
   done
 }
 

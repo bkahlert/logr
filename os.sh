@@ -6,7 +6,7 @@ set -euo pipefail
 # Arguments:
 #   * - command line
 as_admin() {
-  [ $# -gt 0 ] || failr "COMMAND missing" --usage "COMMAND [ARGS...]" -- "$@"
+  [ $# -gt 0 ] || logr error "COMMAND missing" --usage "COMMAND [ARGS...]" -- "$@"
   osascript -e 'do shell script "'"$*"'" with administrator privileges'
 }
 
@@ -33,7 +33,7 @@ open_activate() {
     esac
   done
 
-  [ $# -gt 0 ] || failr "app missing" --usage "[--admin] [--] APP [ARGS...]" -- "$@"
+  [ $# -gt 0 ] || logr error "app missing" --usage "[--admin] [--] APP [ARGS...]" -- "$@"
 
   local app_path=$1
   local app=${app_path##*/}
@@ -59,4 +59,22 @@ sudo_forever() {
     sleep 60
     kill -0 "$$" || exit
   done 2>/dev/null &
+}
+
+
+
+# Prints the specified error message and exits with 1.
+die() {
+  local pattern=' ✘ %s\n'
+  [ ! -t 2 ] || pattern="$(tput setaf 1)${pattern}$(tput sgr0)"
+  # shellcheck disable=SC2059
+  printf "$pattern" "${*:-error in line ${BASH_LINENO[0]}}" >&2
+  exit 1
+}
+
+# Kills the process listening on the specified port.
+kill_listening_process() {
+  local port=${1?port missing} pid
+  pid=$(lsof -i ":$port" -P -n | tail -n 1 | awk '{print $2}')
+  [ ! "${pid}" ] || kill "$pid" || kill "$pid" -9 || die "failed to kill process $pid"
 }

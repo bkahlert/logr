@@ -40,8 +40,8 @@ EXPECT
 @test "should fail on invalid arguments" {
   printf '%s\n' "prompt4 --illegal" >> script.sh
   run ./script.sh
-  assert_failure
-  assert_line --partial "failed: unknown type"
+  assert_failure 64
+  assert_line --partial "--illegal: unknown type"
   assert_line --partial "Usage: prompt4 TYPE [ARGS...]"
 }
 
