@@ -81,10 +81,11 @@ echo bar >&2 && sleep .1
 echo baz >&2 && sleep .1
 exit 2
 '
+
   # shellcheck disable=SC2154
-  assert_equal "$output" $'   bash -c ; ...; exit 2\n'
+  assert_equal "$output" \ \ \ bash\ -c\ \;\ ...\;\ exit\ 2
   # shellcheck disable=SC2154
-  assert_equal "$stderr" $' ✘ bash -c ; ...; exit 2\n   bar\n   baz'
+  assert_equal "$stderr" $'✘ bash -c ; ...; exit 2\n   bar\n   baz'
 }
 
 @test "should filter escape sequences" {
