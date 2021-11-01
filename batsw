@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Bats wrapper that transparently delegates calls to an
 # ad-hoc built Docker image containing Bats.

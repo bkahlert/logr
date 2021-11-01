@@ -783,7 +783,7 @@ logr() {
 
       printf '%s\n' "$formatted" >&2
 
-      if [ "${warning-}" = true ]; then
+      if [ "$command" = warning ]; then
         return "${code:-1}"
       else
         exit "${code:-1}"

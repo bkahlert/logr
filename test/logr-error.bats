@@ -17,7 +17,21 @@ setup() {
     bar
     logr error
   }
-  run bar
+  run foo
+  assert_equal "$status" "42"
+}
+
+# shellcheck disable=SC2154
+@test "should exit" {
+  bar() {
+    return 42
+  }
+  foo() {
+    bar
+    logr error
+    return 49
+  }
+  run foo
   assert_equal "$status" "42"
 }
 

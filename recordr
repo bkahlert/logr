@@ -80,7 +80,7 @@ find_term_profile() {
     profiles+=("$REPLY")
   done < <(find "$path" -type f \( $query \) -print0)
 
-  [ ! "${#profiles[@]}" -gt 1 ] || printf ' %s %s\n' "$(tput bold && tput setaf 3)!$(tput sgr0) Found multiple terminal profiles:" "${profiles[*]/#/$'\n   ▪ '}" >&2
+  [ ! "${#profiles[@]}" -gt 1 ] || printf ' %s %s\n' "$(tput bold && tput setaf 3)!$(tput sgr0) multiple terminal profiles found:" "${profiles[*]/#/$'\n   ▪ '}" >&2
   [ "${#profiles[@]}" -eq 0 ] || {
     printf ' %s terminal profile: %s\n' "$(tput setaf 2)✔$(tput sgr0)" "${profiles[0]}" >&2
     printf '%s\n' "${profiles[0]}"
