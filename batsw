@@ -29,20 +29,16 @@ die() {
   exit 1
 }
 
-# Splits a variable to an array like it would be the case if a program was called,
+# Splits the specified variable to an array like it would be the case if a program was called,
 # that is, its value is word-split along the whitespaces while *honoring* quotes.
-#
 # Arguments:
-#   1 - name of the variable
+#   1 - variable name
 split_to_array() {
-  # Called like a program in conjunction with eval.
+  eval "declare -a -g ${1?missing variable name}=()"
   # Assigns the arguments array to the variable with the name of the first element.
-  program() {
-    local var="$1"
-    shift
-    eval "$var"='("${@}")'
-  }
-  eval program "$1" "${!1}"
+  program() { local var="$1" && shift && eval "$var"='("${@}")'; }
+  [ ! -v "$1" ] || eval program "$1" "${!1}"
+  unset program
 }
 
 # Bakes a new Docker image
@@ -73,7 +69,7 @@ bake_local() {
 entrypoint_script() {
   cat <<'ENTRYPOINT'
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 if [ "${BATSW_INJECT-}" ]; then
   inject_path=${BATSW_INJECT%%=*}
   [ "${inject_path:0:1}" = "/" ] || inject_path="/opt/bats/${inject_path}"

@@ -62,7 +62,7 @@ rec -2 run_prompt y prompt4 Y/n
 rec -2 run_prompt y prompt4 Y/n "Single line"
 rec -2 run_prompt y prompt4 Y/n "%s\n" "Multi-" "line"
 rec -2 run_prompt y prompt4 Y/n "%s\n" "Multi-" "line" -
-rec -2 run_prompt n prompt4 Y/n
-rec -2 run_prompt n prompt4 Y/n "Single line"
-rec -2 run_prompt n prompt4 Y/n "%s\n" "Multi-" "line"
-rec -2 run_prompt n prompt4 Y/n "%s\n" "Multi-" "line" -
+(rec -2 run_prompt n prompt4 Y/n)
+(rec -2 run_prompt n prompt4 Y/n "Single line")
+(rec -2 run_prompt n prompt4 Y/n "%s\n" "Multi-" "line")
+(rec -2 run_prompt n prompt4 Y/n "%s\n" "Multi-" "line" -)

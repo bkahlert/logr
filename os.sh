@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -uo pipefail
 
 # Runs the specified command line with admin rights.
 # Arguments:
@@ -63,7 +63,11 @@ sudo_forever() {
 
 
 
-# Prints the specified error message and exits with 1.
+# Prints the specified error message and exits with an optional exit code (default: 1).
+# Arguments:
+#   -c | --code - optional exit code (default: 1)
+#   --          - indicates that all following arguments are non-options
+#   [TEXT...]   - optional error message (default: error in line ${BASH_LINENO[0]})
 die() {
   local pattern=' ✘ %s\n'
   [ ! -t 2 ] || pattern="$(tput setaf 1)${pattern}$(tput sgr0)"

@@ -25,7 +25,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -euo pipefail
+set -uo pipefail
 
 [ ! "$PUID" ] || [ "$(id -u)" = "$PUID" ] || [ ! "$PGID" ] || [ "$(id -g)" = "$PGID" ] || exec yasu "$PUID:$PGID" "$0" "$@"
 
@@ -231,7 +231,7 @@ inv() {
 [ $# -eq 0 ] && {
   declare dest_dir=${opts['dest-dir']}
   opts['dest-dir']="" flags['hide-recording']=true
-  echo "$(tput setaf 1)●$(tput setaf 2)◕$(tput sgr0) $(tput bold)BATCH RECORD AND CONVERT$(tput sgr0)"
+  echo "$(tput setaf 1)●$(tput setaf 2)◕$(tput sgr0) $(tput bold)BATCH CONVERSION$(tput sgr0)"
   echo "$(tput setaf 7) ℹ$(tput sgr0) recordings directory: ${opts['rec-dir']}"
   inv=$(inv)
   #shellcheck disable=SC2086
@@ -245,7 +245,7 @@ inv() {
 [ $# -gt 1 ] && {
   declare dest_dir=${opts['dest-dir']}
   opts['dest-dir']="" flags['hide-recording']=true
-  echo "$(tput setaf 1)●$(tput setaf 2)◕$(tput sgr0) $(tput bold)BATCH RECORD AND CONVERT$(tput sgr0)"
+  echo "$(tput setaf 1)●$(tput setaf 2)◕$(tput sgr0) $(tput bold)BATCH CONVERSION$(tput sgr0)"
   echo "$(tput setaf 7) ℹ$(tput sgr0) files: ${*}"
   inv=$(inv)
   #shellcheck disable=SC2086
@@ -292,7 +292,7 @@ esc_esc_cuu1=$(printf '%q' "$(tput cuu 1 || tput cuu1 || tput up)")
 printf -v cursor_show "sleep .5; printf %b; " "$esc_esc_show"
 printf -v cursor_hide "sleep .5; printf %b; " "$esc_esc_hide"
 
-echo " $(tput setaf 1)●$(tput sgr0) $(tput bold)RECORDING $rec_file$(tput sgr0)"
+echo " $(tput setaf 1)●$(tput sgr0) $(tput bold)RECORDING: $rec_file$(tput sgr0)"
 [ ! -e "$recordable_file" ] || rm -- "$recordable_file"
 touch "$recordable_file"
 declare -a settings=()
@@ -386,7 +386,7 @@ cat "$real_rec_file" >>"$recordable_file"
     "$cast_file"
 )
 
-echo " $(tput setaf 2)◕$(tput sgr0) $(tput bold)CONVERTING $cast_file$(tput sgr0)"
+echo " $(tput setaf 2)◕$(tput sgr0) $(tput bold)CONVERTING: $cast_file$(tput sgr0)"
 declare -a svg_term_args=()
 [ ! -e "$svg_file" ] || rm -- "$svg_file"
 [ ! "${opts['columns']-}" ] || svg_term_args+=("--width" "${opts['columns']}")

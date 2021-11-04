@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -uo pipefail
 
 DOCKER_BUILDKIT=1 \
 DOCKER_SCAN_SUGGEST=false \

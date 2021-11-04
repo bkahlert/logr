@@ -14,18 +14,18 @@ rec logr file --line 300 --column 10 "logr.sh"
 rec logr file --line 300 --column 10 "logr.sh" "link-text"
 rec logr success "text"
 rec logr info "text"
-rec logr warning "text"
-rec logr error "text"
-rec logr failure "--bar expected" --name foo --usage "--bar [baz]" -- --baz
+(rec logr warning "text")
+(rec logr error "text")
+(rec logr failure "--bar expected" --name foo --usage "--bar [baz]" -- --baz)
 
-rec logr task "text"
-rec logr task "text" -- sleep 2
+(rec logr task "text")
+(rec logr task "text" -- sleep 2)
 
-rec logr task -- bash -c '
+(rec logr task -- bash -c '
 echo foo && sleep 0.7
 echo bar >&2 && sleep 0.7
 echo baz >&2 && sleep 0.7
-exit 2'
+exit 2')
 
 # vanilla recursion
 foo() {

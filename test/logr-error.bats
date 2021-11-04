@@ -9,7 +9,7 @@ setup() {
 }
 
 # shellcheck disable=SC2154
-@test "should exit with exit code of last command" {
+@test "should exit with non-zero exit code of last command" {
   bar() {
     return 42
   }
@@ -19,6 +19,32 @@ setup() {
   }
   run foo
   assert_equal "$status" "42"
+}
+
+# shellcheck disable=SC2154
+@test "should exit with 1 if last status is 0" {
+  bar() {
+    return 0
+  }
+  foo() {
+    bar
+    logr error
+  }
+  run foo
+  assert_equal "$status" "1"
+}
+
+# shellcheck disable=SC2154
+@test "should exit with 0 if specified explicitly" {
+  bar() {
+    return 0
+  }
+  foo() {
+    bar
+    logr error --code 0
+  }
+  run foo
+  assert_equal "$status" "0"
 }
 
 # shellcheck disable=SC2154

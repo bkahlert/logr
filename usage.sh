@@ -5,12 +5,6 @@ source logr.sh
 declare -r URL='https://github.com/bkahlert/logr/'
 declare -r LABEL=${URL#*://}
 
-
-(logr warn -x "kklk" --usage "kllkklö" -- "dslöklsdk" "lkölk" 20)
-(logr error -x --warn "kklk" --usage "kllkklö" -- "dslöklsdk" "lkölk" 20)
-(logr error -x "klkl")
-(logr fail -x)
-
 headr "Usage"
 
 logr info "Check out %s for instructive terminal session recording.\n" "$(logr -i link "$URL" "$LABEL")"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -uo pipefail
 
 # query specified terminal: infocmp $1 | sed -e 's/,/\n/' -e 's/\t/ /'
 

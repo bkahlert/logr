@@ -22,6 +22,19 @@ setup() {
 }
 
 # shellcheck disable=SC2154
+@test "should return 0 if last status is 0" {
+  bar() {
+    return 0
+  }
+  foo() {
+    bar
+    logr warning
+  }
+  run foo
+  assert_equal "$status" "0"
+}
+
+# shellcheck disable=SC2154
 @test "should not exit" {
   bar() {
     return 42

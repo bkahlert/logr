@@ -2,7 +2,7 @@
 #
 # Common test setup
 
-set -euo pipefail
+set -uo pipefail
 
 # Delegates to echo just as if called directory
 # **unless** a Bats test is being executed
@@ -282,7 +282,7 @@ fixture() {
 #   2 - target
 # Outputs:
 #   STDERR - details on failure
-cp_fixture() {
+copy_fixture() {
   cp "$(fixture "${1:?}")" "${2:?}"
 }
 
