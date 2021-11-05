@@ -238,7 +238,7 @@ bats() {
   fi
 
   local -r -a BATS_ARGS=(
-    --jobs "$(grep 2>/dev/null -c ^processor /proc/cpuinfo || printf %s 4)"
+    --jobs "$(nproc || echo 4)"
     --no-parallelize-within-files
     --recursive
     --timing

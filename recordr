@@ -97,7 +97,7 @@ declare -A opts=(
   ['rows']=25                                                                 # optional number of rows to use for recording and conversion
   ['restart-delay']=5                                                         # optional number of seconds until the animation restart
   ['term-profile']=auto                                                       # optional path to the terminal profile to use for conversion
-  ['parallel']=$(grep 2>/dev/null -c ^processor /proc/cpuinfo || printf %s 4) # optional maximum number of conversions that run at once; 0 will run as many conversions as possible
+  ['parallel']=$(nproc || echo 4) # optional maximum number of conversions that run at once; 0 will run as many conversions as possible
 )
 declare -A flags=(
   ['keep-build']=false     # flag that if specified will keep intermediary build files on completion

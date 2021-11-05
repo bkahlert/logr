@@ -626,7 +626,7 @@ headr() {
 #   1 - error
 #   * - signal
 logr() {
-  local inv=("$@") args=() code=$? usage="[-i | --inline] COMMAND [ARGS...]" inline
+  local inv=("$@") args=() code=${LOGR_ALIAS_CODE:-$?} usage="[-i | --inline] COMMAND [ARGS...]" inline
   while (($#)); do
     case $1 in
       -i | --inline)
@@ -663,33 +663,39 @@ logr() {
       ;;
     _init)
       shift
-      # ERR handler
-      _err() {
-        logr _cleanup
-        local meta && printf -v meta '%s%%s%s' "${esc_dim-}" "${esc_reset-}"
-        [ "$1" -eq "$EX_NEG_USR_RESP" ] && exit $EX_NEG_USR_RESP
-        logr error --name 'unhandled exception' "%s   %s %s\n     %s %s" "$2" "${esc_red-}$1" "${ICONS['exit']}" 'at' "$3"
+      # Registers signal_handler to run when the shell receives one of the specified signals.
+      handle() {
+        [ ! "${_Dbg_DEBUGGER_LEVEL-}" ] || return 0
+        local args=('$?' '"${BASH_COMMAND:-?}"' '"${FUNCNAME[0]:-main}(${BASH_SOURCE[0]:-?}:${LINENO:-?})"')
+        for signal in "$@" ; do
+          trap 'signal_handler '"$signal ${args[*]}" "$signal" || die "Failed to set trap for $signal"
+        done
       }
-      # HUP QUIT TERM handler
-      _term() {
-        logr _cleanup
-        local meta && printf -v meta '%s%%s%s' "${esc_dim-}" "${esc_reset-}"
-        logr warn "%s $meta %d\n  $meta %s" "$2" 'returned (HUP QUIT TERM)' "$1" 'at' "$3"
-        logr error --name "${0##*/}" --code "$1" Terminated
+      # Unified signal handler run when shell receives signals earlier registered using handle.
+      signal_handler() {
+        local signal="$1" status="$2" command="$3" location="$4"
+        case $signal in
+        ERR)
+          logr _cleanup
+          status="${esc_red-}$status ${ICONS['exit']}${esc_reset-}"
+          logr error --name "unhandled exit status" "%s %s\n     %s %s" "$status" "$command" 'at' "$location"
+          ;;
+        HUP | EXIT)
+          logr _cleanup
+          trap - "$signal" && kill -s "$signal" "$$"
+          ;;
+        INT | TERM)
+          logr task "Aborting ${0##*/}"
+          if logr _cleanup; then
+            util reprint --icon success "Process ${0##*/} terminated"
+          else
+            util reprint --icon failure "Process ${0##*/} failed to cleanup"
+          fi
+          trap - "$signal" && kill -s "$signal" "$$"
+          ;;
+        esac
       }
-      # INT handler
-      _int() {
-        logr _cleanup
-        local meta && printf -v meta '%s%%s%s' "${esc_dim-}" "${esc_reset-}"
-        logr new "%s $meta %d\n  $meta %s" "$2" 'returned (INT)' "$1" 'at' "$3"
-        (logr error --name "${0##*/}" --code "$1" Interrupted) || true
-        trap - INT && kill -s INT "$$"
-      }
-      if [ ! "${_Dbg_DEBUGGER_LEVEL-}" ]; then
-        trap '_err $? "${BASH_COMMAND:-?}" "${FUNCNAME[0]:-main}(${BASH_SOURCE[0]:-?}:${LINENO:-?})"' ERR
-        trap '_term $? "${BASH_COMMAND:-?}" "${FUNCNAME[0]:-main}(${BASH_SOURCE[0]:-?}:${LINENO:-?})"' HUP QUIT TERM
-        trap '_int $? "${BASH_COMMAND:-?}" "${FUNCNAME[0]:-main}(${BASH_SOURCE[0]:-?}:${LINENO:-?})"' INT
-      fi
+      handle HUP INT TERM ERR EXIT # no QUIT one's not supposed to cleanup
       esc cursor_hide
       ;;
     _cleanup)
@@ -708,6 +714,17 @@ logr() {
       [ ! "${inline-}" ] || _rs="${_rs# }"
       echo "$_rs"
       ;;
+
+    # TODO
+#    EX_*)
+#      local
+#       Parses this script for a line documenting the parameter and returns the comment.
+#      describe() { sed -En "/declare -r -g $1=.*#/p" "${BASH_SOURCE[0]}" | sed -E 's/[^#]*#[[:space:]]*(.*)$/\1/g'; }
+#
+#      local err_message=$(describe $1)
+#      logr error --code "$1" "$2 is missing a value -- $err_message" --usage "$usage" -- "${@}"
+#      ;;
+
     warning | error | failure)
       local command=$1 call_offset=0
       local usage="${usage%COMMAND*}$1 [-c|--code CODE] [-n|--name NAME] [-u|--usage USAGE] [FORMAT [ARGS...]] [--] [INVOCATION...]" && shift
@@ -951,7 +968,7 @@ logr() {
       [ "${original}" ] || logr error "unknown command" --usage "$usage" -- "$@"
 
       shift
-      LOGR_ALIAS=$alias logr ${inline+"--inline"} "$original" "$@"
+      LOGR_ALIAS=$alias LOGR_ALIAS_CODE=$code logr ${inline+"--inline"} "$original" "$@"
       ;;
   esac
 }
@@ -1132,7 +1149,7 @@ $(
       "${esc_yellow-}"'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/logr.sh"'"${esc_reset-}"
     logr info "%s\n%s\n" "To source logr ${esc_bold-}relative to your script${esc_reset-} add:" \
       "${esc_yellow-}"'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE_PATH/logr.sh"'"${esc_reset-}"
-    logr info "%s\n%s" "And for the more adventurous:" \
+    logr info "%s\n%s\n" "And for the more adventurous:" \
       "${esc_yellow-}"'source <(curl -LfsS https://git.io/logr.sh)'"${esc_reset-}"
   )"
 }

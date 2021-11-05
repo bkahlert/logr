@@ -23,6 +23,21 @@ setup() {
   done
 }
 
+@test "should produce same status" {
+  local expected
+  # shellcheck disable=SC2154
+  for alias in "${!ICON_ALIASES[@]}"; do
+    original=${ICON_ALIASES[$alias]}
+
+    [ ! "$original" = nested ] || continue
+
+    run logr "$original" "$original"
+    expected=$status
+    run logr "$alias" "$original"
+    assert_equal "$status" "$expected"
+  done
+}
+
 @test "should produce same icon" {
   for alias in "${!ICON_ALIASES[@]}"; do
     original=${ICON_ALIASES[$alias]}
