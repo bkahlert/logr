@@ -237,7 +237,7 @@ inv() {
   #shellcheck disable=SC2086
   (cd "${opts['rec-dir']}" && find . -name '*.rec' -print0) | xargs -0 -I {} -n 1 -P "${opts['parallel']}" -r $inv {}
   [ ! "${dest_dir-}" ] || rsync -ar --prune-empty-dirs --include "*/"  --include="*.svg" --exclude="*" "${opts['build-dir']%/}/" "$dest_dir"
-  echo " $(tput setaf 2)✔$(tput sgr0) $(tput bold)BATCH COMPLETED$(tput sgr0)"
+  echo " $(tput setaf 2)✔$(tput sgr0) $(tput bold)BATCH PROCESSING COMPLETED$(tput sgr0)"
   exit 0
 }
 
@@ -254,7 +254,7 @@ inv() {
   done) | xargs -0 -I {} -n 1 -P "${opts['parallel']}" -r $inv {}
   wait
   [ ! "${dest_dir-}" ] || rsync -ar  --prune-empty-dirs --include "*/"  --include="*.svg" --exclude="*" "${opts['build-dir']%/}/" "$dest_dir"
-  echo " $(tput setaf 2)✔$(tput sgr0) $(tput bold)BATCH COMPLETED$(tput sgr0)"
+  echo " $(tput setaf 2)✔$(tput sgr0) $(tput bold)BATCH PROCESSING COMPLETED$(tput sgr0)"
   exit 0
 }
 

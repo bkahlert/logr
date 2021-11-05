@@ -685,11 +685,10 @@ logr() {
           trap - "$signal" && kill -s "$signal" "$$"
           ;;
         INT | TERM)
-          logr task "Aborting ${0##*/}"
           if logr _cleanup; then
-            util reprint --icon success "Process ${0##*/} terminated"
+            logr success "terminated"
           else
-            util reprint --icon failure "Process ${0##*/} failed to cleanup"
+            logr error "failed to cleanup"
           fi
           trap - "$signal" && kill -s "$signal" "$$"
           ;;
@@ -713,7 +712,7 @@ logr() {
       done
       ;;
 
-    created | added | item | success | info)
+    created | added | item | info)
       local usage="${usage%COMMAND*}$1 FORMAT [ARGS...]"
       local _rs
       util -v _rs print --icon "$1" "${@:2}"
@@ -731,10 +730,10 @@ logr() {
 #      logr error --code "$1" "$2 is missing a value -- $err_message" --usage "$usage" -- "${@}"
 #      ;;
 
-    warning | error | failure)
+    success | warning | error | failure)
       local command=$1 call_offset=0
       local usage="${usage%COMMAND*}$1 [-c|--code CODE] [-n|--name NAME] [-u|--usage USAGE] [FORMAT [ARGS...]] [--] [INVOCATION...]" && shift
-      [ "$command" = warning ] || [ "$code" -ne 0 ] || code=1 # default code for non-warnings is 1
+      [ "$command" = success ] || [ "$command" = warning ] || [ "$code" -ne 0 ] || code=1 # default code for errors
       [ ! "${LOGR_ALIAS-}" ] || call_offset=1
       local name=${FUNCNAME[$((1 + call_offset))]:-?} format=() usage_opt stacktrace=() print_call idx
       [ ! "${name-}" = main ] || name=${BASH_SOURCE[$((${#BASH_SOURCE[@]} - 1))]##*/}
@@ -790,6 +789,10 @@ logr() {
       # shellcheck disable=SC2059
       [ "${#format[@]}" -eq 0 ] || printf -v formatted -- "${format[@]}"
       case $command in
+        success)
+          printf -v formatted '%s %s %s%s%s\n' "${esc_green-}" "${ICONS["$command"]}" "$invocation" \
+            "${formatted+: "${esc_bold-}${formatted}${esc_stout_end-}"}" "${esc_reset-}"
+          ;;
         warning)
           printf -v formatted '%s %s %s%s%s\n' "${esc_yellow-}" "${ICONS["$command"]}" "$invocation" \
             "${formatted+: "${esc_bold-}${formatted}${esc_stout_end-}"}" "${esc_reset-}"
@@ -809,7 +812,7 @@ logr() {
 
       printf '%s' "$formatted" >&2
 
-      if [ "$command" = warning ]; then
+      if [ "$command" = success ] || [ "$command" = warning ]; then
         return "${code:-0}"
       else
         exit "${code:-1}"
