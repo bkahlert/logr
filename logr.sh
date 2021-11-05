@@ -27,7 +27,6 @@
 
 set -o nounset
 set -o pipefail
-set -o posix
 set -o errtrace
 
 declare -r -g EX_OK=0
@@ -470,8 +469,8 @@ spinner() {
     stop)
       shift
       [ $# = 0 ] || logr error "unexpected argument" --usage "$usage" --stacktrace -- "$@"
-      if jobs -p 'spinner _spin' >/dev/null 2>/dev/null; then
-        jobs -p 'spinner _spin' | xargs -r kill
+      if jobs -pr 'spinner _spin' >/dev/null 2>/dev/null; then
+        jobs -pr 'spinner _spin' | xargs -r kill
       fi
       ;;
     _spin)
@@ -658,6 +657,7 @@ logr() {
      warning     Log a warning
      error       Log an error
      failure     Log an error and terminate
+
 '
       exit "$EX_OK"
       ;;
@@ -675,12 +675,12 @@ logr() {
       signal_handler() {
         local signal="$1" status="$2" command="$3" location="$4"
         case $signal in
-        ERR)
+        EXIT)
           logr _cleanup
-          status="${esc_red-}$status ${ICONS['exit']}${esc_reset-}"
-          logr error --name "unhandled exit status" "%s %s\n     %s %s" "$status" "$command" 'at' "$location"
+#          trap - ERR EXIT
+#          exit "$status"
           ;;
-        HUP | EXIT)
+        HUP)
           logr _cleanup
           trap - "$signal" && kill -s "$signal" "$$"
           ;;
@@ -693,16 +693,22 @@ logr() {
           fi
           trap - "$signal" && kill -s "$signal" "$$"
           ;;
+        ERR)
+          logr _cleanup
+          [ "$status" -ne 0 ] || return 0
+          status="${esc_red-}$status ${ICONS['exit']}${esc_reset-}"
+          logr fatal --name "${0##*/}" "%s %s\n     %s %s" "$status" "$command" 'at' "$location"
+          ;;
         esac
       }
-      handle HUP INT TERM ERR EXIT # no QUIT one's not supposed to cleanup
+      handle EXIT HUP INT TERM ERR # no QUIT one's not supposed to cleanup
       esc cursor_hide
       ;;
     _cleanup)
       shift
       esc cursor_show
       local job_pid
-      for job_pid in $(jobs -p); do
+      for job_pid in $(jobs -pr); do
         kill "$job_pid" &>/dev/null || true
       done
       ;;
@@ -804,7 +810,7 @@ logr() {
       printf '%s' "$formatted" >&2
 
       if [ "$command" = warning ]; then
-        return "${code:-1}"
+        return "${code:-0}"
       else
         exit "${code:-1}"
       fi
@@ -968,7 +974,7 @@ logr() {
       [ "${original}" ] || logr error "unknown command" --usage "$usage" -- "$@"
 
       shift
-      LOGR_ALIAS=$alias LOGR_ALIAS_CODE=$code logr ${inline+"--inline"} "$original" "$@"
+      LOGR_ALIAS=$alias LOGR_ALIAS_CODE=$code logr ${inline+"--inline"} "$original" "$@" || return "$?"
       ;;
   esac
 }
