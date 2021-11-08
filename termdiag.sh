@@ -95,7 +95,7 @@ boolean_diag() {
     result=true
     description="$(tput setaf 2)$description$(tput sgr0)"
   else
-    [ ! "${HIDE_UNSUPPORTED-}" = true ] || return 0
+    [ "${HIDE_UNSUPPORTED:-false}" = false ] || return 0
     result=''
   fi
   printf '%s%s\t%s\t%s\t%s\t%s\n' "$result" "$(guide "$result")" "$variable" "$capname" "$termcap" "$description"
@@ -107,7 +107,7 @@ numeric_diag() {
   if result=$(tput "$capname"); then
     description="$(tput setaf 2)$description$(tput sgr0)"
   else
-    [ ! "${HIDE_UNSUPPORTED-}" = true ] || return 0
+    [ "${HIDE_UNSUPPORTED:-}" = false ] || return 0
     result=""
   fi
   printf '%s%s\t%s\t%s\t%s\t%s\n' "$result" "$(guide "$result")" "$variable" "$capname" "$termcap" "$description"
@@ -123,7 +123,7 @@ string_diag() {
     result=$(printf '%q' "$result")
     description="$(tput setaf 2)$description$(tput sgr0)""${args+ (${args[*]})}"
   else
-    [ ! "${HIDE_UNSUPPORTED-}" = true ] || return 0
+    [ "${HIDE_UNSUPPORTED:-false}" = false ] || return 0
     result=""
   fi
   printf '%s%s\t%s\t%s\t%s\t%s\n' "$result" "$(guide "$result")" "$variable" "$capname" "$termcap" "$description"

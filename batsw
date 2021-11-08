@@ -34,10 +34,10 @@ die() {
 # Arguments:
 #   1 - variable name
 split_to_array() {
-  eval "declare -a -g ${1?missing variable name}=()"
   # Assigns the arguments array to the variable with the name of the first element.
-  program() { local var="$1" && shift && eval "$var"='("${@}")'; }
+  program() { eval "$1"='("${@:2}")'; }
   [ ! -v "$1" ] || eval program "$1" "${!1}"
+  [ -v "$1" ] || eval "declare -a -g $1=()"
   unset program
 }
 
@@ -238,7 +238,7 @@ bats() {
   fi
 
   local -r -a BATS_ARGS=(
-    --jobs "$(nproc || echo 4)"
+    --jobs "$(nproc 2>/dev/null || echo 4)"
     --no-parallelize-within-files
     --recursive
     --timing
@@ -304,35 +304,35 @@ main() {
   done
 
   [ "${BATS_TMPDIR-}" ] || export BATS_TMPDIR="build/bats-tmp"
-  [ -e "${BATS_TMPDIR}" ] && rm -rf "${BATS_TMPDIR:?}"
-  [ -e "${BATS_TMPDIR}" ] || mkdir -p "${BATS_TMPDIR}" || die "'${BATS_TMPDIR}' could not be created"
+  [ ! -e "$BATS_TMPDIR" ] || rm -rf -- "$BATS_TMPDIR"
+  [ -e "$BATS_TMPDIR" ] || mkdir -p "$BATS_TMPDIR" || die "'$BATS_TMPDIR' could not be created"
   # shellcheck disable=SC2064
-  trap "rmdir '${BATS_TMPDIR}' &>/dev/null || true" EXIT # delete if empty on exit
+  trap "rmdir '$BATS_TMPDIR' &>/dev/null || true" EXIT # delete if empty on exit
 
   echo "$(tput setaf 2)▶▶$(tput sgr0) $(tput bold)TEST RUN$(tput sgr0)"
   echo "$(tput setaf 7) ℹ$(tput sgr0) working directory: $PWD"
-  echo "$(tput setaf 7) ℹ$(tput sgr0) batsw command line:" "${BATS_CMD}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
+  echo "$(tput setaf 7) ℹ$(tput sgr0) batsw command line:" "$BATS_CMD" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
 
   if [ "${DOCKER_BAKE-}" ]; then
-    split_to_array "DOCKER_BAKE"
+    DOCKER_BAKE=$DOCKER_BAKE split_to_array "DOCKER_BAKE"
     if ! baked_tag="$(bake_local "${DOCKER_BAKE[@]+"${DOCKER_BAKE[@]}"}")"; then
       exit 1
     fi
-    echo "🐳 built Docker image: ${baked_tag}"
+    echo "🐳 built Docker image: $baked_tag"
   fi
 
   # Checks for tests starting with capital X.
   # If such exist, focus on them and ignore the others.
   local highlighted_tests_args=('--filter' '^[Xx]')
   local highlighted_tests=0
-  if ! highlighted_tests=$(TERM=dumb "${BATS_CMD}" --count "${highlighted_tests_args[@]}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"); then
+  if ! highlighted_tests=$(TERM=dumb "$BATS_CMD" --count "${highlighted_tests_args[@]}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"); then
     echo "Failed to find highlighted tests"
   fi
 
   if [ "$highlighted_tests" = "0" ]; then
-    "${BATS_CMD}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
+    "$BATS_CMD" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
   else
-    "${BATS_CMD}" "${highlighted_tests_args[@]}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
+    "$BATS_CMD" "${highlighted_tests_args[@]}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
   fi
 }
 

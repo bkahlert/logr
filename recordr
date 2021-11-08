@@ -97,7 +97,7 @@ declare -A opts=(
   ['rows']=25                                                                 # optional number of rows to use for recording and conversion
   ['restart-delay']=5                                                         # optional number of seconds until the animation restart
   ['term-profile']=auto                                                       # optional path to the terminal profile to use for conversion
-  ['parallel']=$(nproc || echo 4) # optional maximum number of conversions that run at once; 0 will run as many conversions as possible
+  ['parallel']=$(nproc 2>/dev/null || echo 4) # optional maximum number of conversions that run at once; 0 will run as many conversions as possible
 )
 declare -A flags=(
   ['keep-build']=false     # flag that if specified will keep intermediary build files on completion
@@ -223,7 +223,7 @@ inv() {
     printf ' --%b=%b' "$opt" "${opts[$opt]}"
   done
   for flag in "${!flags[@]}"; do
-    [ ! "${flags[$flag]}" = true ] || printf ' --%b' "$flag"
+    [ "${flags[$flag]:-false}" = false ] || printf ' --%b' "$flag"
   done
 }
 
@@ -379,7 +379,7 @@ cat "$real_rec_file" >>"$recordable_file"
 
 [ ! -e "$cast_file" ] || rm -- "$cast_file"
 (
-  [ ! "${flags['hide-recording']}" = true ] || exec &>/dev/null
+  [ "${flags['hide-recording']:-false}" = false ] || exec &>/dev/null
   HISTFILE='' HISTIGNORE='*' TERM=${opts['term']-} asciinema rec \
     --command "cat '$recordable_file' | bash -s" \
     --quiet \
@@ -451,7 +451,7 @@ css+=".container>g>svg>svg>*{transform: scaleY(.95);}"
 printf '%s\n' "${svg/<style>/<style>$css}" >"$svg_file"
 
 [ -e "$svg_file" ] || die "An unknown error occurred: \`$svg_file\` missing"
-[ "${flags['keep-build']}" = true ] || rm -- "$recordable_file" "$cast_file"
+[ ! "${flags['keep-build']:-false}" = false ] || rm -- "$recordable_file" "$cast_file"
 [ ! "${dest_svg_file-}" ] || cp "$svg_file" "$dest_svg_file"
 echo " $(tput setaf 2)✔$(tput sgr0) $(tput bold)COMPLETED $svg_file$(tput sgr0)"
 

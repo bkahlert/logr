@@ -339,8 +339,8 @@ util() {
       # shellcheck disable=SC2059
       local text='' && [ $# -eq 0 ] || printf -v text "$@"
       text=${text//$LF/$LF$MARGIN}
-      [ "${icon_last-}" = true ] || util_text=$print_icon$text
-      [ ! "${icon_last-}" = true ] || util_text=$text$print_icon
+      [ ! "${icon_last:-false}" = false ] || util_text=$print_icon$text
+      [ "${icon_last:-false}" = false ] || util_text=$text$print_icon
       ;;
 
     prefix)
@@ -498,7 +498,7 @@ spinner() {
 # Globals:
 #   BANR_CHAR - the default char to use
 # Arguments:
-#   --indent - Either the amount of whitespaces or the string itself to prepend the banner with (default: 1)
+#   --indent - Either the number of whitespaces or the string itself to prepend the banner with (default: 1)
 #   --static - If specified, not animation will take place; optionally can be set to a pattern that controls the design.
 #              Format: colon (:) separated list of space separated key-value pairs, e.g. `char=A : char=B state=1` specifies
 #                      the first banner char as an `A`, the second as a `B` with bright colors and the remaining chars as default.
@@ -582,8 +582,8 @@ banr() {
   # shellcheck disable=SC2206
   local intro_frames=(${raw_prefix//?/"$intro_char" }) outro_frames=(${raw_prefix//?/"$outro_char" })
 
-  [ ! "${intro-}" = true ] || intro_frames+=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █ █ █ █ ▉ ▊ ▋ ▌ ▍ ▎ ▏ "${intro_char[@]}")
-  [ ! "${outro-}" = true ] || outro_frames=(▏ ▎ ▍ ▌ ▋ ▊ ▉ "${outro_frames[@]}")
+  [ "${intro:-false}" = false ] || intro_frames+=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █ █ █ █ ▉ ▊ ▋ ▌ ▍ ▎ ▏ "${intro_char[@]}")
+  [ "${outro:-false}" = false ] || outro_frames=(▏ ▎ ▍ ▌ ▋ ▊ ▉ "${outro_frames[@]}")
 
   intro_frames=("${intro_frames[@]/#/c=$intro_modifier}")
   outro_frames=("${outro_frames[@]/#/c=$outro_modifier}")
@@ -677,25 +677,19 @@ logr() {
         case $signal in
         EXIT)
           logr _cleanup
-#          trap - ERR EXIT
-#          exit "$status"
           ;;
         HUP)
           logr _cleanup
           trap - "$signal" && kill -s "$signal" "$$"
           ;;
         INT | TERM)
-          if logr _cleanup; then
-            logr success "terminated"
-          else
-            logr error "failed to cleanup"
-          fi
+          logr _cleanup
           trap - "$signal" && kill -s "$signal" "$$"
           ;;
         ERR)
           logr _cleanup
-          [ "$status" -ne 0 ] || return 0
-          status="${esc_red-}$status ${ICONS['exit']}${esc_reset-}"
+          [ "${status:-1}" -ne 0 ] || return 0
+          status="${esc_red-}${status:-?} ${ICONS['exit']}${esc_reset-}"
           logr fatal --name "${0##*/}" "%s %s\n     %s %s" "$status" "$command" 'at' "$location"
           ;;
         esac
