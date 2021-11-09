@@ -51,7 +51,7 @@ split_to_array() {
 bake_local() {
   echo "🐳 building Docker image:" "$@"
   if ! docker buildx bake "$@"; then
-    die "Failed to bake Docker image"
+    die "failed to bake Docker image"
   fi
   docker images --format='{{.ID}}' | head -1
 }
@@ -93,6 +93,11 @@ ENTRYPOINT
 # Builds a Bats docker container and returns its image ID.
 # All arguments are passed unchanged to `docker build`.
 #
+# According to http://lists.busybox.net/pipermail/busybox/2004-January/044642.html
+# busybox's sed is a "fully compatible sed implementation", but unfortunately
+# it's not (https://lists.uclibc.org/pipermail/uclibc-cvs/2012-January/030044.html).
+# Therefore GNU's sed will be also installed.
+#
 # Globals:
 #   none
 # Arguments:
@@ -116,6 +121,7 @@ RUN apk \
     git \
     jq \
     shadow \
+    sed \
     openssh-client \
     sshpass
 RUN set -eu; \
@@ -201,18 +207,18 @@ bats() {
   local -a BATS_ARGS=()
   while (($#)); do
     case "$1" in
-    -e | --env)
-      if [ "${2-}" ] && [ "${2:0:1}" != "-" ]; then
-        DOCKER_ARGS+=("$1" "$2")
-        shift 2
-      else
-        die "value of $1 missing"
-      fi
-      ;;
-    *)
-      BATS_ARGS+=("$1")
-      shift
-      ;;
+      -e | --env)
+        if [ "${2-}" ] && [ "${2:0:1}" != "-" ]; then
+          DOCKER_ARGS+=("$1" "$2")
+          shift 2
+        else
+          die "value of $1 missing"
+        fi
+        ;;
+      *)
+        BATS_ARGS+=("$1")
+        shift
+        ;;
     esac
   done
 
@@ -278,28 +284,28 @@ main() {
   local -a BATS_ARGS=("--env" "TESTING=1")
   while (($#)); do
     case "$1" in
-    --inject)
-      [ "${2-}" ] || die "value of inject missing"
-      BATS_ARGS+=("--env" "BATSW_INJECT=$2")
-      shift 2
-      ;;
-    --quiet)
-      export BATSW_QUIET=1
-      shift
-      ;;
-    -o | --output)
-      if [ "${2-}" ] && [ "${2:0:1}" != "-" ]; then
-        mkdir -p "$2"
-        BATS_ARGS+=("$1" "$2")
+      --inject)
+        [ "${2-}" ] || die "value of inject missing"
+        BATS_ARGS+=("--env" "BATSW_INJECT=$2")
         shift 2
-      else
-        [ "${2-}" ] || die "value of $1 missing"
-      fi
-      ;;
-    *)
-      BATS_ARGS+=("$1")
-      shift
-      ;;
+        ;;
+      --quiet)
+        export BATSW_QUIET=1
+        shift
+        ;;
+      -o | --output)
+        if [ "${2-}" ] && [ "${2:0:1}" != "-" ]; then
+          mkdir -p "$2"
+          BATS_ARGS+=("$1" "$2")
+          shift 2
+        else
+          [ "${2-}" ] || die "value of $1 missing"
+        fi
+        ;;
+      *)
+        BATS_ARGS+=("$1")
+        shift
+        ;;
     esac
   done
 
@@ -314,10 +320,8 @@ main() {
   echo "$(tput setaf 7) ℹ$(tput sgr0) batsw command line:" "$BATS_CMD" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
 
   if [ "${DOCKER_BAKE-}" ]; then
-    DOCKER_BAKE=$DOCKER_BAKE split_to_array "DOCKER_BAKE"
-    if ! baked_tag="$(bake_local "${DOCKER_BAKE[@]+"${DOCKER_BAKE[@]}"}")"; then
-      exit 1
-    fi
+    split_to_array DOCKER_BAKE
+    baked_tag="$(bake_local "${DOCKER_BAKE[@]+"${DOCKER_BAKE[@]}"}")"
     echo "🐳 built Docker image: $baked_tag"
   fi
 
@@ -332,7 +336,7 @@ main() {
   if [ "$highlighted_tests" = "0" ]; then
     "$BATS_CMD" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
   else
-    "$BATS_CMD" "${highlighted_tests_args[@]}" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
+    "$BATS_CMD" "${highlighted_tests_args[@]}" "--no-tempdir-cleanup" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
   fi
 }
 

@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 ### Added
-*none*
+- support for `NO_COLOR` and `MY_APP_NO_COLOR`
 
 ### Changed
 - `failr` is replaced by `logr error`; arguments are unchanged
