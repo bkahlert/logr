@@ -623,7 +623,7 @@ headr() {
 #   1 - error
 #   * - signal
 logr() {
-  local inv=("$@") args=() code=${LOGR_ALIAS_CODE:-$?} usage="[-i | --inline] COMMAND [ARGS...]" inline
+  local inv=("$@") args=() code=${LOGR_ALIAS_CODE:-$?} usage="[-i | --inline] COMMAND [ARGS...]" exit inline
   while (($#)); do
     case $1 in
       -i | --inline)
@@ -672,7 +672,8 @@ logr() {
       # Unified signal handler run when shell receives signals earlier registered using handle.
       signal_handler() {
         local signal="$1" status="$2" command="$3" location="$4"
-        logr _cleanup
+        echo "kllk"
+        logr cleanup
         case $signal in
         EXIT)
           return 0
@@ -692,7 +693,7 @@ logr() {
       esc cursor_hide
       ;;
 
-    _cleanup)
+    cleanup)
       shift
       esc cursor_show
       ;;
@@ -947,7 +948,7 @@ logr() {
               -e 's/^/'"$MARGIN${esc_red-}"'/;' \
               -e 's/$/'"${esc_reset-}"'/;' \
               "$log_file"
-            logr _cleanup
+            logr cleanup
             exit $task_exit_status
           } >&2
         else
