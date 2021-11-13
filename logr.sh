@@ -683,10 +683,12 @@ logr() {
           logr fatal --name "${0##*/}" "%s %s\n     %s %s" "$status" "$command" 'at' "$location"
           ;;
         esac
+
         trap - EXIT HUP INT QUIT PIPE TERM
-        kill -"$signal" $$
+        kill -TERM $$
       }
-      handle HUP INT QUIT PIPE TERM ERR
+      handle HUP INT QUIT PIPE TERM
+      [ "${TESTING-}" ] || handle ERR
       esc cursor_hide
       ;;
 
@@ -1122,12 +1124,11 @@ main() {
     [[ ":${BASHOPTS}:" != *":$1:"* ]] || return 0
     shopt -s "$1" || logr error "unsupported shell option" --stacktrace -- "$@"
   }
-  require_shopt checkjobs           # check for running jobs before exiting
   require_shopt globstar            # ** matches all files and any number of dirs and sub dirs
   require_shopt checkwinsize        # updates COLUMNS and LINES
   stty -echoctl 2>/dev/null || true # don't echo control characters in hat notation (e.g. `^C`)
 
-  [ "${TESTING-}" ] || logr _init
+  logr _init
 
   [ ! "${RECORDING-}" ] || return "$EX_OK"
   [[ " $* " == *" -!- "* ]] || return "$EX_OK"
