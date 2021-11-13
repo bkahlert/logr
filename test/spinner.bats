@@ -14,7 +14,7 @@ teardown() {
   # shellcheck disable=SC2034
   export -n tty_connected
   export -n TERM
-  logr _cleanup
+  logr cleanup
 }
 
 @test "should print usage" {
