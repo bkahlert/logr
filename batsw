@@ -194,22 +194,22 @@ DOCKERFILE
 # Globals:
 #   TERM - used to determine the terminal capabilities
 #   PWD - the current working directory
-#   BATS_IMAGE_ID - ID of the Docker image containing Bats (default: built ad-hoc)
-#   BATS_IMAGE_LOCAL_TAG - Tag of the locally built Bats Docker image (default: bats:local)
+#   BATSW_IMAGE - image containing Bats (default: built ad-hoc)
+#   BATSW_LOCAL_IMAGE - locally built Bats Docker image (default: batsw:local)
 #   BATS_TMPDIR - base temporary directory used by Bats
 # Arguments:
 #   * - docker run arguments
 # bashsupport disable=BP2001,BP5006
 bats() {
-  local -a DOCKER_ARGS=()
-  [ ! -t 2 ] || [ "${TERM-}" = dumb ] || DOCKER_ARGS+=("--tty")
+  local -a BATSW_ARGS=()
+  [ ! -t 2 ] || [ "${TERM-}" = dumb ] || BATSW_ARGS+=("--tty")
 
   local -a BATS_ARGS=()
   while (($#)); do
     case "$1" in
       -e | --env)
         if [ "${2-}" ] && [ "${2:0:1}" != "-" ]; then
-          DOCKER_ARGS+=("$1" "$2")
+          BATSW_ARGS+=("$1" "$2")
           shift 2
         else
           die "value of $1 missing"
@@ -222,22 +222,22 @@ bats() {
     esac
   done
 
-  local tag="${BATS_IMAGE_LOCAL_TAG:-bats:local}"
-  if [ "${BATS_IMAGE_ID-}" ]; then
-    echo "🐳 re-using existing Bats Docker image: $BATS_IMAGE_ID"
+  local tag="${BATSW_LOCAL_IMAGE:-batsw:local}"
+  if [ "${BATSW_IMAGE-}" ]; then
+    echo "🐳 re-using existing Bats Docker image: $BATSW_IMAGE"
   else
-    if BATS_IMAGE_ID=$(
+    if BATSW_IMAGE=$(
       docker_build \
         --tag "$tag" \
         --build-arg PUID="$(id -u)" \
         --build-arg PGID="$(id -g)"
     ); then
-      export BATS_IMAGE_ID
-      echo "🐳 using built Bats Docker image: $BATS_IMAGE_ID"
+      export BATSW_IMAGE
+      echo "🐳 using built Bats Docker image: $BATSW_IMAGE"
     elif [ "$(docker image ls --quiet "$tag")" ]; then
-      BATS_IMAGE_ID="$tag"
-      export BATS_IMAGE_ID
-      echo " $(tput setaf 11)!$(tput sgr0) failed to build Bats Docker image; re-using previous build: $BATS_IMAGE_ID"
+      BATSW_IMAGE="$tag"
+      export BATSW_IMAGE
+      echo " $(tput setaf 11)!$(tput sgr0) failed to build Bats Docker image; re-using previous build: $BATSW_IMAGE"
     else
       die "Failed to build Bats Docker image and no previous build to re-use"
     fi
@@ -252,14 +252,14 @@ bats() {
   )
 
   echo "$(tput setaf 7) ℹ$(tput sgr0) bats command line: bats" "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
-  docker run --rm --name "bats-$(head /dev/urandom | LC_ALL=C.UTF-8 tr -dc A-Za-z0-9 | head -c 3)" \
+  docker run --rm --name "bats-$(head /dev/urandom | LC_ALL=C.UTF-8 tr -dc A-Za-z0-9 2>/dev/null | head -c 3)" \
     -e TERM="${TERM-}" \
-    -e TMPDIR="${PWD:?}/${BATS_TMPDIR%${PWD}}" \
+    -e TMPDIR="$PWD/${BATS_TMPDIR%$PWD}" \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    -v "${PWD:?}:${PWD:?}" \
-    -w "${PWD:?}" \
-    "${DOCKER_ARGS[@]+"${DOCKER_ARGS[@]}"}" \
-    "${BATS_IMAGE_ID:?}" \
+    -v "$PWD:$PWD" \
+    -w "$PWD" \
+    "${BATSW_ARGS[@]+"${BATSW_ARGS[@]}"}" \
+    "${BATSW_IMAGE:?}" \
     "${BATS_ARGS[@]+"${BATS_ARGS[@]}"}"
 }
 
