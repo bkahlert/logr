@@ -9,7 +9,7 @@ setup() {
 
   declare -g usage="
 $MARGIN
-   ▔▔▔▔▔▔▔ LOGR SNAPSHOT
+   ▔▔▔▔▔▔▔ LOGR 0.6.0
 
    Usage: logr [-i | --inline] COMMAND [ARGS...]
 
