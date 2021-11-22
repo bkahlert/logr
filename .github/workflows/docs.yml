@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v2
         if: success() || failure()
         with:
-          name: rec-articats
+          name: rec-artifacts
           if-no-files-found: error
           path: ${{ steps.prep.outputs.recordr-build-dir }}
 
