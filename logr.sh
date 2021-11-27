@@ -661,6 +661,8 @@ logr() {
       ;;
     _init)
       shift
+      [ -e "$TMPDIR" ] || mkdir -p "$TMPDIR" || die "'$TMPDIR' could not be created"
+
       # Registers signal_handler to run when the shell receives one of the specified signals.
       handle() {
         [ ! "${_Dbg_DEBUGGER_LEVEL-}" ] || return 0
@@ -942,17 +944,21 @@ logr() {
           # error
           {
             util reprint --icon error "$(cat "$task_file")"
+            [ ! -e "$task_file" ] || rm -- "$task_file"
             sed \
               -e "$ESC_PATTERN" \
               -e 's/^/'"$MARGIN${esc_red-}"'/;' \
               -e 's/$/'"${esc_reset-}"'/;' \
               "$log_file"
+            [ ! -e "$log_file" ] || rm -- "$log_file"
             logr cleanup
             exit $task_exit_status
           } >&2
         else
           # success
           # erase what has been printed on same line by printing task_line again
+          [ ! -e "$task_file" ] || rm -- "$task_file"
+          [ ! -e "$log_file" ] || rm -- "$log_file"
           util reprint --icon success "$logr_tasks"
         fi
       fi

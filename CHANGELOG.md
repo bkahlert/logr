@@ -20,7 +20,14 @@
 
 ### Fixed
 
-*none*
+- `$TMPDIR` will be created if it does not exist
+
+
+## [0.6.1] - 2021-11-27
+
+### Fixed
+
+- `$TMPDIR` will be created if it does not exist
 
 
 ## [0.6.0] - 2021-11-22
