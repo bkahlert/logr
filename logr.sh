@@ -50,7 +50,7 @@ declare -r -g EX_NOPERM=77      # permission denied
 declare -r -g EX_CONFIG=78      # configuration error
 
 declare -r -g TMPDIR=${TMPDIR:-/tmp}
-declare -r -g LOGR_VERSION=0.6.0
+declare -r -g LOGR_VERSION=0.6.1
 declare -r -g BANR_CHAR=▔
 declare -r -g MARGIN='   '
 declare -r -g LF=$'\n'
@@ -661,6 +661,8 @@ logr() {
       ;;
     _init)
       shift
+      [ -e "$TMPDIR" ] || mkdir -p "$TMPDIR" || die "'$TMPDIR' could not be created"
+
       # Registers signal_handler to run when the shell receives one of the specified signals.
       handle() {
         [ ! "${_Dbg_DEBUGGER_LEVEL-}" ] || return 0
@@ -942,17 +944,21 @@ logr() {
           # error
           {
             util reprint --icon error "$(cat "$task_file")"
+            [ ! -e "$task_file" ] || rm -- "$task_file"
             sed \
               -e "$ESC_PATTERN" \
               -e 's/^/'"$MARGIN${esc_red-}"'/;' \
               -e 's/$/'"${esc_reset-}"'/;' \
               "$log_file"
+            [ ! -e "$log_file" ] || rm -- "$log_file"
             logr cleanup
             exit $task_exit_status
           } >&2
         else
           # success
           # erase what has been printed on same line by printing task_line again
+          [ ! -e "$task_file" ] || rm -- "$task_file"
+          [ ! -e "$log_file" ] || rm -- "$log_file"
           util reprint --icon success "$logr_tasks"
         fi
       fi
