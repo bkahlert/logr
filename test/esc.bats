@@ -2,10 +2,7 @@
 # shellcheck disable=SC1090
 
 setup() {
-  load helpers/common.sh
-  load_lib support
-  load_lib assert
-  cd "$BATS_TEST_TMPDIR" || exit 1
+  load "$BATS_CWD/logr.sh"
 }
 
 @test "should print on empty list" {

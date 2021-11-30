@@ -1,13 +1,8 @@
 #!/usr/bin/env bats
 
 setup() {
-  load helpers/common.sh
-  load_lib support
-  load_lib assert
-
   load "$BATS_CWD/logr.sh"
 }
-
 
 @test "should print trace information for 0 arguments" {
   run tracr

@@ -8,7 +8,7 @@
 
 ### Changed
 
-*none*
+- use [Bats Wrapper GitHub action](https://github.com/marketplace/actions/bats-wrapper)
 
 ### Deprecated
 

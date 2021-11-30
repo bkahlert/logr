@@ -1,16 +1,11 @@
 #!/usr/bin/env bats
 
 setup() {
-  load helpers/common.sh
-  load_lib support
-  load_lib assert
-
-  cd "$BATS_TEST_TMPDIR" || exit 1
-  cat <<SCRIPT > script.sh
+  cat <<SCRIPT >"${BATS_TEST_TMPDIR%/}/script.sh"
 #!/usr/bin/env bash
-source $BATS_CWD/logr.sh
+source "$BATS_CWD/logr.sh"
 SCRIPT
-  chmod +x script.sh
+  chmod +x "${BATS_TEST_TMPDIR%/}/script.sh"
 
   MARGIN='   '
   declare -g usage="

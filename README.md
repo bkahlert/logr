@@ -56,8 +56,7 @@ git clone https://github.com/bkahlert/logr.git
 cd logr
 
 # Use Bats wrapper to run tests
-chmod +x ./batsw
-./batsw test
+curl -LfsS https://git.io/batsw | "$SHELL" -s -- test
 ```
 
 [Bats Wrapper](https://github.com/bkahlert/bats-wrapper) is a self-contained wrapper to run tests based on the 
