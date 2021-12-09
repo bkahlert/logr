@@ -5,7 +5,7 @@ setup() {
 
   declare -g usage="
 $MARGIN
-   ▔▔▔▔▔▔▔ LOGR 0.6.1
+   ▔▔▔▔▔▔▔ LOGR 0.6.2
 
    Usage: logr [-i | --inline] COMMAND [ARGS...]
 
@@ -60,5 +60,11 @@ $MARGIN
 @test "should print help if executed with --help flag" {
   run bash "$BATS_CWD/logr.sh" --help
   assert_output "$usage"
+  assert_success
+}
+
+@test "should do nothing if sourced multiple times" {
+  run source "$BATS_CWD/logr.sh"
+  run source "$BATS_CWD/logr.sh"
   assert_success
 }

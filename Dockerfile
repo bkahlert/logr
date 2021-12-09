@@ -17,7 +17,8 @@ RUN apt-get update \
     expect \
     nodejs \
     npm \
-    rsync \
+    rsync \ \
+ && rm -rf /tmp/* /var/lib/apt/list/* \
  && npm install -g svg-term-cli \
  && groupadd \
     --gid "$PGID" \
@@ -28,8 +29,7 @@ RUN apt-get update \
     --gid "$APP_GROUP" \
     --home "$APP_HOME" \
     --shell /bin/bash \
-    "$APP_USER" \
- && rm -rf /tmp/* /var/lib/apt/list/*
+    "$APP_USER"
 
 COPY --from=crazymax/yasu:1.17.0 / /
 COPY recordr /usr/local/bin/

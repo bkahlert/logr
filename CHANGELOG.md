@@ -20,7 +20,14 @@
 
 ### Fixed
 
-- `$TMPDIR` will be created if it does not exist
+*none*
+
+
+## [0.6.2] - 2021-12-09
+
+### Fixed
+
+- do nothing if sourced multiple times
 
 
 ## [0.6.1] - 2021-11-27
@@ -171,7 +178,9 @@
     Usage: foo baz
   ```
 
-[unreleased]: https://github.com/bkahlert/logr/compare/v0.6.1...HEAD
+[unreleased]: https://github.com/bkahlert/logr/compare/v0.6.2...HEAD
+
+[0.6.2]: https://github.com/bkahlert/logr/compare/v0.6.1...v0.6.2
 
 [0.6.1]: https://github.com/bkahlert/logr/compare/v0.6.0...v0.6.1
 

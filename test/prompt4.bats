@@ -10,7 +10,7 @@ SCRIPT
   MARGIN='   '
   declare -g usage="
 $MARGIN
-   ▔▔▔▔▔▔▔ PROMPT 4 0.6.1
+   ▔▔▔▔▔▔▔ PROMPT 4 0.6.2
 
    Usage: prompt4 TYPE [ARGS...]
 
