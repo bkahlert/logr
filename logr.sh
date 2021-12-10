@@ -1088,7 +1088,7 @@ main() {
 
   local r=${esc_reset-}
   # bashsupport disable=BP5006
-  [ "${ICONS-}" ] || declare -A -g ICONS=(
+  declare -A -g ICONS=(
     ['created']="${esc_yellow-}✱$r"
     ['added']="${esc_green-}✚$r"
     ['item']="${esc_bright_black-}▪$r"
@@ -1107,7 +1107,7 @@ main() {
   declare -g logr_parent_tasks=''
 
   # bashsupport disable=BP5006
-  [ "${ICON_ALIASES-}" ] || declare -A -g -x ICON_ALIASES=(
+  declare -A -g -x ICON_ALIASES=(
     ['creation']="created"
     ['create']="created"
     ['new']="created"
