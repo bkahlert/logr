@@ -1037,9 +1037,9 @@ tracr() {
 main() {
   [ ! "${LOGR_VERSION-}" ] || return 0
 
-  set -o nounset
+  set -o 'no''unset'
   set -o pipefail
-  set -o errtrace
+  [ "${ZSH_VERSION-}" ] || set -o 'err''trace'
 
   declare -r -g EX_OK=0
   declare -r -g EX_GENERAL=1
