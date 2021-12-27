@@ -69,7 +69,7 @@ Bash testing framework [Bats](https://github.com/bats-core/bats-core).
 
 Want to contribute? Awesome! The most basic way to show your support is to star the project, or to raise issues. You
 can also support this project by making
-a [Paypal donation](https://www.paypal.me/bkahlert) to ensure this journey continues indefinitely!
+a [PayPal donation](https://www.paypal.me/bkahlert) to ensure this journey continues indefinitely!
 
 Thanks again for your support, it is much appreciated! :pray:
 
