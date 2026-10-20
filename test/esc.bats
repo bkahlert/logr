@@ -28,6 +28,12 @@ BASH
   assert_output --partial "$(printf '%q\n' $'\E[31m')"
 }
 
+@test "should not hide the cursor when sourced" {
+  run script -qec "TERM=xterm bash -c 'source \"$BATS_CWD/logr.sh\"'" /dev/null
+  assert_success
+  [[ "$output" != *$'\E[?25l'* ]]
+}
+
 @test "should disable ANSI support on TERM=dumb" {
   run_tty "bash" "$(mkfile +x '#!/usr/bin/env bash' - <<BASH
 TERM=dumb source $BATS_CWD/logr.sh
