@@ -30,10 +30,11 @@ BASH
 
 @test "should not hide the cursor when sourced" {
   run_tty "bash" "$(mkfile +x '#!/usr/bin/env bash' - <<BASH
-TERM=xterm source $BATS_CWD/logr.sh
+TERM=xterm source "$BATS_CWD/logr.sh" && printf '%s\n' 'source succeeded'
 BASH
 )"
   assert_success
+  assert_output --partial 'source succeeded'
   [[ "$output" != *$'\E[?25l'* ]]
 }
 
