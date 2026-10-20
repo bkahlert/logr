@@ -38,8 +38,8 @@ jobs:
           build-dir: ${{ steps.prep.outputs.recordr-build-dir }}
 
       - name: Upload ● REC artifacts
-        uses: actions/upload-artifact@v3
-        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        if: (success() || failure()) && github.event_name != 'pull_request'
         with:
           name: rec-artifacts
           if-no-files-found: error

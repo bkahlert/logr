@@ -650,7 +650,6 @@ logr() {
       }
       handle HUP INT QUIT PIPE TERM
       [ "${TESTING-}" ] || handle ERR
-      esc cursor_hide
       ;;
 
     cleanup)
