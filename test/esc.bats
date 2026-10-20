@@ -84,7 +84,9 @@ run_tty() {
     mkfile +x '#!/usr/bin/expect' - <<EXPECT
 set timeout -1
 spawn $opts$command
-expect "$ "
+expect eof
+set result [wait]
+exit [lindex \$result 3]
 EXPECT
   )
   run "$script"
