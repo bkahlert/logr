@@ -426,8 +426,12 @@ spinner() {
     stop)
       shift
       [ $# = 0 ] || logr error "unexpected argument" --usage "$usage" --stacktrace -- "$@"
-      if jobs -pr 'spinner _spin' >/dev/null 2>/dev/null; then
-        jobs -pr 'spinner _spin' | xargs -r kill
+      local spinner_pids spinner_pid
+      if spinner_pids=$(jobs -pr '%spinner _spin' 2>/dev/null); then
+        for spinner_pid in $spinner_pids; do
+          kill "$spinner_pid" 2>/dev/null || true
+          wait "$spinner_pid" 2>/dev/null || true
+        done
       fi
       ;;
     _spin)
@@ -1067,7 +1071,7 @@ main() {
   declare -r -g EX_CONFIG=78      # configuration error
 
   declare -r -g TMPDIR=${TMPDIR:-/tmp}
-  declare -r -g LOGR_VERSION=0.6.2
+  declare -r -g LOGR_VERSION=0.6.3
   declare -r -g BANR_CHAR=▔
   declare -r -g MARGIN='   '
   declare -r -g LF=$'\n'

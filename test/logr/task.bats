@@ -90,3 +90,48 @@ exit 2
 '
   assert_line --partial 'foo ℹ bar'
 }
+
+@test "should complete terminal-enabled tasks without cleanup diagnostics" {
+  run bash -c '
+    source "$1"
+    set -e
+    tty_connected=true
+    logr task "terminal task" -- true
+    echo continued
+  ' bash "$BATS_CWD/logr.sh"
+  assert_success
+  assert_line --partial 'terminal task'
+  assert_line 'continued'
+  refute_output --partial 'job specification'
+  refute_output --partial 'kill:'
+}
+
+@test "should preserve failed terminal-enabled task status and error log" {
+  run bash -c '
+    source "$1"
+    set -e
+    tty_connected=true
+    logr task "terminal task" -- bash -c "echo task-error >&2; exit 7"
+    echo unreachable
+  ' bash "$BATS_CWD/logr.sh"
+  assert_failure 7
+  assert_line --partial 'task-error'
+  refute_output --partial 'unreachable'
+  refute_output --partial 'job specification'
+  refute_output --partial 'kill:'
+}
+
+@test "should complete non-terminal tasks without starting a spinner" {
+  run bash -c '
+    source "$1"
+    set -e
+    unset tty_connected
+    jobs() { exit 42; }
+    kill() { exit 42; }
+    logr task "non-terminal task" -- true
+    test -z "$(builtin jobs -p)"
+    echo continued
+  ' bash "$BATS_CWD/logr.sh"
+  assert_success
+  assert_output $'   non-terminal task\n ✔ non-terminal task\ncontinued'
+}

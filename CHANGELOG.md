@@ -8,7 +8,7 @@
 
 ### Changed
 
-- use [Bats Wrapper GitHub action](https://github.com/marketplace/actions/bats-wrapper)
+*none*
 
 ### Deprecated
 
@@ -21,6 +21,19 @@
 ### Fixed
 
 *none*
+
+
+## [0.6.3] - 2026-10-20
+
+### Changed
+
+- use [Bats Wrapper GitHub action](https://github.com/marketplace/actions/bats-wrapper)
+
+### Fixed
+
+- use an explicit job specification when stopping the spinner for Bash 5.3 compatibility
+- tolerate an already-exited spinner during cleanup without disabling unrelated error handling
+- keep cleanup scoped to spinner jobs, leaving other background jobs untouched
 
 
 ## [0.6.2] - 2021-12-09
@@ -178,7 +191,9 @@
     Usage: foo baz
   ```
 
-[unreleased]: https://github.com/bkahlert/logr/compare/v0.6.2...HEAD
+[unreleased]: https://github.com/bkahlert/logr/compare/v0.6.3...HEAD
+
+[0.6.3]: https://github.com/bkahlert/logr/compare/v0.6.2...v0.6.3
 
 [0.6.2]: https://github.com/bkahlert/logr/compare/v0.6.1...v0.6.2
 
