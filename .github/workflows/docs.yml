@@ -27,7 +27,7 @@ jobs:
           echo ::set-output name=recordr-build-dir::"build/rec"
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.1.0
 
       - name: ● REC terminal sessions
         if: github.event_name != 'pull_request'
@@ -46,7 +46,7 @@ jobs:
           path: ${{ steps.prep.outputs.recordr-build-dir }}
 
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v5
         if: startsWith(github.ref, 'refs/heads/')
         with:
           commit-message: |
