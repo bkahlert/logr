@@ -31,7 +31,7 @@ RUN apt-get update \
     --shell /bin/bash \
     "$APP_USER"
 
-COPY --from=crazymax/yasu:1.17.0 / /
+COPY --from=crazymax/yasu:1.20.1 / /
 COPY recordr /usr/local/bin/
 RUN mkdir -p "$APP_HOME" \
  && chown -R "$PUID:$PGID" "$APP_HOME" \

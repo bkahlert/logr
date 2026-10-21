@@ -8,10 +8,15 @@ on:
 jobs:
   report:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      checks: write
 
     steps:
-      - uses: dorny/test-reporter@v1
+      - uses: dorny/test-reporter@v3.0.0
         with:
+          use-actions-summary: false
           artifact: test-reports
           name: Bats tests
           path: '*.xml'
