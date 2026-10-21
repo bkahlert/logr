@@ -8,7 +8,8 @@
 
 ### Changed
 
-*none*
+- update pinned GitHub Actions and the Yasu container image
+- use `GITHUB_OUTPUT` and explicit permissions in GitHub Actions workflows
 
 ### Deprecated
 
@@ -20,7 +21,7 @@
 
 ### Fixed
 
-- emit the info icon's text variation selector as locale-independent UTF-8 bytes
+- keep the info icon in text presentation so terminals do not render it as an emoji
 
 
 ## [0.6.3] - 2026-10-20
