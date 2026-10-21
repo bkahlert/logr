@@ -172,7 +172,13 @@ util() {
       set -- "${args[@]}"
       [ $# -eq 1 ] || logr error "text missing" --usage "$usage" --stacktrace -- "$@"
 
-      local -i available_width=${#MARGIN} text_width="${util_center_width:-${#1}}"
+      local -i available_width=${#MARGIN} text_width
+      if [ "${util_center_width-}" ]; then
+        text_width=$util_center_width
+      else
+        local util_center_text=${1//$'\xEF\xB8\x8E'/}
+        text_width=${#util_center_text}
+      fi
       local -i lpad=$(((available_width - text_width) / 2))
       [ "$lpad" -gt 0 ] || lpad=0
       local -i rpad=$((available_width - text_width - lpad))
@@ -226,6 +232,16 @@ util() {
       local truncation=' ... ' slack=5
       # shellcheck disable=SC2059
       local _fit_text && printf -v _fit_text "$@"
+      local _fit_info_icon=$'ℹ\xEF\xB8\x8E' _fit_icon_marker='' _fit_control_byte _fit_control_octal
+      if [[ $_fit_text == *"$_fit_info_icon"* ]]; then
+        for ((_fit_control_byte = 1; _fit_control_byte < 32; _fit_control_byte++)); do
+          printf -v _fit_control_octal '%03o' "$_fit_control_byte"
+          printf -v _fit_icon_marker '%b' "\\$_fit_control_octal"
+          [[ $_fit_text == *"$_fit_icon_marker"* ]] || break
+        done
+        [[ $_fit_text != *"$_fit_icon_marker"* ]] || _fit_icon_marker=''
+        [ ! "$_fit_icon_marker" ] || _fit_text=${_fit_text//"$_fit_info_icon"/"$_fit_icon_marker"}
+      fi
       local _fit_columns=$((${COLUMNS:-80} - ${#MARGIN} - "$slack"))
       [ "$_fit_columns" -gt 20 ] || _fit_columns=20
       if [ "$_fit_columns" -lt "${#_fit_text}" ]; then
@@ -235,6 +251,7 @@ util() {
       else
         util_text=$_fit_text
       fi
+      [ ! "$_fit_icon_marker" ] || util_text=${util_text//"$_fit_icon_marker"/"$_fit_info_icon"}
       ;;
 
     # concatenates the specified texts with the specified icon

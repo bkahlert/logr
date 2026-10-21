@@ -38,6 +38,11 @@ setup() {
   assert_output "👐 "
 }
 
+@test "should treat info icon text presentation as zero-width" {
+  run util center "ℹ︎"
+  assert_output " ℹ︎ "
+}
+
 @test "should overprint if to wide" {
   run util center "1234"
   assert_output "1234"
