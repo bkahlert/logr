@@ -45,6 +45,11 @@ setup() {
   assert_output " bold  and blue "
 }
 
+@test "should cleanse ANSI sequences around non-UTF-8 bytes" {
+  run util remove_ansi $'\xff\x1b[31mred\x1b[0m'
+  assert_output $'\xffred'
+}
+
 @test "should cleanse unescaped" {
   run util remove_ansi "[1m bold [34m and blue [0m"
   assert_output " bold  and blue "

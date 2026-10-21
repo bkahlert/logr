@@ -146,11 +146,11 @@ util() {
       shift
       [ $# -gt 0 ] || logr error "format missing" --usage "$usage" --stacktrace -- "$@"
       for text in "${@}"; do
-        cleansed+=("$(echo "$text" | sed "$ESC_PATTERN")")
+        cleansed+=("$(echo "$text" | LC_ALL=C sed "$ESC_PATTERN")")
       done
       # shellcheck disable=SC2059
       printf -v util_text "${cleansed[@]}"
-      util_text=$(echo "$util_text" | sed -e "$ESC_PATTERN")
+      util_text=$(echo "$util_text" | LC_ALL=C sed -e "$ESC_PATTERN")
       ;;
 
     center)

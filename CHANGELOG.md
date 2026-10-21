@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.6.4] - 2026-10-21
 
 ### Added
 
@@ -22,6 +22,7 @@
 ### Fixed
 
 - keep the info icon in text presentation so terminals do not render it as an emoji
+- preserve non-UTF-8 text while removing ANSI sequences
 
 
 ## [0.6.3] - 2026-10-20
