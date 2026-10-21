@@ -34,9 +34,3 @@ teardown() {
   run util fit "123456789012345678901"
   assert_output "1234567 ... 5678901"
 }
-
-@test "should count info icon text presentation as zero-width" {
-  COLUMNS=31
-  run util fit "ℹ︎1234567890123456789012"
-  assert_output "ℹ︎1234567890123456789012"
-}

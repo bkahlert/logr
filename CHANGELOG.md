@@ -1,5 +1,12 @@
 # Changelog
 
+## [unreleased]
+
+### Fixed
+
+- use a single-cell info icon to avoid recordr shifting the following text
+
+
 ## [0.6.5] - 2026-10-21
 
 ### Fixed
