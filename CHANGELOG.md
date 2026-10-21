@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.5] - 2026-10-21
+
+### Fixed
+
+- report the release version consistently in runtime output and CLI help
+
+
 ## [0.6.4] - 2026-10-21
 
 ### Added
@@ -193,7 +200,11 @@
     Usage: foo baz
   ```
 
-[unreleased]: https://github.com/bkahlert/logr/compare/v0.6.3...HEAD
+[unreleased]: https://github.com/bkahlert/logr/compare/v0.6.5...HEAD
+
+[0.6.5]: https://github.com/bkahlert/logr/compare/v0.6.4...v0.6.5
+
+[0.6.4]: https://github.com/bkahlert/logr/compare/v0.6.3...v0.6.4
 
 [0.6.3]: https://github.com/bkahlert/logr/compare/v0.6.2...v0.6.3
 
