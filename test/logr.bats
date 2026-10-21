@@ -26,7 +26,7 @@ $MARGIN
 
 @test "should run specified command" {
   run logr info foo
-  assert_output " ℹ foo"
+  assert_output $' ℹ\uFE0E foo'
 }
 
 @test "should fail on invalid arguments" {

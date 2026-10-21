@@ -20,6 +20,16 @@ setup() {
   assert_output "✱"
 }
 
+@test "should print info icon with text presentation" {
+  run util icon info
+  assert_output $'ℹ\uFE0E'
+}
+
+@test "should center info icon with text presentation" {
+  run util icon --center info
+  assert_output $' ℹ\uFE0E '
+}
+
 @test "should print question mark on unknown icon" {
   run util icon "unknown-icon"
   assert_output "?"
