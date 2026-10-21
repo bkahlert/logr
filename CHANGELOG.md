@@ -20,7 +20,7 @@
 
 ### Fixed
 
-*none*
+- emit the info icon's text variation selector as locale-independent UTF-8 bytes
 
 
 ## [0.6.3] - 2026-10-20
