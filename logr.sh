@@ -1101,7 +1101,7 @@ main() {
     ['nested']="${esc_yellow-}❱$r"
     ['exit']="${esc_bold-}${esc_red-}↩$r"
     ['success']="${esc_green-}✔$r"
-    ['info']="${esc_white-}ℹ"$'\xEF\xB8\x8E'"$r"
+    ['info']="${esc_white-}ℹ$r"
     ['warning']="${esc_bold-}${esc_yellow-}!$r"
     ['error']="${esc_red-}✘$r"
     ['failure']="${esc_bold-}${esc_red-}ϟ$r"
