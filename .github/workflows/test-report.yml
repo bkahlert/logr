@@ -14,7 +14,7 @@ jobs:
       checks: write
 
     steps:
-      - uses: dorny/test-reporter@v3.0.0
+      - uses: dorny/test-reporter@v3.2.0
         with:
           use-actions-summary: false
           artifact: test-reports
