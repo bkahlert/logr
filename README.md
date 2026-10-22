@@ -39,14 +39,7 @@ logr info "logr.sh sourced"
 logr task "do some work" -- sleep 2
 ```
 
-```shell
-# invoke as binary for a feature overview
-chmod +x logr.sh
-./logr.sh
-
-# help
-./logr.sh --help
-```
+Running `logr.sh` directly exits silently. Source it to use its functions.
 
 
 ## Testing

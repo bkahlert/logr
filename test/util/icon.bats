@@ -20,14 +20,14 @@ setup() {
   assert_output "✱"
 }
 
-@test "should print info icon with text presentation" {
+@test "should print info icon without a variation selector" {
   run util icon info
-  assert_output $'\xE2\x84\xB9\xEF\xB8\x8E'
+  assert_output $'\xE2\x84\xB9'
 }
 
-@test "should center info icon with text presentation" {
+@test "should center info icon without a variation selector" {
   run util icon --center info
-  assert_output $' \xE2\x84\xB9\xEF\xB8\x8E '
+  assert_output $' \xE2\x84\xB9 '
 }
 
 @test "should print question mark on unknown icon" {

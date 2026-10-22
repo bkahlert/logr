@@ -26,7 +26,7 @@ $MARGIN
 
 @test "should run specified command" {
   run logr info foo
-  assert_output $' \xE2\x84\xB9\xEF\xB8\x8E foo'
+  assert_output $' \xE2\x84\xB9 foo'
 }
 
 @test "should fail on invalid arguments" {
@@ -37,30 +37,34 @@ $MARGIN
 }
 
 
-@test "should warning if executed" {
+@test "should succeed silently on execution" {
   run bash "$BATS_CWD/logr.sh"
-  assert_line --partial "Usage: logr.sh must be sourced at the top of your script in order to be used."
+  assert_success
+  assert_output ''
 }
 
-@test "should print usage information if executed" {
-  run bash "$BATS_CWD/logr.sh"
-  assert_failure 64
-  assert_line --partial 'source logr.sh'
-  assert_line --partial 'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/logr.sh"'
-  assert_line --partial 'source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/RELATIVE_PATH/logr.sh"'
-  assert_line --partial 'source <(curl -LfsS https://git.io/logr.sh)'
-}
-
-@test "should print help if executed with -h flag" {
+@test "should succeed silently on execution with -h" {
   run bash "$BATS_CWD/logr.sh" -h
-  assert_output "$usage"
   assert_success
+  assert_output ''
 }
 
-@test "should print help if executed with --help flag" {
+@test "should succeed silently on execution with --help" {
   run bash "$BATS_CWD/logr.sh" --help
-  assert_output "$usage"
   assert_success
+  assert_output ''
+}
+
+@test "should print help on calling logr without arguments" {
+  run logr
+  assert_success
+  assert_output "$usage"
+}
+
+@test "should initialize with caller arguments" {
+  run bash -c 'source "$1"; logr info foo' -- "$BATS_CWD/logr.sh" -!- --help
+  assert_success
+  assert_output ' ℹ foo'
 }
 
 @test "should do nothing if sourced multiple times" {
