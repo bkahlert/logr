@@ -51,12 +51,14 @@ chmod +x logr.sh
 
 ## Testing
 
+The test wrapper requires Bash 4.2 or newer on `PATH`.
+
 ```shell
 git clone https://github.com/bkahlert/logr.git
 cd logr
 
 # Use Bats wrapper to run tests
-curl -LfsS https://git.io/batsw | "$SHELL" -s -- test
+curl -LfsS https://git.io/batsw | bash -s -- test
 ```
 
 [Bats Wrapper](https://github.com/bkahlert/bats-wrapper) is a self-contained wrapper to run tests based on the 
