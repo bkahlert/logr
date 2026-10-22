@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.6] - 2026-10-22
+
+### Changed
+
+- exit silently when `logr.sh` is executed directly, including with `-h` or `--help`
+
+### Fixed
+
+- emit the info icon without a variation selector that can occupy an extra terminal cell
+- use the working copy of Logr in recordings instead of a copy found on `PATH`
+
+
 ## [0.6.5] - 2026-10-21
 
 ### Fixed
