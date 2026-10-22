@@ -1,6 +1,6 @@
 #!/usr/bin/env recordr
 
-source logr.sh
+source ./logr.sh
 
 # Creates and executes an expect script that is passed via STDIN.
 expect() {
@@ -16,7 +16,7 @@ logr_script() {
   local script && script="$(mktemp "${TMPDIR%/}/script.bash-XXXXXX")"
   cat <<SCRIPT >"$script"
 #!/usr/bin/env bash
-source logr.sh
+source ./logr.sh
 $*
 SCRIPT
   chmod +x "$script"

@@ -1,6 +1,6 @@
 #!/usr/bin/env recordr
 
-source logr.sh
+source ./logr.sh
 
 rec tracr
 rec tracr foo
