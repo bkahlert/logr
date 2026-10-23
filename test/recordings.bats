@@ -33,10 +33,15 @@
     rec() {
       [ "${1-}" != -1 ] || shift
       "$@"
+      local status=$?
+      printf "returned status %s: %s\n" "$status" "$*"
+      return "$status"
     }
     source "$1" || exit "$?"
   ' -- "$BATS_CWD/rec/logr.rec"
   assert_success
+  assert_line "returned status 1: eval (logr task -- foo 3 2)"
+  assert_line "returned status 1: eval (logr task -- bar 3 2)"
   assert_line --partial "✘ foo 3 2"
   assert_line --partial "foo args: 2 2"
   assert_line --partial "✔ bar 3 -"
