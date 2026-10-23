@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.7] - 2026-10-23
+
+### Changed
+
+- publish the latest terminal recordings through GitHub Pages
+- pin recording jobs to Recordr 0.2.6
+- pin test jobs to Bats Wrapper 0.2.2
+
 ## [0.6.6] - 2026-10-22
 
 ### Changed
@@ -212,7 +220,11 @@
     Usage: foo baz
   ```
 
-[unreleased]: https://github.com/bkahlert/logr/compare/v0.6.5...HEAD
+[unreleased]: https://github.com/bkahlert/logr/compare/v0.6.7...HEAD
+
+[0.6.7]: https://github.com/bkahlert/logr/compare/v0.6.6...v0.6.7
+
+[0.6.6]: https://github.com/bkahlert/logr/compare/v0.6.5...v0.6.6
 
 [0.6.5]: https://github.com/bkahlert/logr/compare/v0.6.4...v0.6.5
 

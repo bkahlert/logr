@@ -1069,7 +1069,7 @@ main() {
   declare -r -g EX_CONFIG=78      # configuration error
 
   declare -r -g TMPDIR=${TMPDIR:-/tmp}
-  declare -r -g LOGR_VERSION=0.6.6
+  declare -r -g LOGR_VERSION=0.6.7
   declare -r -g BANR_CHAR=▔
   declare -r -g MARGIN='   '
   declare -r -g LF=$'\n'
