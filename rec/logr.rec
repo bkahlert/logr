@@ -35,7 +35,7 @@ foo() {
   [ ! "$1" = "$2" ] || exit 1
 }
 rec logr task -- foo 3 -
-rec logr task -- foo 3 2
+rec -1 eval '(logr task -- foo 3 2)'
 
 # logr task recursion
 bar() {
@@ -45,7 +45,7 @@ bar() {
   [ ! "$1" = "$2" ] || exit 1
 }
 rec logr task -- bar 3 -
-rec logr task -- bar 3 2
+rec -1 eval '(logr task -- bar 3 2)'
 
 # provoking line overflow
 supercalifragilisticexpialidocious() {
