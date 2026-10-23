@@ -5,7 +5,7 @@ setup() {
 
   declare -g usage="
 $MARGIN
-   ▔▔▔▔▔▔▔ LOGR 0.6.6
+   ▔▔▔▔▔▔▔ LOGR 0.6.7
 
    Usage: logr [-i | --inline] COMMAND [ARGS...]
 

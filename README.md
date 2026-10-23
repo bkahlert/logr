@@ -3,20 +3,20 @@
 ## About
 **Logr** is a logger written for the Bourne Again SHell — Bash, with a certain focus on aesthetics. 
 
-[![recorded terminal session demonstrating the logr function](docs/logr.svg "logr function")  
-***logr** function*](../../raw/master/docs/logr.svg)
+[![recorded terminal session demonstrating the logr function](https://bkahlert.github.io/logr/logr.svg "logr function")\
+***logr** function*](https://bkahlert.github.io/logr/logr.svg)
 
-[![recorded terminal session demonstrating the prompt4 function](docs/prompt4.svg "prompt4 function")  
-***prompt4** function*](../../raw/master/docs/prompt4.svg)
+[![recorded terminal session demonstrating the prompt4 function](https://bkahlert.github.io/logr/prompt4.svg "prompt4 function")\
+***prompt4** function*](https://bkahlert.github.io/logr/prompt4.svg)
 
-[![recorded terminal session demonstrating the banr utilities](docs/utilities/banr.svg "banr utilities")  
-***banr** utilities*](../../raw/master/docs/utilities/banr.svg)
+[![recorded terminal session demonstrating the banr utilities](https://bkahlert.github.io/logr/utilities/banr.svg "banr utilities")\
+***banr** utilities*](https://bkahlert.github.io/logr/utilities/banr.svg)
 
-[![recorded terminal session demonstrating the tracr utilities](docs/utilities/tracr.svg "tracr utilities")  
-***tracr** utilities*](../../raw/master/docs/utilities/tracr.svg)
+[![recorded terminal session demonstrating the tracr utilities](https://bkahlert.github.io/logr/utilities/tracr.svg "tracr utilities")\
+***tracr** utilities*](https://bkahlert.github.io/logr/utilities/tracr.svg)
 
-[![recorded terminal session demonstrating the misc utilities](docs/utilities/util.svg "misc utilities")  
-***misc** utilities*](../../raw/master/docs/utilities/util.svg)
+[![recorded terminal session demonstrating the misc utilities](https://bkahlert.github.io/logr/utilities/util.svg "misc utilities")\
+***misc** utilities*](https://bkahlert.github.io/logr/utilities/util.svg)
 
 ## Installation
 
