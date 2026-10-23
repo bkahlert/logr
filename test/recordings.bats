@@ -30,7 +30,10 @@
   run bash -c '
     sleep() { :; }
     export -f sleep
-    rec() { "$@"; }
+    rec() {
+      [ "${1-}" != -1 ] || shift
+      "$@"
+    }
     source "$1" || exit "$?"
   ' -- "$BATS_CWD/rec/logr.rec"
   assert_success
